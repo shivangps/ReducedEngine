@@ -1,4 +1,4 @@
-#include <Windows.h>
+#include "GameEngine.h"
 
 // Main function.
 
@@ -7,7 +7,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_ LPWSTR lpCmdLine,
 	_In_ int nCmdShow)
 {
-	OutputDebugStringA("\nSup World!!\n");
+	Scene* scene = new Scene();
+
+	scene->SetGameObject(new GameObject());
+
+	GameEngine* mainEngine = GameEngine::GetInstance();
+
+	mainEngine->SetScene(scene);
+
+	mainEngine->RunGame();
 
 	return 0;
 }

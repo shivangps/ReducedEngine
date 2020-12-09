@@ -1,0 +1,3 @@
+The Next Objective for the Engine Development:
+1. Developing the main game engine framework(GameObject, Scene, Engine) - Done
+2. Window and Input System - 
