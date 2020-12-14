@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CommonHeader.h"
+#include "Time.h"
 #include <comdef.h>
 
 // This header file contains the convinient helper functions.

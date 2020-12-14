@@ -1,10 +1,5 @@
 #include "GameEngine.h"
 
-void GameEngine::SetScene(Scene* setNewScene)
-{
-	this->currentScene = setNewScene;
-}
-
 void GameEngine::RunGame()
 {
 	// SEQUENCE OF UPDATE PROCESS:
@@ -26,5 +21,8 @@ void GameEngine::RunGame()
 
 			*objectPointer = cachedObject;
 		}
+
+		// Reset the frame time.
+		this->time->ResetFrameTime();
 	}
 }
