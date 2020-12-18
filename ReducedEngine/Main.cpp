@@ -13,6 +13,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	GameEngine* mainEngine = GameEngine::GetInstance();
 
+	mainEngine->Initialize(hInstance);
+
 	mainEngine->SetScene(scene);
 
 	mainEngine->RunGame();
