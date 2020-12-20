@@ -26,6 +26,8 @@ private:
 	unsigned int framesPerSecond = 0;
 	unsigned int framesPerSecondCounter = 0;
 	float framesPerSecondTimer = 0.0f;
+	// To see if the change in frames per second occured.
+	bool changeFramesPerSecond = false;
 
 	// Function to calculate the FPS
 	void CalculateFramesPerSecond();
@@ -41,4 +43,6 @@ public:
 	float GetDeltaTime();
 	// Function to get Frame Per Second
 	unsigned int GetFPS();
+	// Function to get wether the change in FPS occured.
+	bool IsFPSChanged();
 };

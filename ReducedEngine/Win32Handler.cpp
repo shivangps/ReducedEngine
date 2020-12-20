@@ -1,6 +1,6 @@
 #include "Win32Handler.h"
 
-// Function to handle the windows input messages.
+// Function to handle the windows input messages.(mainly mouse and keyboard)
 LRESULT CALLBACK HandleInput(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	Win32Handler* handler = Win32Handler::GetInstance();
@@ -31,26 +31,88 @@ LRESULT CALLBACK HandleInput(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 void Win32Handler::CreateFullscreenMode()
 {
-	// Apply fullscreen.
-	SetWindowLongPtr(this->hWnd, GWL_STYLE, WS_VISIBLE | WS_POPUP);
-	SetWindowPos(this->hWnd, HWND_TOP, 0, 0, this->fullscreen_width, this->fullscreen_height, SWP_FRAMECHANGED);
 	// Assign new current resolution to render.
 	this->width = this->fullscreen_width;
 	this->height = this->fullscreen_height;
+	// Recreate a new window.
+	this->CreateNewWindow(&this->hWnd, 0, 0, this->width, this->height);
+	// Apply fullscreen.
+	SetWindowLongPtr(this->hWnd, GWL_STYLE, WS_VISIBLE | WS_POPUP);
+	SetWindowPos(this->hWnd, HWND_TOP, 0, 0, this->fullscreen_width, this->fullscreen_height, SWP_FRAMECHANGED);
+
+	this->fullscreenMode = true;
 }
 
-void Win32Handler::Initialize(HINSTANCE hInstance, std::string window_title, std::string window_class)
+void Win32Handler::CreateWindowedMode()
 {
-	// Get the screen dimensions for fullscreen.
+	// Assign new current resolution to render.
+	this->width = this->windowed_width;
+	this->height = this->windowed_height;
+	// Recreate a new window.
+	this->CreateNewWindow(&this->hWnd, this->window_position_x, this->window_position_y, this->width, this->height);
+	// Apply windowed.
+	SetWindowLongPtr(this->hWnd, GWL_STYLE, WS_VISIBLE | WS_OVERLAPPEDWINDOW);
+	SetWindowPos(this->hWnd, NULL, this->window_position_x, this->window_position_y, this->windowed_width, this->windowed_height, SWP_FRAMECHANGED);
+
+	this->fullscreenMode = false;
+}
+
+bool Win32Handler::IsWindowedFullscreen()
+{
+	return this->fullscreenMode;
+}
+
+void Win32Handler::CreateNewWindow(HWND* hWnd, unsigned int window_offsetX, unsigned int window_offsetY, unsigned int width, unsigned int height)
+{
+	// First destroy the window.
+	DestroyWindow(*hWnd);
+
+	// Specify and create the window and get the window handle.
+	this->hWnd = CreateWindowEx(
+		0,
+		this->window_class_wide.c_str(),
+		this->window_title_wide.c_str(),
+		WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU | WS_VISIBLE | WS_POPUP,
+		window_offsetX,
+		window_offsetY,
+		width,
+		height,
+		NULL,
+		NULL,
+		this->hInstance,
+		nullptr);
+
+	// Sanity check for windows creation.
+	if (*hWnd == NULL)
+	{
+		ErrorLog("Windows creation failed for windows: " + window_title);
+		exit(-1);
+	}
+
+	// Set the window handle to the global output class for DirectX12 API to access.
+	Output::GetInstance()->SetHandle(*hWnd);
+
+	// Select the created window for current use in front of all windows opened.
+	ShowWindow(*hWnd, SW_SHOW);
+	SetForegroundWindow(*hWnd);
+	SetFocus(*hWnd);
+}
+
+void Win32Handler::Initialize(HINSTANCE hInstance, std::string window_title, std::string window_class, unsigned int window_width, unsigned int window_height)
+{
+	// Get the screen dimensions (i.e screen resolution of monitor) for fullscreen.
 	this->fullscreen_width = GetSystemMetrics(SM_CXSCREEN);
 	this->fullscreen_height = GetSystemMetrics(SM_CYSCREEN);
+	// Assign windowed resolution.
+	this->windowed_width = window_width;
+	this->windowed_height = window_height;
 
 	// Initializing the window first in fullscreen mode.
 	this->hInstance = hInstance;
 
 	// Assign current resolution.
-	this->width = this->fullscreen_width;
-	this->height = this->fullscreen_height;
+	this->width = this->windowed_width;
+	this->height = this->windowed_height;
 
 	this->window_class = window_class;
 	this->window_class_wide = StringToWide(window_class);
@@ -78,37 +140,15 @@ void Win32Handler::Initialize(HINSTANCE hInstance, std::string window_title, std
 		exit(-1);
 	}
 
-	this->hWnd = CreateWindowEx(
-		0,
-		this->window_class_wide.c_str(),
-		this->window_title_wide.c_str(),
-		WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU | WS_VISIBLE | WS_POPUP,
-		0,
-		0,
-		this->width,
-		this->height,
-		NULL,
-		NULL,
-		this->hInstance,
-		nullptr);
-
-	// Sanity check for windows creation.
-	if (this->hWnd == NULL)
-	{
-		ErrorLog("Windows creation failed for windows: " + window_title);
-		exit(-1);
-	}
-
-	// Set the window handle to the global output class for DirectX12 API to access.
-	Output::GetInstance()->SetHandle(this->hWnd);
-
-	// Select the created window for current use in front of all windows opened.
-	ShowWindow(this->hWnd, SW_SHOW);
-	SetForegroundWindow(this->hWnd);
-	SetFocus(this->hWnd);
-
+#ifndef _DEBUG
 	// Complete fullscreen mode.
 	this->CreateFullscreenMode();
+#else
+	// Complete windowed mode.
+	this->CreateWindowedMode();
+#endif // !_DEBUG
+
+
 
 	return;
 }

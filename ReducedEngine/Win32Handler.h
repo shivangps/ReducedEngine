@@ -27,6 +27,9 @@ private:
 	// Current render resoution.
 	unsigned int width = 100;
 	unsigned int height = 100;
+	// Resolution dimensions when windowed.
+	unsigned int windowed_width = 100;
+	unsigned int windowed_height = 100;
 	// Resolution dimensions when fullscreen.
 	unsigned int fullscreen_width = 100;
 	unsigned int fullscreen_height = 100;
@@ -36,10 +39,15 @@ private:
 
 	// To check is window is to be closed or not.
 	bool openWindow = true;
+	// To check if window is fullscreen or not.
+	bool fullscreenMode = false;
+
+	// Function to create a window.
+	void CreateNewWindow(HWND* hWnd, unsigned int window_offsetX, unsigned int window_offsetY, unsigned int width, unsigned int height);
 
 public:
 	// Function to initialize the windows display and few other windows parameters such as windows title cursor and such...
-	void Initialize(HINSTANCE hInstance, std::string window_title, std::string window_class);
+	void Initialize(HINSTANCE hInstance, std::string window_title, std::string window_class, unsigned int window_width, unsigned int window_height);
 	// Function to process the input message.
 	void ProcessInput();
 	// Get Functions for current width and height.
@@ -48,6 +56,10 @@ public:
 
 	// Function to create a fullscreen.
 	void CreateFullscreenMode();
+	// Function to create windowed screen.
+	void CreateWindowedMode();
+	// Get Function for fullscreen mode.
+	bool IsWindowedFullscreen();
 
 	// Get function for openWindow.
 	bool IsWindowOpen();

@@ -6,12 +6,14 @@ void Time::CalculateFramesPerSecond()
 	{
 		this->framesPerSecondTimer += (this->GetDeltaTime() / 1000.0f);
 		this->framesPerSecondCounter++;
+		this->changeFramesPerSecond = false;
 	}
 	else
 	{
 		this->framesPerSecond = this->framesPerSecondCounter;
-		this->framesPerSecondTimer = 0.0f;
+		this->framesPerSecondTimer = this->framesPerSecondTimer - 1.0f;
 		this->framesPerSecondCounter = 0;
+		this->changeFramesPerSecond = true;
 	}
 }
 
@@ -42,5 +44,10 @@ float Time::GetDeltaTime()
 
 unsigned int Time::GetFPS()
 {
-	return this->framesPerSecondCounter;
+	return this->framesPerSecond;
+}
+
+bool Time::IsFPSChanged()
+{
+	return this->changeFramesPerSecond;
 }

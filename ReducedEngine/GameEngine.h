@@ -6,18 +6,27 @@
 // Game Engine class is a class that runs the whole game.
 class GameEngine	// Single Instance
 {
-	GameEngine() 
-	{
-		this->time->Start();
-	}
+	GameEngine() {}
+
+	// Name of the window title.
+	std::string window_title = "Reduced Engine";
 
 	// Current scene to run.
-	Scene* currentScene = nullptr;
+	Scene* currentScene = NULL;
 
 	// Win32 application class to run the display window.
 	Win32Handler* win32Handler = Win32Handler::GetInstance();
 	// Time instance.
 	Time* time = Time::GetInstance();
+
+	// Function to be called to check to run the game.
+	bool IsGameRunning();
+	// Function to process all the inputs.
+	void ProcessAllInputs();
+	// Function to update all the states of game objects.
+	void UpdateGameObjects();
+	// Function to render all the game object render components present in the scene.
+	void RenderScene();
 
 public:
 	static GameEngine* GetInstance()
@@ -36,4 +45,5 @@ public:
 	void Initialize(HINSTANCE hInstance);
 	// Function to run the game in a continous non-stop loop for each frame.
 	void RunGame();
+
 };
