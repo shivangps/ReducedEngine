@@ -3,8 +3,8 @@
 #include <chrono>
 #include <Windows.h>
 
-// Time header contains a class that maintains the time keeping for the engine and,
-// maintains the time elapsed between frames.
+// Time header contains a class that maintains the time keeping for the engine,
+// maintains the time elapsed between frames and calculates and keeps track of FPS(frames per second).
 
 // It is a singleton class.
 class Time

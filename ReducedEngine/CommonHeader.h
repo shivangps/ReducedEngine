@@ -5,3 +5,4 @@
 #include <DirectXMath.h>
 #include <vector>
 #include <string>
+#include <comdef.h>

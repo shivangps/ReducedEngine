@@ -3,7 +3,7 @@
 bool GameEngine::IsGameRunning()
 {
 	// Check if the window is open and the scene is assigned to run.
-	return (this->win32Handler->IsWindowOpen() && this->currentScene != NULL);
+	return (this->currentScene != NULL && this->output->IsWindowOpen());
 }
 
 void GameEngine::ProcessAllInputs()

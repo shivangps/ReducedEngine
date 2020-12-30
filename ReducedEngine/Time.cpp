@@ -2,12 +2,15 @@
 
 void Time::CalculateFramesPerSecond()
 {
+	// If the time it took since last FPS update is more than one second 
+	// then increase the FPS counter and update the FPS timer.
 	if (this->framesPerSecondTimer < 1.0f)
 	{
 		this->framesPerSecondTimer += (this->GetDeltaTime() / 1000.0f);
 		this->framesPerSecondCounter++;
 		this->changeFramesPerSecond = false;
 	}
+	// Otherwise update the new FPS value.
 	else
 	{
 		this->framesPerSecond = this->framesPerSecondCounter;

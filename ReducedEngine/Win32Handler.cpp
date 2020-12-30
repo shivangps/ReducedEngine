@@ -4,6 +4,7 @@
 LRESULT CALLBACK HandleInput(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	Win32Handler* handler = Win32Handler::GetInstance();
+	Output* output = Output::GetInstance();
 
 	switch (uMsg)
 	{
@@ -13,14 +14,14 @@ LRESULT CALLBACK HandleInput(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		// Exit the application if escape key is pressed.
 		if (wParam == VK_ESCAPE)
 		{
-			handler->CloseWindow();
+			output->GetInstance()->CloseWindow();
 		}
 	}
 	return 0;
 	// If close button is pressed then simply close the window.
 	case WM_CLOSE:
 	{
-		handler->CloseWindow();
+		output->GetInstance()->CloseWindow();
 	}
 	return 0;
 	default:
@@ -90,7 +91,7 @@ void Win32Handler::CreateNewWindow(HWND* hWnd, unsigned int window_offsetX, unsi
 	}
 
 	// Set the window handle to the global output class for DirectX12 API to access.
-	Output::GetInstance()->SetHandle(*hWnd);
+	this->output->GetInstance()->SetHandle(*hWnd);
 
 	// Select the created window for current use in front of all windows opened.
 	ShowWindow(*hWnd, SW_SHOW);
@@ -107,13 +108,9 @@ void Win32Handler::Initialize(HINSTANCE hInstance, std::string window_title, std
 	this->windowed_width = window_width;
 	this->windowed_height = window_height;
 
-	// Initializing the window first in fullscreen mode.
 	this->hInstance = hInstance;
 
-	// Assign current resolution.
-	this->width = this->windowed_width;
-	this->height = this->windowed_height;
-
+	// Initializing window class.
 	this->window_class = window_class;
 	this->window_class_wide = StringToWide(window_class);
 	this->window_title = window_title;
@@ -148,7 +145,8 @@ void Win32Handler::Initialize(HINSTANCE hInstance, std::string window_title, std
 	this->CreateWindowedMode();
 #endif // !_DEBUG
 
-
+	// Assign the window resolution to the output class.
+	this->output->GetInstance()->SetWindowResoution(this->width, this->height);
 
 	return;
 }
@@ -169,7 +167,7 @@ void Win32Handler::ProcessInput()
 		if (!IsWindow)
 		{
 			this->hWnd;
-			this->openWindow = false;
+			this->output->CloseWindow();
 			UnregisterClass(this->window_class_wide.c_str(), this->hInstance);
 			return;
 		}
@@ -184,14 +182,4 @@ unsigned int Win32Handler::GetWidth()
 unsigned int Win32Handler::GetHeight()
 {
 	return this->height;
-}
-
-bool Win32Handler::IsWindowOpen()
-{
-	return this->openWindow;
-}
-
-void Win32Handler::CloseWindow()
-{
-	this->openWindow = false;
 }

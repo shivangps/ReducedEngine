@@ -141,6 +141,10 @@
   <ItemGroup>
     <ClCompile Include="GameEngine.cpp" />
     <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="Input\Keyboard\KeyboardClass.cpp" />
+    <ClCompile Include="Input\Keyboard\KeyboardEvent.cpp" />
+    <ClCompile Include="Input\Mouse\MouseClass.cpp" />
+    <ClCompile Include="Input\Mouse\MouseEvent.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Time.cpp" />
@@ -151,6 +155,12 @@
     <ClInclude Include="GameEngine.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Helper.h" />
+    <ClInclude Include="Input\Input.h" />
+    <ClInclude Include="ErrorLogger.h" />
+    <ClInclude Include="Input\Keyboard\KeyboardClass.h" />
+    <ClInclude Include="Input\Keyboard\KeyboardEvent.h" />
+    <ClInclude Include="Input\Mouse\MouseClass.h" />
+    <ClInclude Include="Input\Mouse\MouseEvent.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Time.h" />
     <ClInclude Include="Win32Handler.h" />

@@ -18,6 +18,8 @@ class GameEngine	// Single Instance
 	Win32Handler* win32Handler = Win32Handler::GetInstance();
 	// Time instance.
 	Time* time = Time::GetInstance();
+	// Output class.
+	Output* output = Output::GetInstance();
 
 	// Function to be called to check to run the game.
 	bool IsGameRunning();

@@ -13,6 +13,24 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\Input">
+      <UniqueIdentifier>{a50a4d09-57f9-47d5-b505-47f03556cbf8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Input\Mouse">
+      <UniqueIdentifier>{60dbdb08-7bac-4c5a-bddd-a15c535e63ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Input\Keyboard">
+      <UniqueIdentifier>{d7024dcb-3eca-497c-835b-b90383571ea1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Input">
+      <UniqueIdentifier>{31de4501-a3ff-4151-8c42-280965cc6013}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Input\Mouse">
+      <UniqueIdentifier>{a67efb0d-ee24-492f-8a70-844c12fa9ec8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Input\Keyboard">
+      <UniqueIdentifier>{a3508400-b5f1-4a1f-8152-06f2f98b4643}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -32,6 +50,18 @@
     </ClCompile>
     <ClCompile Include="Win32Handler.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Input\Mouse\MouseEvent.cpp">
+      <Filter>Source Files\Input\Mouse</Filter>
+    </ClCompile>
+    <ClCompile Include="Input\Mouse\MouseClass.cpp">
+      <Filter>Source Files\Input\Mouse</Filter>
+    </ClCompile>
+    <ClCompile Include="Input\Keyboard\KeyboardClass.cpp">
+      <Filter>Source Files\Input\Keyboard</Filter>
+    </ClCompile>
+    <ClCompile Include="Input\Keyboard\KeyboardEvent.cpp">
+      <Filter>Source Files\Input\Keyboard</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -57,6 +87,24 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Output.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\Input.h">
+      <Filter>Header Files\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\Mouse\MouseEvent.h">
+      <Filter>Header Files\Input\Mouse</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\Mouse\MouseClass.h">
+      <Filter>Header Files\Input\Mouse</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\Keyboard\KeyboardClass.h">
+      <Filter>Header Files\Input\Keyboard</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\Keyboard\KeyboardEvent.h">
+      <Filter>Header Files\Input\Keyboard</Filter>
+    </ClInclude>
+    <ClInclude Include="ErrorLogger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

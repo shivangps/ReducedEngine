@@ -37,10 +37,13 @@ private:
 	unsigned int window_position_x = 250;
 	unsigned int window_position_y = 100;
 
-	// To check is window is to be closed or not.
-	bool openWindow = true;
 	// To check if window is fullscreen or not.
 	bool fullscreenMode = false;
+
+	// Global Input class.
+	Input* input = Input::GetInstance();
+	// Global Output class.
+	Output* output = Output::GetInstance();
 
 	// Function to create a window.
 	void CreateNewWindow(HWND* hWnd, unsigned int window_offsetX, unsigned int window_offsetY, unsigned int width, unsigned int height);
@@ -60,9 +63,4 @@ public:
 	void CreateWindowedMode();
 	// Get Function for fullscreen mode.
 	bool IsWindowedFullscreen();
-
-	// Get function for openWindow.
-	bool IsWindowOpen();
-	// Function to close the window.
-	void CloseWindow();
 };
