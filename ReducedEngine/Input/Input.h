@@ -5,6 +5,8 @@
 #include "Keyboard/KeyboardClass.h"
 
 // Class that handles the input via mouse, keyboard and Xbox controller.
+
+// It is a singleton class.
 class Input
 {
 	Input()

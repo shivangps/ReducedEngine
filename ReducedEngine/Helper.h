@@ -8,3 +8,10 @@
 
 // This header file contains the convinient helper functions.
 
+static void DebugString(LPCSTR lpcstr)
+{
+#ifdef _DEBUG
+	OutputDebugStringA(lpcstr);
+#endif // _DEBUG
+	return;
+}

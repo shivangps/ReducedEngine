@@ -8,5 +8,5 @@ class GameObject
 public:
 	GameObject() {}
 
-	void Update() {}
+	virtual void Update() {}
 };

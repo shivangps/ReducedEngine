@@ -6,3 +6,4 @@
 #include <vector>
 #include <string>
 #include <comdef.h>
+#include <memory>
