@@ -10,6 +10,8 @@ void GameEngine::ProcessAllInputs()
 {
 	// Process the inputs from keyboard and mouse.
 	this->win32Handler->ProcessInput();
+	// Process the Xbox controller gamepad input.
+	this->controller->UpdateGamepadState();
 }
 
 void GameEngine::UpdateGameObjects()

@@ -18,6 +18,8 @@ class GameEngine	// Single Instance
 	Win32Handler* win32Handler = Win32Handler::GetInstance();
 	// Time instance.
 	Time* time = Time::GetInstance();
+	// Xbox Controller class.
+	XController* controller = Input::GetInstance()->GetController();
 	// Output class.
 	Output* output = Output::GetInstance();
 

@@ -3,6 +3,7 @@
 #include "../ErrorLogger.h"
 #include "Mouse/MouseClass.h"
 #include "Keyboard/KeyboardClass.h"
+#include "XController.h"
 
 // Class that handles the input via mouse, keyboard and Xbox controller.
 
@@ -46,8 +47,13 @@ public:
 	{
 		return &this->mouse;
 	}
+	XController* GetController()
+	{
+		return &this->controller;
+	}
 
 private:
 	KeyboardClass keyboard;
 	MouseClass mouse;
+	XController controller;
 };

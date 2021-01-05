@@ -145,6 +145,7 @@
     <ClCompile Include="Input\Keyboard\KeyboardEvent.cpp" />
     <ClCompile Include="Input\Mouse\MouseClass.cpp" />
     <ClCompile Include="Input\Mouse\MouseEvent.cpp" />
+    <ClCompile Include="Input\XController.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Time.cpp" />
@@ -161,6 +162,7 @@
     <ClInclude Include="Input\Keyboard\KeyboardEvent.h" />
     <ClInclude Include="Input\Mouse\MouseClass.h" />
     <ClInclude Include="Input\Mouse\MouseEvent.h" />
+    <ClInclude Include="Input\XController.h" />
     <ClInclude Include="MathEngine.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Time.h" />

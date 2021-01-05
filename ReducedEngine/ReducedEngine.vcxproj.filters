@@ -63,6 +63,9 @@
     <ClCompile Include="Input\Keyboard\KeyboardEvent.cpp">
       <Filter>Source Files\Input\Keyboard</Filter>
     </ClCompile>
+    <ClCompile Include="Input\XController.cpp">
+      <Filter>Source Files\Input</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CommonHeader.h">
@@ -109,6 +112,9 @@
     </ClInclude>
     <ClInclude Include="MathEngine.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\XController.h">
+      <Filter>Header Files\Input</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
