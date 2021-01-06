@@ -76,8 +76,8 @@ public:
 	//Normalized Y value of right thumbstick
 	float GetRightThumbNormalizedY();
 
-	//RUMBLE Function(Enter only normalized values)
-	void SetRumble(float left, float right);
+	//Get the id of the gamepad.
+	unsigned int GetPadID();
 
 	//TRIGGER Functions
 	//Left

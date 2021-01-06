@@ -234,23 +234,9 @@ float XController::GetRightThumbNormalizedY()
 	return normalizedRY;
 }
 
-void XController::SetRumble(float left, float right)
+unsigned int XController::GetPadID()
 {
-	// XInput vibration state
-	XINPUT_VIBRATION rumble;
-
-	// Zero memory on vibration state
-	ZeroMemory(&rumble, sizeof(XINPUT_VIBRATION));
-
-	// Calculate vibration intensity
-	int left_motor = int(left * 65535.0f);
-	int right_motor = int(right * 65535.0f);
-
-	rumble.wLeftMotorSpeed = left_motor;
-	rumble.wRightMotorSpeed = right_motor;
-
-	// Apply vibration
-	XInputSetState(padId, &rumble);
+	return this->padId;
 }
 
 float XController::GetTriggerL()
