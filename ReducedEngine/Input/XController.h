@@ -2,10 +2,7 @@
 
 #include<Windows.h>
 #include<Xinput.h>
-#include<wrl/client.h>
 #include<DirectXMath.h>
-
-using namespace DirectX;
 
 static const WORD XInput_Buttons[] =
 {

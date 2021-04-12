@@ -4,7 +4,7 @@
 #include "ErrorLogger.h"
 #include "Time.h"
 #include "Input/Input.h"
-#include "Output.h"
+#include "Output/Output.h"
 
 // This header file contains the convinient helper functions.
 

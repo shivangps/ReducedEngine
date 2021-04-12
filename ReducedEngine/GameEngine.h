@@ -2,6 +2,7 @@
 
 #include "Scene.h"
 #include "Win32Handler.h"
+#include "Output/Graphics/Graphics.h"
 
 // Game Engine class is a class that runs the whole game.
 class GameEngine	// Single Instance
@@ -22,6 +23,8 @@ class GameEngine	// Single Instance
 	XController* controller = Input::GetInstance()->GetController();
 	// Output class.
 	Output* output = Output::GetInstance();
+	// Graphics class.
+	Graphics* graphics = Graphics::GetInstance();
 
 	// Function to be called to check to run the game.
 	bool IsGameRunning();

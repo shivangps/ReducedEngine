@@ -33,6 +33,7 @@ void GameEngine::UpdateGameObjects()
 
 void GameEngine::RenderScene()
 {
+	this->graphics->RenderScene();
 }
 
 void GameEngine::Initialize(HINSTANCE hInstance)
@@ -43,6 +44,8 @@ void GameEngine::Initialize(HINSTANCE hInstance)
 	this->win32Handler->Initialize(hInstance, this->window_title, "EngineWindow", window_width, window_height);
 	// Start the time for the game.
 	this->time->Start();
+	// Initialize the render engine.
+	this->graphics->Initialize(this->output->GetHandle(), this->output->GetWindowWidth(), this->output->GetWindowHeight());
 }
 
 void GameEngine::RunGame()
@@ -51,7 +54,8 @@ void GameEngine::RunGame()
 	// 1. Input
 	// 2. Physics (Not present in this engine.)
 	// 3. Game Objects state
-	// 4. Render
+	// 4. Sound (Not present in this engine.)
+	// 5. Render
 
 	// Main game loop running each frame.
 	while (this->IsGameRunning())

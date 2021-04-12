@@ -104,7 +104,8 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>XInput.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>XInput.lib;dxgi.lib;d3d12.lib;D3DCompiler.lib;dxguid.lib;DirectXTK12.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\ReducedEngine\Lib\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -137,7 +138,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>XInput.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>XInput.lib;dxgi.lib;d3d12.lib;D3DCompiler.lib;dxguid.lib;DirectXTK12.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\ReducedEngine\Lib\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -149,7 +151,9 @@
     <ClCompile Include="Input\Mouse\MouseEvent.cpp" />
     <ClCompile Include="Input\XController.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Output.cpp" />
+    <ClCompile Include="Output\Graphics\Graphics.cpp" />
+    <ClCompile Include="Output\Graphics\GraphicsHelper.cpp" />
+    <ClCompile Include="Output\Output.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Time.cpp" />
     <ClCompile Include="Win32Handler.cpp" />
@@ -167,10 +171,13 @@
     <ClInclude Include="Input\Mouse\MouseEvent.h" />
     <ClInclude Include="Input\XController.h" />
     <ClInclude Include="MathEngine.h" />
+    <ClInclude Include="Output\Graphics\d3dx12.h" />
+    <ClInclude Include="Output\Graphics\Graphics.h" />
+    <ClInclude Include="Output\Graphics\GraphicsHelper.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Time.h" />
     <ClInclude Include="Win32Handler.h" />
-    <ClInclude Include="Output.h" />
+    <ClInclude Include="Output\Output.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

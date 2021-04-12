@@ -24,3 +24,14 @@ static void ErrorLog(HRESULT hr, std::string message)
 	MessageBoxW(NULL, error_message.c_str(), L"Error: ", MB_ICONERROR);
 #endif // DEBUG
 }
+
+static void ExitOnError(HRESULT hr, std::string message)
+{
+#ifdef _DEBUG
+	if (FAILED(hr))
+	{
+		ErrorLog(hr, message);
+		exit(-1);
+	}
+#endif // DEBUG
+}

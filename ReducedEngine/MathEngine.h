@@ -360,38 +360,3 @@ public:
 		return model;
 	}
 };
-
-// Structure to store viewport rect.
-struct Viewport
-{
-	D3D12_VIEWPORT values = {};
-
-	Viewport()
-	{
-		this->values.MinDepth = 0.0f;
-		this->values.MaxDepth = 1.0f;
-		this->values.Width = 0;
-		this->values.Height = 0;
-		this->values.TopLeftX = 0.0f;
-		this->values.TopLeftY = 0.0f;
-	}
-	void operator=(D3D12_VIEWPORT newViewport)
-	{
-		this->values = newViewport;
-	}
-};
-
-// Structure to store rects.
-struct Rect
-{
-	D3D12_RECT values = {};
-
-	Rect()
-	{
-		this->values = { 0, 0, 0, 0 };
-	}
-	void operator=(D3D12_RECT newRect)
-	{
-		this->values = newRect;
-	}
-};
