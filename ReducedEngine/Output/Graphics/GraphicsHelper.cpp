@@ -60,3 +60,8 @@ void InitializeResource(Microsoft::WRL::ComPtr<ID3D12Resource>* resource, Micros
 		IID_PPV_ARGS(resource->GetAddressOf()));
 	ExitOnError(HR, "Failed to initialize resource.");
 }
+
+void TransitionResourceState(Microsoft::WRL::ComPtr<ID3D12Resource> resource, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList, D3D12_RESOURCE_STATES beforeState, D3D12_RESOURCE_STATES afterState)
+{
+	commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(resource.Get(), beforeState, afterState));
+}

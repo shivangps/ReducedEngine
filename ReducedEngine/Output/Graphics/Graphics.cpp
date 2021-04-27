@@ -1,6 +1,7 @@
 #include "d3dx12.h"
 #include "..//..//Helper.h"
 #include "Graphics.h"
+#include "DisplayShader/DisplayShader.h"
 
 void Graphics::CreateDevice()
 {
@@ -112,7 +113,7 @@ void Graphics::CreateRenderTargets(DescriptorHeap* heap, Microsoft::WRL::ComPtr<
 	{
 		HR = this->swapChain->GetBuffer(i, IID_PPV_ARGS(renderTargetResource[i].GetAddressOf()));
 		device->CreateRenderTargetView(renderTargetResource[i].Get(), nullptr, heap->GetCPUHandle(i));
-		renderTargetResource[i]->SetName(L"Back Buffer " + i);
+		renderTargetResource[i]->SetName(L" Back Buffer " + i);
 	}
 }
 
@@ -241,6 +242,92 @@ void Graphics::PresentFrame(Microsoft::WRL::ComPtr<IDXGISwapChain3> swapChain, u
 	*currentFrame = swapChain->GetCurrentBackBufferIndex();
 }
 
+void Graphics::InitializeDeferredRendering(Microsoft::WRL::ComPtr<ID3D12Device5> device, unsigned int width, unsigned int height, unsigned int multiSamples)
+{
+	this->gBufferHeap_RTV.Initialize(device, GBufferRenderTarget::Size_RT, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);	// Remove one count for depth.
+	this->gBufferHeap_DSV.Initialize(device, 1, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
+	this->gBufferHeap_SRV.Initialize(device, GBufferShaderResource::Size_SR, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
+
+	// Position
+	this->positionFramebuffer.Initialize(device, gBufferFormats[GBufferRenderTarget::Position_RT], width, height, multiSamples, this->gBufferClearColor[GBufferRenderTarget::Position_RT], L"Position");
+	this->positionFramebuffer.SetFramebufferToRTVHandle(device, this->gBufferHeap_RTV.GetCPUHandle(GBufferRenderTarget::Position_RT));
+	this->positionFramebuffer.SetFramebufferToSRVHandle(device, this->gBufferHeap_SRV.GetCPUHandle(GBufferShaderResource::Position_SR));
+
+	// Normal
+	this->normalFramebuffer.Initialize(device, gBufferFormats[GBufferRenderTarget::Normal_RT], width, height, multiSamples, this->gBufferClearColor[GBufferRenderTarget::Normal_RT], L"Normal");
+	this->normalFramebuffer.SetFramebufferToRTVHandle(device, this->gBufferHeap_RTV.GetCPUHandle(GBufferRenderTarget::Normal_RT));
+	this->normalFramebuffer.SetFramebufferToSRVHandle(device, this->gBufferHeap_SRV.GetCPUHandle(GBufferShaderResource::Normal_SR));
+
+	// Albedo
+	this->albedoSpecFramebuffer.Initialize(device, this->gBufferFormats[GBufferRenderTarget::AlbedoSpecular_RT], width, height, multiSamples,this->gBufferClearColor[GBufferRenderTarget::AlbedoSpecular_RT], L"Albedo");
+	this->albedoSpecFramebuffer.SetFramebufferToRTVHandle(device, this->gBufferHeap_RTV.GetCPUHandle(GBufferRenderTarget::AlbedoSpecular_RT));
+	this->albedoSpecFramebuffer.SetFramebufferToSRVHandle(device, this->gBufferHeap_SRV.GetCPUHandle(GBufferShaderResource::AlbedoSpecular_SR));
+
+	// Depth
+	this->depthFramebuffer.Initialize(device, width, height, multiSamples, L"");
+	this->depthFramebuffer.SetDepthBufferToDSVHandle(device, this->gBufferHeap_DSV.GetCPUHandle(0));
+	this->depthFramebuffer.SetDepthBufferToSRVHandle(device, this->gBufferHeap_SRV.GetCPUHandle(GBufferShaderResource::Depth_SR));
+}
+
+void Graphics::SetDeferredFramebuffers(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList)
+{
+	// Position
+	commandList->ClearRenderTargetView(this->gBufferHeap_RTV.GetCPUHandle(GBufferRenderTarget::Position_RT), this->gBufferClearColor[GBufferRenderTarget::Position_RT], 0, nullptr);
+	// Normal
+	commandList->ClearRenderTargetView(this->gBufferHeap_RTV.GetCPUHandle(GBufferRenderTarget::Normal_RT), this->gBufferClearColor[GBufferRenderTarget::Normal_RT], 0, nullptr);
+	// Albedo
+	commandList->ClearRenderTargetView(this->gBufferHeap_RTV.GetCPUHandle(GBufferRenderTarget::AlbedoSpecular_RT), this->gBufferClearColor[GBufferRenderTarget::AlbedoSpecular_RT], 0, nullptr);
+	// Depth
+	commandList->ClearDepthStencilView(this->gBufferHeap_DSV.GetCPUHandle(0), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
+
+	commandList->OMSetRenderTargets(GBufferRenderTarget::Size_RT, &this->gBufferHeap_RTV.GetCPUHandle(0), true, &this->gBufferHeap_DSV.GetCPUHandle(0));
+}
+
+void Graphics::RemoveDeferredFramebuffers(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList, unsigned int numRT, D3D12_CPU_DESCRIPTOR_HANDLE* newRTHandle, D3D12_CPU_DESCRIPTOR_HANDLE* newDepthHandle)
+{
+	commandList->OMSetRenderTargets(numRT, newRTHandle, (newDepthHandle == nullptr) ? false : true, newDepthHandle);
+
+	this->positionFramebuffer.CopyResource(commandList);
+	this->normalFramebuffer.CopyResource(commandList);
+	this->albedoSpecFramebuffer.CopyResource(commandList);
+	this->depthFramebuffer.CopyResource(commandList);
+}
+
+void Graphics::InitializeQuadGeometry(Microsoft::WRL::ComPtr<ID3D12Device5> device)
+{
+	QuadVertex quadVertex[] =
+	{
+		QuadVertex(-1.0f, 1.0f, 0.0f, 0.0f, 1.0f),
+		QuadVertex(-1.0f,-1.0f, 0.0f, 0.0f, 0.0f),
+		QuadVertex( 1.0f, 1.0f, 0.0f, 1.0f, 1.0f),
+		QuadVertex( 1.0f,-1.0f, 0.0f, 1.0f, 0.0f),
+	};
+	unsigned int quadBufferSize = sizeof(quadVertex);
+
+	// Create the vertex buffer resource for quad.
+	InitializeResource(&this->quadVertexBuffer, device, &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), &CD3DX12_RESOURCE_DESC::Buffer(quadBufferSize), D3D12_RESOURCE_STATE_GENERIC_READ, nullptr);
+	this->quadVertexBuffer->SetName(L"Quad Vertex Upload Buffer");
+
+	// Fill the quad vertex data.
+	unsigned char* pQuadVertexDataBegin;
+	CD3DX12_RANGE readRange(0, 0);
+	this->quadVertexBuffer->Map(0, &readRange, reinterpret_cast<void**>(&pQuadVertexDataBegin));
+	memcpy(pQuadVertexDataBegin, quadVertex, quadBufferSize);
+	this->quadVertexBuffer->Unmap(0, nullptr);
+
+	// Initialize vertex buffer view.
+	this->quadVBV.BufferLocation = this->quadVertexBuffer->GetGPUVirtualAddress();
+	this->quadVBV.SizeInBytes = quadBufferSize;
+	this->quadVBV.StrideInBytes = sizeof(QuadVertex);
+}
+
+void Graphics::DrawQuadGeometry(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList)
+{
+	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+	commandList->IASetVertexBuffers(0, 1, &this->quadVBV);
+	commandList->DrawInstanced(4, 1, 0, 0);
+}
+
 void Graphics::Initialize(HWND windowHandle, unsigned int width, unsigned int height)
 {
 	// Assign window handle.
@@ -276,6 +363,15 @@ void Graphics::Initialize(HWND windowHandle, unsigned int width, unsigned int he
 	// Create command allocator.
 	this->CreateCommandListSet(&this->commandAllocator, &this->commandList, &this->commandFenceValue, this->device, this->directTypeList);
 
+	// Create framebuffer.
+	this->InitializeDeferredRendering(this->device, width, height, (this->multiSampling)? this->sampleCount : 1 );
+
+	// Initialize shader to render G-buffer on quad.
+	this->quadShader = DisplayShader::GetInstance();
+	this->quadShader->Initialize(this->device, 1, &this->renderTargetFormat, this->depthStencilFormat, 1);
+
+	// Initialize the quad geometry.
+	this->InitializeQuadGeometry(this->device);
 
 	// Close and execute the command list.
 	HRESULT HR = this->commandList->Close();
@@ -296,7 +392,47 @@ void Graphics::RenderScene()
 
 	this->Reset(this->commandList, this->commandAllocator);
 
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle;
+	rtvHandle = this->renderTargetHeap.GetCPUHandle(this->currentFrame);
+	Microsoft::WRL::ComPtr<ID3D12Resource> currentRenderBuffer = this->renderTargetResource[this->currentFrame];
+	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle;
+	dsvHandle = this->depthStencilHeap.GetCPUHandle(0);
+	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilBuffer = this->depthStencilResource;
 
+	commandList->RSSetViewports(1, &this->viewport);
+	commandList->RSSetScissorRects(1, &this->clippingRect);
+
+	TransitionResourceState(currentRenderBuffer, this->commandList, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+	//----------------X-----------------//
+	// G-BUFFER FILL.
+	this->SetDeferredFramebuffers(this->commandList);
+	
+
+
+	this->RemoveDeferredFramebuffers(this->commandList, 1, &rtvHandle, &dsvHandle);
+
+	//----------------X-----------------//
+	// POST-PROCESS DEBUG.
+	// Clear the buffer.
+	static bool flag;
+	float refreshColor[4] = { 0.0f, 0.5f, 0.0f, 1.0f };
+	this->commandList->ClearRenderTargetView(rtvHandle, refreshColor, 0, nullptr);
+
+	this->commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, 1.0f, 0, 0, nullptr);
+
+	this->commandList->OMSetRenderTargets(1, &rtvHandle, true, &dsvHandle);
+
+	this->quadShader->SetShaderForRender(commandList);
+
+	ID3D12DescriptorHeap* ppHeaps[] = { this->gBufferHeap_SRV.Get() };
+	this->commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
+	
+	this->commandList->SetGraphicsRootDescriptorTable(0, this->gBufferHeap_SRV.GetGPUHandle(GBufferShaderResource::AlbedoSpecular_SR));
+
+	this->DrawQuadGeometry(commandList);
+
+	//----------------X-----------------//
+	TransitionResourceState(currentRenderBuffer, this->commandList, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 	this->CloseCommandList(this->commandList);
 
 	ID3D12CommandList* ppCommandLists[] = { this->commandList.Get() };

@@ -6,6 +6,10 @@
 // Function to initialize resource.
 void InitializeResource(Microsoft::WRL::ComPtr<ID3D12Resource>* resource, Microsoft::WRL::ComPtr<ID3D12Device5> device, D3D12_HEAP_PROPERTIES* heapProperties, D3D12_RESOURCE_DESC* resourceDesc, D3D12_RESOURCE_STATES resourceState, D3D12_CLEAR_VALUE* clearValue);
 
+// Function to transition resource state.
+void TransitionResourceState(Microsoft::WRL::ComPtr<ID3D12Resource> resource, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList,
+	D3D12_RESOURCE_STATES beforeState, D3D12_RESOURCE_STATES afterState);
+
 // Class to manage descriptor heap.
 class DescriptorHeap
 {
@@ -21,8 +25,8 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> mainHeap = nullptr;
 	unsigned int heapSize = 0;
 	unsigned int maximumHeaps = 0;
-	D3D12_CPU_DESCRIPTOR_HANDLE startCPUHandle;
-	D3D12_GPU_DESCRIPTOR_HANDLE startGPUHandle;
+	D3D12_CPU_DESCRIPTOR_HANDLE startCPUHandle = {};
+	D3D12_GPU_DESCRIPTOR_HANDLE startGPUHandle = {};
 
 public:
 	// Initialization function.

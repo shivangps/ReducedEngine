@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -151,8 +151,12 @@
     <ClCompile Include="Input\Mouse\MouseEvent.cpp" />
     <ClCompile Include="Input\XController.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Output\Graphics\DepthFramebuffer.cpp" />
+    <ClCompile Include="Output\Graphics\DisplayShader\DisplayShader.cpp" />
     <ClCompile Include="Output\Graphics\Graphics.cpp" />
     <ClCompile Include="Output\Graphics\GraphicsHelper.cpp" />
+    <ClCompile Include="Output\Graphics\RenderFramebuffer.cpp" />
+    <ClCompile Include="Output\Graphics\Shader.cpp" />
     <ClCompile Include="Output\Output.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Time.cpp" />
@@ -172,12 +176,34 @@
     <ClInclude Include="Input\XController.h" />
     <ClInclude Include="MathEngine.h" />
     <ClInclude Include="Output\Graphics\d3dx12.h" />
+    <ClInclude Include="Output\Graphics\DepthFramebuffer.h" />
+    <ClInclude Include="Output\Graphics\DisplayShader\DisplayShader.h" />
     <ClInclude Include="Output\Graphics\Graphics.h" />
     <ClInclude Include="Output\Graphics\GraphicsHelper.h" />
+    <ClInclude Include="Output\Graphics\RenderFramebuffer.h" />
+    <ClInclude Include="Output\Graphics\Shader.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Time.h" />
     <ClInclude Include="Win32Handler.h" />
     <ClInclude Include="Output\Output.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Output\Graphics\DisplayShader\display_pixel_shader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Output\Graphics\DisplayShader\display_vertex_shader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -31,11 +31,23 @@
     <Filter Include="Source Files\Input\Keyboard">
       <UniqueIdentifier>{a3508400-b5f1-4a1f-8152-06f2f98b4643}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Graphics">
-      <UniqueIdentifier>{69e3b9e9-594c-44b4-bd8e-3e813770c57d}</UniqueIdentifier>
+    <Filter Include="Header Files\Output">
+      <UniqueIdentifier>{119e14de-877c-4c41-ae7a-0c389b91210b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Graphics">
-      <UniqueIdentifier>{40d94633-99ae-44bb-b58e-3a5fdd137445}</UniqueIdentifier>
+    <Filter Include="Header Files\Output\Graphics">
+      <UniqueIdentifier>{86e3fbc9-0f95-4280-a1e4-7d1dbdaa87d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Output\Graphics\DisplayShader">
+      <UniqueIdentifier>{45fa47bc-cac5-4df0-b50a-3f52e3861933}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Output">
+      <UniqueIdentifier>{23d61d7a-99ce-4923-8c26-49fb2cce1e82}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Output\Graphics">
+      <UniqueIdentifier>{e7e5df05-7cf8-424a-a8f5-aa340624dd8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Output\Graphics\DisplayShader">
+      <UniqueIdentifier>{ac5a1e93-2dea-4cfc-9067-c34f0f495e1a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -72,14 +84,26 @@
     <ClCompile Include="Input\XController.cpp">
       <Filter>Source Files\Input</Filter>
     </ClCompile>
-    <ClCompile Include="Output\Output.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Output\Graphics\DisplayShader\DisplayShader.cpp">
+      <Filter>Source Files\Output\Graphics\DisplayShader</Filter>
     </ClCompile>
     <ClCompile Include="Output\Graphics\Graphics.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Output\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Output\Graphics\GraphicsHelper.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Output\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Output\Graphics\DepthFramebuffer.cpp">
+      <Filter>Source Files\Output\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Output\Graphics\RenderFramebuffer.cpp">
+      <Filter>Source Files\Output\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Output\Graphics\Shader.cpp">
+      <Filter>Source Files\Output\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Output\Output.cpp">
+      <Filter>Source Files\Output</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -129,16 +153,36 @@
       <Filter>Header Files\Input</Filter>
     </ClInclude>
     <ClInclude Include="Output\Output.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Output\Graphics\Graphics.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Output\Graphics\d3dx12.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Output</Filter>
     </ClInclude>
     <ClInclude Include="Output\Graphics\GraphicsHelper.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Output\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="Output\Graphics\Graphics.h">
+      <Filter>Header Files\Output\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Output\Graphics\DepthFramebuffer.h">
+      <Filter>Header Files\Output\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Output\Graphics\Shader.h">
+      <Filter>Header Files\Output\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Output\Graphics\RenderFramebuffer.h">
+      <Filter>Header Files\Output\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Output\Graphics\DisplayShader\DisplayShader.h">
+      <Filter>Header Files\Output\Graphics\DisplayShader</Filter>
+    </ClInclude>
+    <ClInclude Include="Output\Graphics\d3dx12.h">
+      <Filter>Header Files\Output\Graphics</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Output\Graphics\DisplayShader\display_vertex_shader.hlsl">
+      <Filter>Source Files\Output\Graphics\DisplayShader</Filter>
+    </FxCompile>
+    <FxCompile Include="Output\Graphics\DisplayShader\display_pixel_shader.hlsl">
+      <Filter>Source Files\Output\Graphics\DisplayShader</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

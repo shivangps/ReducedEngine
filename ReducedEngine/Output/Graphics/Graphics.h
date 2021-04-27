@@ -3,6 +3,9 @@
 // Graphics headers.
 #include "..//..//CommonHeader.h"
 #include "GraphicsHelper.h"
+#include "RenderFramebuffer.h"
+#include "DepthFramebuffer.h"
+#include "Shader.h"
 #include <dxgi1_4.h>
 #include <wrl/client.h>
 
@@ -80,6 +83,80 @@ class Graphics
 	// Function to present the frame.
 	void PresentFrame(Microsoft::WRL::ComPtr<IDXGISwapChain3> swapChain, unsigned int* currentFrame);
 
+private:
+	// Deffered rendering.
+	// Framebuffer render target.
+	enum GBufferRenderTarget
+	{
+		Position_RT = 0,
+		Normal_RT,
+		AlbedoSpecular_RT,
+		Size_RT
+	};
+	DescriptorHeap gBufferHeap_RTV = {};
+
+	DXGI_FORMAT gBufferFormats[GBufferRenderTarget::Size_RT] = {
+		DXGI_FORMAT_R32G32B32A32_FLOAT,				// Position
+		DXGI_FORMAT_R32G32B32A32_FLOAT,				// Normal
+		DXGI_FORMAT_R32G32B32A32_FLOAT,				// Albedo & Specular
+	};
+	float gBufferClearColor[GBufferRenderTarget::Size_RT][4] =
+	{
+		{ 0.0f, 0.0f, 0.0f, 0.0f },			// Position
+		{ 0.0f, 0.0f, 0.0f, 0.0f },			// Normal
+		{ 0.0f, 0.0f, 0.0f, 0.0f },			// Albedo & Specular
+	};
+	RenderFramebuffer positionFramebuffer = {};
+	RenderFramebuffer normalFramebuffer = {};
+	RenderFramebuffer albedoSpecFramebuffer = {};
+	
+	DepthFramebuffer depthFramebuffer = {};
+
+	DescriptorHeap gBufferHeap_DSV = {};
+
+	// Framebuffer shader resource.
+	enum GBufferShaderResource
+	{
+		Position_SR = 0,
+		Normal_SR,
+		AlbedoSpecular_SR,
+		Depth_SR,
+		Size_SR
+	};
+	DescriptorHeap gBufferHeap_SRV = {};
+
+	// Boolean to apply anti aliasing using mutli sampling.
+	bool multiSampling = true;
+	unsigned int sampleCount = 4;
+
+	// Function to initialize the deferred rendering process.
+	void InitializeDeferredRendering(Microsoft::WRL::ComPtr<ID3D12Device5> device, unsigned int width, unsigned int height, unsigned int multiSamples);
+	// Function to set the framebuffers for rendering the scene.
+	void SetDeferredFramebuffers(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList);
+	// Function to remove the framebuffers from rendering.
+	void RemoveDeferredFramebuffers(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList, unsigned int numRT, D3D12_CPU_DESCRIPTOR_HANDLE* newRTHandle, D3D12_CPU_DESCRIPTOR_HANDLE* newDepthHandle);
+
+private:
+	// Deferred render display.
+	Shader* quadShader = nullptr;
+
+	// The following definition is for rendering the quad and applying the texture of a post processed scene.
+	// Vertex for quad.
+	struct QuadVertex
+	{
+		DirectX::XMFLOAT3 position;
+		DirectX::XMFLOAT2 texCoord;
+
+		QuadVertex(float x,float y,float z,float u,float v) : position(x, y, z), texCoord(u, v) {}
+	};
+	Microsoft::WRL::ComPtr<ID3D12Resource> quadVertexBuffer = nullptr;
+	D3D12_VERTEX_BUFFER_VIEW quadVBV = {};
+	
+	// Function to initialize the geometry of a quad covering the whole scene.
+	void InitializeQuadGeometry(Microsoft::WRL::ComPtr<ID3D12Device5> device);
+	// Function to call for drawing the whole scene.
+	void DrawQuadGeometry(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList);
+
 public:
 	// Function to get a single instance of graphics or render engine.
 	static Graphics* GetInstance()
@@ -88,6 +165,8 @@ public:
 		return instance;
 	}
 
+	// Function to call for initializing the render engine and directx.
 	void Initialize(HWND windowHandle, unsigned int width, unsigned int height);
+	// Function to call for rendering the whole scene.
 	void RenderScene();
 };
