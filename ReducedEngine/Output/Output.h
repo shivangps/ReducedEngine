@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Windows.h>
+#include "../CommonHeader.h"
 #include <Xinput.h>
 #define MAX_VIBRATION_VALUE 65535.0f
 
@@ -27,6 +27,9 @@ class Output
 	// XInput vibration state
 	XINPUT_VIBRATION rumble;
 
+	// Boolean to disable showing of pointer.
+	bool showCursor = false;
+
 public:
 	static Output* GetInstance()
 	{
@@ -50,4 +53,9 @@ public:
 	//RUMBLE Function(Enter only normalized values)
 	void SetLeftRumble(unsigned int padId, float normalizedValue);
 	void SetRightRumble(unsigned int padId, float normalizedValue);
+
+	// Function to enable and disable cursor.
+	void EnableCursor();
+	void DisableCursor();
+	bool IsCursorEnabled();
 };

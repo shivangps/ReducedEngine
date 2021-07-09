@@ -43,10 +43,7 @@ public:
 	}
 
 	// Function to set the scene to run.
-	void SetScene(Scene* setNewScene)
-	{
-		this->currentScene = setNewScene;
-	}
+	void SetScene(Scene* setNewScene);
 
 	// Game engine initialization.
 	void Initialize(HINSTANCE hInstance);

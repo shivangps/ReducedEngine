@@ -1,3 +1,5 @@
+
+#include "ErrorLogger.h"
 #include "Scene.h"
 
 unsigned int Scene::GetSize()
@@ -32,4 +34,9 @@ GameObject* Scene::GetGameObject(unsigned int index)
 void Scene::SetGameObject(GameObject* newGameObject)
 {
 	this->objectsPresent.push_back(newGameObject);
+}
+
+RenderList* Scene::GetRenderComponentList()
+{
+	return &this->renderComponentList;
 }

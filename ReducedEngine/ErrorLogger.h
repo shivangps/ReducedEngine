@@ -35,3 +35,11 @@ static void ExitOnError(HRESULT hr, std::string message)
 	}
 #endif // DEBUG
 }
+
+static void ExitWithMessage(std::string message)
+{
+#ifdef _DEBUG
+	ErrorLog(message);
+#endif // _DEBUG
+	exit(-1);
+}

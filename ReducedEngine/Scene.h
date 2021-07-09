@@ -5,8 +5,12 @@
 // Scene contains collection of game objects present in the scene.
 class Scene
 {
+protected:
 	// Collections of game objects present in the scene.
 	std::vector<GameObject*> objectsPresent = {};
+
+	// Collection of render components.
+	RenderList renderComponentList = {};
 
 public:
 	Scene() {}
@@ -19,4 +23,6 @@ public:
 	GameObject* GetGameObject(unsigned int index);
 	// Function to set a new game object.
 	void SetGameObject(GameObject* newGameObject);
+	// Function to get the render component list.
+	RenderList* GetRenderComponentList();
 };

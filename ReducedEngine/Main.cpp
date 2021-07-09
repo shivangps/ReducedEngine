@@ -1,5 +1,7 @@
 #include "GameEngine.h"
 
+#include "Assets/Scenes/MainScene.h"
+
 // Main function.
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -7,15 +9,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_ LPWSTR lpCmdLine,
 	_In_ int nCmdShow)
 {
-	Scene* scene = new Scene();
-
-	scene->SetGameObject(new GameObject());
-
 	GameEngine* mainEngine = GameEngine::GetInstance();
 
 	mainEngine->Initialize(hInstance);
 
-	mainEngine->SetScene(scene);
+	mainEngine->SetScene(new MainScene());
 
 	mainEngine->RunGame();
 

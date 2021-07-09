@@ -65,3 +65,8 @@ void TransitionResourceState(Microsoft::WRL::ComPtr<ID3D12Resource> resource, Mi
 {
 	commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(resource.Get(), beforeState, afterState));
 }
+
+unsigned int GetAggregateSize(unsigned int size)
+{
+	return ((size + 255) & ~255);
+}

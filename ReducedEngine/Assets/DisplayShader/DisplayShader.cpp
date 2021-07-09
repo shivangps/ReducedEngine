@@ -1,9 +1,9 @@
 #include "DisplayShader.h"
-#include "..//..//..//ErrorLogger.h"
+#include "..//..//ErrorLogger.h"
 
 void DisplayShader::Initialize(Microsoft::WRL::ComPtr<ID3D12Device5> device, unsigned int numRT, DXGI_FORMAT renderTargetFormats[], DXGI_FORMAT depthStencilFormat, unsigned int samples)
 {
-	this->CreateShaderFromFile("Output/Graphics/DisplayShader/display_vertex_shader.hlsl", "Output/Graphics/DisplayShader/display_pixel_shader.hlsl");
+	this->CreateShaderFromFile("Assets/DisplayShader/display_vertex_shader.hlsl", "Assets/DisplayShader/display_pixel_shader.hlsl");
 
 	this->CreateTextureTable(device, 1);
 

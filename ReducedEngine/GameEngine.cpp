@@ -16,24 +16,34 @@ void GameEngine::ProcessAllInputs()
 
 void GameEngine::UpdateGameObjects()
 {
-	// Get the number of game objects present in the currently assigned scene.
-	unsigned int sceneObjectCount = this->currentScene->GetSize();
-	// Update each game objects in the scene.
-	for (unsigned int i = 0; i < sceneObjectCount; i++)
+	if (this->currentScene)
 	{
-		GameObject* objectPointer = this->currentScene->GetGameObject(i);
-		// Using cache for quick calculation of each game object.
-		GameObject cachedObject = *objectPointer;
+		// Get the number of game objects present in the currently assigned scene.
+		unsigned int sceneObjectCount = this->currentScene->GetSize();
+		// Update each game objects in the scene.
+		for (unsigned int i = 0; i < sceneObjectCount; i++)
+		{
+			GameObject* objectPointer = this->currentScene->GetGameObject(i);
 
-		cachedObject.Update();
-
-		*objectPointer = cachedObject;
+			objectPointer->Update();
+		}
 	}
 }
 
 void GameEngine::RenderScene()
 {
-	this->graphics->RenderScene();
+	if (this->currentScene)
+	{
+		this->graphics->RenderScene(this->currentScene->GetRenderComponentList());
+	}
+}
+
+void GameEngine::SetScene(Scene* setNewScene)
+{
+	this->currentScene = setNewScene;
+
+	// Initialize the scene.
+	this->graphics->InitializeRenderList(this->currentScene->GetRenderComponentList());
 }
 
 void GameEngine::Initialize(HINSTANCE hInstance)
@@ -46,6 +56,7 @@ void GameEngine::Initialize(HINSTANCE hInstance)
 	this->time->Start();
 	// Initialize the render engine.
 	this->graphics->Initialize(this->output->GetHandle(), this->output->GetWindowWidth(), this->output->GetWindowHeight());
+
 }
 
 void GameEngine::RunGame()

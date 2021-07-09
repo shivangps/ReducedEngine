@@ -161,11 +161,11 @@ public:
 	}
 	Matrix4 Inverse()
 	{
-		return DirectX::XMMatrixInverse(&this->Determinant(), this->GetMatrix());
+		return DirectX::XMMatrixInverse(&this->Determinant().GetVector(), this->GetMatrix());
 	}
 	Matrix4 Translation(Vector3 position)
 	{
-		return DirectX::XMMatrixTranslation(position.X(), position.Y(), position.Z()) * this->GetMatrix();
+		return *this * Matrix4(DirectX::XMMatrixTranslation(position.X(), position.Y(), position.Z()));
 	}
 	Matrix4 Rotation(Vector3 rotation)
 	{
@@ -176,9 +176,9 @@ public:
 	}
 	Matrix4 Scale(Vector3 scale)
 	{
-		return DirectX::XMMatrixScaling(scale.X(), scale.Y(), scale.Z()) * this->GetMatrix();
+		return *this * Matrix4(DirectX::XMMatrixScaling(scale.X(), scale.Y(), scale.Z()));
 	}
-	DirectX::XMVECTOR Determinant()
+	Vector3 Determinant()
 	{
 		return DirectX::XMMatrixDeterminant(this->GetMatrix());
 	}
@@ -206,7 +206,7 @@ private:
 
 	void CalculateNewLocalAxes()
 	{
-		Matrix4 rotationMatrix = DirectX::XMMatrixRotationRollPitchYaw(DirectX::XMConvertToRadians(rotation.X()), DirectX::XMConvertToRadians(rotation.Y()), 0.0f);
+		Matrix4 rotationMatrix = DirectX::XMMatrixRotationRollPitchYaw(DirectX::XMConvertToRadians(rotation.X()), DirectX::XMConvertToRadians(rotation.Y()), DirectX::XMConvertToRadians(rotation.Z()));
 		this->local_right = DirectX::XMVector3Normalize(DirectX::XMVector3TransformCoord(global_right, rotationMatrix.GetMatrix()));
 		this->local_up = DirectX::XMVector3Normalize(DirectX::XMVector3TransformCoord(global_up, rotationMatrix.GetMatrix()));
 		this->local_forward = DirectX::XMVector3Normalize(DirectX::XMVector3TransformCoord(global_forward, rotationMatrix.GetMatrix()));

@@ -21,3 +21,18 @@ void Output::SetRightRumble(unsigned int padId, float normalizedValue)
 	// Apply vibration.
 	XInputSetState(padId, &this->rumble);
 }
+
+void Output::EnableCursor()
+{
+	this->showCursor = true;
+}
+
+void Output::DisableCursor()
+{
+	this->showCursor = false;
+}
+
+bool Output::IsCursorEnabled()
+{
+	return this->showCursor;
+}

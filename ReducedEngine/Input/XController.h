@@ -1,8 +1,7 @@
 #pragma once
 
-#include<Windows.h>
+#include "../CommonHeader.h"
 #include<Xinput.h>
-#include<DirectXMath.h>
 
 static const WORD XInput_Buttons[] =
 {

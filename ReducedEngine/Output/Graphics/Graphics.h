@@ -1,13 +1,14 @@
 #pragma once
 
 // Graphics headers.
-#include "..//..//CommonHeader.h"
+#include "../../CommonHeader.h"
 #include "GraphicsHelper.h"
 #include "RenderFramebuffer.h"
 #include "DepthFramebuffer.h"
 #include "Shader.h"
+#include "RenderList.h"
 #include <dxgi1_4.h>
-#include <wrl/client.h>
+#include "Camera.h"
 
 // Class that handles the rendering of objects present in the scene.
 
@@ -42,7 +43,6 @@ class Graphics
 	DXGI_FORMAT depthStencilFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource = nullptr;
 
-	D3D12_COMMAND_LIST_TYPE directTypeList = D3D12_COMMAND_LIST_TYPE_DIRECT;
 	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList = nullptr;
 	UINT64 commandFenceValue = 0;
@@ -96,9 +96,9 @@ private:
 	DescriptorHeap gBufferHeap_RTV = {};
 
 	DXGI_FORMAT gBufferFormats[GBufferRenderTarget::Size_RT] = {
-		DXGI_FORMAT_R32G32B32A32_FLOAT,				// Position
-		DXGI_FORMAT_R32G32B32A32_FLOAT,				// Normal
-		DXGI_FORMAT_R32G32B32A32_FLOAT,				// Albedo & Specular
+		DXGI_FORMAT_R16G16B16A16_FLOAT,				// Position
+		DXGI_FORMAT_R16G16B16A16_FLOAT,				// Normal
+		DXGI_FORMAT_R16G16B16A16_FLOAT,				// Albedo & Specular
 	};
 	float gBufferClearColor[GBufferRenderTarget::Size_RT][4] =
 	{
@@ -157,6 +157,9 @@ private:
 	// Function to call for drawing the whole scene.
 	void DrawQuadGeometry(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList);
 
+private:
+	MainCamera* mainCamera = MainCamera::GetInstance();
+
 public:
 	// Function to get a single instance of graphics or render engine.
 	static Graphics* GetInstance()
@@ -167,6 +170,8 @@ public:
 
 	// Function to call for initializing the render engine and directx.
 	void Initialize(HWND windowHandle, unsigned int width, unsigned int height);
+	// Function to initialize render componenet list.
+	void InitializeRenderList(RenderList* renderComponentList);
 	// Function to call for rendering the whole scene.
-	void RenderScene();
+	void RenderScene(RenderList* renderComponentList);
 };

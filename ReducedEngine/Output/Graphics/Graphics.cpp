@@ -1,7 +1,7 @@
 #include "d3dx12.h"
 #include "..//..//Helper.h"
 #include "Graphics.h"
-#include "DisplayShader/DisplayShader.h"
+#include "..//..//Assets/DisplayShader/DisplayShader.h"
 
 void Graphics::CreateDevice()
 {
@@ -119,8 +119,6 @@ void Graphics::CreateRenderTargets(DescriptorHeap* heap, Microsoft::WRL::ComPtr<
 
 void Graphics::CreateDepthStencil(DescriptorHeap* heap, Microsoft::WRL::ComPtr<ID3D12Resource>* depthStencilResource, DXGI_FORMAT depthStencilFormat, Microsoft::WRL::ComPtr<ID3D12Device5> device, unsigned int width, unsigned int height)
 {
-	HRESULT HR;
-
 	// Create descriptor heap.
 	heap->Initialize(device, 1, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
 
@@ -336,8 +334,8 @@ void Graphics::Initialize(HWND windowHandle, unsigned int width, unsigned int he
 	// Assign viewport.
 	this->viewport.TopLeftX = 0.0f;
 	this->viewport.TopLeftY = 0.0f;
-	this->viewport.Width = width;
-	this->viewport.Height = height;
+	this->viewport.Width = (float)width;
+	this->viewport.Height = (float)height;
 
 	this->viewport.MinDepth = 0.0f;
 	this->viewport.MaxDepth = 1.0f;
@@ -361,17 +359,28 @@ void Graphics::Initialize(HWND windowHandle, unsigned int width, unsigned int he
 	// Create depth stencil.
 	this->CreateDepthStencil(&this->depthStencilHeap, &this->depthStencilResource, this->depthStencilFormat, this->device, width, height);
 	// Create command allocator.
-	this->CreateCommandListSet(&this->commandAllocator, &this->commandList, &this->commandFenceValue, this->device, this->directTypeList);
+	this->CreateCommandListSet(&this->commandAllocator, &this->commandList, &this->commandFenceValue, this->device, this->directCommandListType);
+
+	// Multi samples count.
+	unsigned int currentMultiSamples = (this->multiSampling) ? this->sampleCount : 1;
 
 	// Create framebuffer.
-	this->InitializeDeferredRendering(this->device, width, height, (this->multiSampling)? this->sampleCount : 1 );
+	this->InitializeDeferredRendering(this->device, width, height, currentMultiSamples);
 
 	// Initialize shader to render G-buffer on quad.
 	this->quadShader = DisplayShader::GetInstance();
 	this->quadShader->Initialize(this->device, 1, &this->renderTargetFormat, this->depthStencilFormat, 1);
 
+	GameAssetManager* GAM = GameAssetManager::GetInstance();
+
+	// Initialize the device to Game Asset Manager.
+	GAM->SetGraphicsDevice(this->device);
+
 	// Initialize the quad geometry.
 	this->InitializeQuadGeometry(this->device);
+
+	// Initialize All Shaders.
+	GAM->InitializeAllShadersForDeferredRender(device, _countof(gBufferFormats), gBufferFormats, this->depthFramebuffer.GetRenderTargetDepthFormat(), currentMultiSamples);
 
 	// Close and execute the command list.
 	HRESULT HR = this->commandList->Close();
@@ -384,7 +393,31 @@ void Graphics::Initialize(HWND windowHandle, unsigned int width, unsigned int he
 	this->SignalFence(this->commandQueue, this->fence, this->commandFenceValue);
 }
 
-void Graphics::RenderScene()
+void Graphics::InitializeRenderList(RenderList* renderComponentList)
+{
+	GameAssetManager* GAM = GameAssetManager::GetInstance();
+
+	this->WaitForFenceValue(this->fence, this->commandFenceValue);
+
+	this->Reset(this->commandList, this->commandAllocator);
+
+	renderComponentList->InitializeComponents(this->device, this->commandList);
+
+	GAM->LoadAllAssetsTo_GPU_RAM(this->device, this->commandList);
+	GAM->SetAllTextureViewToRespectiveHeaps(this->device);
+
+	this->CloseCommandList(this->commandList);
+
+	ID3D12CommandList* ppCommandLists[] = { this->commandList.Get() };
+	this->commandQueue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
+
+	this->commandFenceValue = this->GetCurrentSetFence();
+	SignalFence(this->commandQueue, this->fence, this->commandFenceValue);
+
+	GAM->RemoveAssetsFrom_CPU_RAM();
+}
+
+void Graphics::RenderScene(RenderList* renderComponentList)
 {
 	this->WaitForFenceValue(this->fence, this->commandFenceValue);
 
@@ -397,7 +430,6 @@ void Graphics::RenderScene()
 	Microsoft::WRL::ComPtr<ID3D12Resource> currentRenderBuffer = this->renderTargetResource[this->currentFrame];
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle;
 	dsvHandle = this->depthStencilHeap.GetCPUHandle(0);
-	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilBuffer = this->depthStencilResource;
 
 	commandList->RSSetViewports(1, &this->viewport);
 	commandList->RSSetScissorRects(1, &this->clippingRect);
@@ -407,7 +439,11 @@ void Graphics::RenderScene()
 	// G-BUFFER FILL.
 	this->SetDeferredFramebuffers(this->commandList);
 	
+	// Recalculate camera matrix.
+	this->mainCamera->CalculateViewProjection();
+	GameAssetManager::GetInstance()->SetDescriptorHeap(this->commandList);
 
+	renderComponentList->DrawAllComponents(this->commandList, this->mainCamera->GetCamera());
 
 	this->RemoveDeferredFramebuffers(this->commandList, 1, &rtvHandle, &dsvHandle);
 

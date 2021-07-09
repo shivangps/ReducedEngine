@@ -281,6 +281,20 @@ void Win32Handler::Initialize(HINSTANCE hInstance, std::string window_title, std
 	// Assign the window resolution to the output class.
 	this->output->SetWindowResoution(this->width, this->height);
 
+	// Disable the cursor if it is disabled in output.
+	if (!this->output->IsCursorEnabled())
+	{
+		RECT _clip;
+		GetWindowRect(this->hWnd, &_clip);
+		_clip.left += 5;
+		_clip.top += 30;
+		_clip.right -= 5;
+		_clip.bottom -= 5;
+
+		ClipCursor(&_clip);
+		ShowCursor(FALSE);
+	}
+
 	return;
 }
 
@@ -289,7 +303,7 @@ void Win32Handler::ProcessInput()
 	MSG msg;
 	ZeroMemory(&msg, sizeof(MSG));
 
-	if (PeekMessage(&msg, this->hWnd, 0, 0, PM_REMOVE))
+	while (PeekMessage(&msg, this->hWnd, 0, 0, PM_REMOVE))
 	{
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);

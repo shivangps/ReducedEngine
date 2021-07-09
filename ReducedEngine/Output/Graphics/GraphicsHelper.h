@@ -10,6 +10,9 @@ void InitializeResource(Microsoft::WRL::ComPtr<ID3D12Resource>* resource, Micros
 void TransitionResourceState(Microsoft::WRL::ComPtr<ID3D12Resource> resource, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList,
 	D3D12_RESOURCE_STATES beforeState, D3D12_RESOURCE_STATES afterState);
 
+// Functiont otget the aggregate size of a constant buffer view.
+unsigned int GetAggregateSize(unsigned int size);
+
 // Class to manage descriptor heap.
 class DescriptorHeap
 {

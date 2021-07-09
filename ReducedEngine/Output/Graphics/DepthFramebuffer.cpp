@@ -48,6 +48,11 @@ void DepthFramebuffer::Initialize(Microsoft::WRL::ComPtr<ID3D12Device5> device, 
 	this->srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
 }
 
+DXGI_FORMAT DepthFramebuffer::GetRenderTargetDepthFormat()
+{
+	return this->depthRtFormat;
+}
+
 void DepthFramebuffer::SetDepthBufferToDSVHandle(Microsoft::WRL::ComPtr<ID3D12Device5> device, D3D12_CPU_DESCRIPTOR_HANDLE handle)
 {
 	device->CreateDepthStencilView(this->depthStencilBuffer.Get(), &this->dsvDesc, handle);

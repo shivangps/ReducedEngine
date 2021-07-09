@@ -1,6 +1,6 @@
 #pragma once
 #include <DirectXMath.h>
-#include "..//Shader.h"
+#include "..//..//Output/Graphics/Shader.h"
 
 // This header contains the shader to simply display the texture.
 

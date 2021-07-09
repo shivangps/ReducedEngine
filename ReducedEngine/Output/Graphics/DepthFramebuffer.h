@@ -21,6 +21,8 @@ public:
 	// Function to intialize the depth framebuffer.
 	void Initialize(Microsoft::WRL::ComPtr<ID3D12Device5> device,
 		unsigned int width, unsigned int height, unsigned int multiSamples, std::wstring depthBufferName);
+	// Function to get the depth stencil format of render target.
+	DXGI_FORMAT GetRenderTargetDepthFormat();
 	// Function to set depth buffer as a render target to cpu descriptor handle.
 	void SetDepthBufferToDSVHandle(Microsoft::WRL::ComPtr<ID3D12Device5> device, D3D12_CPU_DESCRIPTOR_HANDLE handle);
 	// Function to set depth buffer as a shader resource to cpu descriptor handle.

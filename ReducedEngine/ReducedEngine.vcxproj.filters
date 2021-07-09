@@ -49,15 +49,33 @@
     <Filter Include="Source Files\Output\Graphics\DisplayShader">
       <UniqueIdentifier>{ac5a1e93-2dea-4cfc-9067-c34f0f495e1a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Asset Manager">
+      <UniqueIdentifier>{ea54e153-b59c-4856-a527-3b3ac8fb11f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Shaders">
+      <UniqueIdentifier>{f148fe41-173d-47c1-97a1-82b6be6b7794}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{033608bb-9a69-4c5e-9d49-098a01cc9e7a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Asset Manager">
+      <UniqueIdentifier>{d930ad62-ac33-43b9-ab74-494995a197b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Assets">
+      <UniqueIdentifier>{96ad8e68-5842-4a3b-96b2-737f22749caf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\TextureShader">
+      <UniqueIdentifier>{5b4693b5-3c31-4ca7-b2da-daf5f08d71a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\UnlitShader">
+      <UniqueIdentifier>{6dbcb704-08fa-4f56-9ec9-5169832b0685}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GameEngine.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GameObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Scene.cpp">
@@ -84,9 +102,6 @@
     <ClCompile Include="Input\XController.cpp">
       <Filter>Source Files\Input</Filter>
     </ClCompile>
-    <ClCompile Include="Output\Graphics\DisplayShader\DisplayShader.cpp">
-      <Filter>Source Files\Output\Graphics\DisplayShader</Filter>
-    </ClCompile>
     <ClCompile Include="Output\Graphics\Graphics.cpp">
       <Filter>Source Files\Output\Graphics</Filter>
     </ClCompile>
@@ -104,6 +119,48 @@
     </ClCompile>
     <ClCompile Include="Output\Output.cpp">
       <Filter>Source Files\Output</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\DisplayShader\DisplayShader.cpp">
+      <Filter>Source Files\Output\Graphics\DisplayShader</Filter>
+    </ClCompile>
+    <ClCompile Include="AssetManager\GameAssetManager.cpp">
+      <Filter>Source Files\Asset Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="AssetManager\MeshAssetManager.cpp">
+      <Filter>Source Files\Asset Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="AssetManager\Mesh.cpp">
+      <Filter>Source Files\Asset Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="AssetManager\Texture.cpp">
+      <Filter>Source Files\Asset Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="AssetManager\TextureAssetManager.cpp">
+      <Filter>Source Files\Asset Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\TextureShader\TextureShader.cpp">
+      <Filter>Shaders\TextureShader</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\UnlitShader\UnlitShader.cpp">
+      <Filter>Shaders\UnlitShader</Filter>
+    </ClCompile>
+    <ClCompile Include="Output\Graphics\RenderComponent.cpp">
+      <Filter>Source Files\Output\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Output\Graphics\RenderList.cpp">
+      <Filter>Source Files\Output\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Output\Graphics\Camera.cpp">
+      <Filter>Source Files\Output\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\Objects\Box\BoxObject.cpp">
+      <Filter>Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\Scenes\MainScene.cpp">
+      <Filter>Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\Objects\Player\PlayerObject.cpp">
+      <Filter>Assets</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -170,19 +227,70 @@
     <ClInclude Include="Output\Graphics\RenderFramebuffer.h">
       <Filter>Header Files\Output\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Output\Graphics\DisplayShader\DisplayShader.h">
-      <Filter>Header Files\Output\Graphics\DisplayShader</Filter>
-    </ClInclude>
     <ClInclude Include="Output\Graphics\d3dx12.h">
       <Filter>Header Files\Output\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="Assets\DisplayShader\DisplayShader.h">
+      <Filter>Header Files\Output\Graphics\DisplayShader</Filter>
+    </ClInclude>
+    <ClInclude Include="Output\Graphics\RenderComponent.h">
+      <Filter>Header Files\Output\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Output\Graphics\RenderList.h">
+      <Filter>Header Files\Output\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="AssetManager\TextureAssetManager.h">
+      <Filter>Header Files\Asset Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="AssetManager\MeshAssetManager.h">
+      <Filter>Header Files\Asset Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="AssetManager\Mesh.h">
+      <Filter>Header Files\Asset Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="AssetManager\GameAssetManager.h">
+      <Filter>Header Files\Asset Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="AssetManager\Texture.h">
+      <Filter>Header Files\Asset Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets\TextureShader\TextureShader.h">
+      <Filter>Shaders\TextureShader</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets\UnlitShader\UnlitShader.h">
+      <Filter>Shaders\UnlitShader</Filter>
+    </ClInclude>
+    <ClInclude Include="Output\Graphics\Camera.h">
+      <Filter>Header Files\Output\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets\Objects\Player\PlayerObject.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets\Objects\Box\BoxObject.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets\Scenes\MainScene.h">
+      <Filter>Assets</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Output\Graphics\DisplayShader\display_vertex_shader.hlsl">
+    <FxCompile Include="Assets\DisplayShader\display_pixel_shader.hlsl">
       <Filter>Source Files\Output\Graphics\DisplayShader</Filter>
     </FxCompile>
-    <FxCompile Include="Output\Graphics\DisplayShader\display_pixel_shader.hlsl">
+    <FxCompile Include="Assets\DisplayShader\display_vertex_shader.hlsl">
       <Filter>Source Files\Output\Graphics\DisplayShader</Filter>
+    </FxCompile>
+    <FxCompile Include="Assets\TextureShader\texture_pixel_shader.hlsl">
+      <Filter>Shaders\TextureShader</Filter>
+    </FxCompile>
+    <FxCompile Include="Assets\TextureShader\texture_vertex_shader.hlsl">
+      <Filter>Shaders\TextureShader</Filter>
+    </FxCompile>
+    <FxCompile Include="Assets\UnlitShader\unlit_pixel_shader.hlsl">
+      <Filter>Shaders\UnlitShader</Filter>
+    </FxCompile>
+    <FxCompile Include="Assets\UnlitShader\unlit_vertex_shader.hlsl">
+      <Filter>Shaders\UnlitShader</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>
