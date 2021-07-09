@@ -196,17 +196,19 @@ void GameAssetManager::AssignTextureViewToHeap(UINT64 textureIndex, D3D12_CPU_DE
 	this->ToBeAppliedHandles.push_back({ textureIndex, handle });
 }
 
-#include "../Assets/UnlitShader/UnlitShader.h"
-#include "../Assets/TextureShader/TextureShader.h"
-
 void GameAssetManager::SetGraphicsDevice(Microsoft::WRL::ComPtr<ID3D12Device5> device)
 {
 	this->Mesh_AM->SetDevice(device);
 	this->Texture_AM->SetDevice(device);
 }
 
+#include "../Assets/UnlitShader/UnlitShader.h"
+#include "../Assets/TextureShader/TextureShader.h"
+#include "../Assets/CubemapShader/CubemapShader.h"
+
 void GameAssetManager::InitializeAllShadersForDeferredRender(Microsoft::WRL::ComPtr<ID3D12Device5> device, unsigned int numberOfRenderTarget, DXGI_FORMAT* renderTargetFormats, DXGI_FORMAT depthStencilFormat, unsigned int samples)
 {
 	UnlitShader::GetInstance()->Initialize(device, numberOfRenderTarget, renderTargetFormats, depthStencilFormat, samples);
 	TextureShader::GetInstance()->Initialize(device, numberOfRenderTarget, renderTargetFormats, depthStencilFormat, samples);
+	CubemapShader::GetInstance()->Initialize(device, numberOfRenderTarget, renderTargetFormats, depthStencilFormat, samples);
 }

@@ -9,6 +9,7 @@
 #include "RenderList.h"
 #include <dxgi1_4.h>
 #include "Camera.h"
+#include "Cubemap.h"
 
 // Class that handles the rendering of objects present in the scene.
 
@@ -159,6 +160,10 @@ private:
 
 private:
 	MainCamera* mainCamera = MainCamera::GetInstance();
+
+private:
+	Cubemap skymap;
+	std::string skymapFileLocation = "Assets/Textures/Skymap/Skymap.dds";
 
 public:
 	// Function to get a single instance of graphics or render engine.

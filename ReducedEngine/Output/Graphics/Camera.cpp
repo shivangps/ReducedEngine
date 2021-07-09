@@ -18,6 +18,11 @@ Matrix4 Camera::GetViewProjectionMatrix()
 	return (view * projection);
 }
 
+Transform Camera::GetTransform()
+{
+	return *this->transform;
+}
+
 void MainCamera::SetNewCamera(Camera* camera)
 {
 	this->mainCamera = camera;
@@ -28,19 +33,24 @@ Camera MainCamera::GetCamera()
 	return *this->mainCamera;
 }
 
+Transform MainCamera::GetTransform()
+{
+	return this->cameraTransform;
+}
+
 Matrix4 MainCamera::GetCameraMatrix()
 {
-	return this->mainCamera->GetViewProjectionMatrix();
+	return this->cameraMatrix;
 }
 
 Matrix4 MainCamera::GetProjectionMatrix()
 {
-	return this->mainCamera->projection;
+	return this->projectionMatrix;
 }
 
 Matrix4 MainCamera::GetViewMatrix()
 {
-	return this->mainCamera->view;
+	return this->viewMatrix;
 }
 
 unsigned int MainCamera::GetWidth()
@@ -71,4 +81,8 @@ float MainCamera::GetFieldOfView()
 void MainCamera::CalculateViewProjection()
 {
 	this->mainCamera->CalculateViewProjection();
+	this->cameraMatrix = this->mainCamera->GetViewProjectionMatrix();
+	this->viewMatrix = this->mainCamera->view;
+	this->projectionMatrix = this->mainCamera->projection;
+	this->cameraTransform = this->GetTransform();
 }

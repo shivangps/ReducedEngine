@@ -28,6 +28,9 @@ public:
 
 	// Function to get view projection matrix.
 	Matrix4 GetViewProjectionMatrix();
+
+	// Function to get the transform.
+	Transform GetTransform();
 };
 
 // Singleton(single instance) definition of Main Camera component.
@@ -35,6 +38,12 @@ class MainCamera
 {
 private:
 	MainCamera() {}
+
+	// Copy data of the camera.
+	Matrix4 cameraMatrix;
+	Matrix4 viewMatrix;
+	Matrix4 projectionMatrix;
+	Transform cameraTransform;
 
 	// Assigned main camera.
 	Camera* mainCamera = nullptr;
@@ -53,6 +62,7 @@ public:
 	Camera GetCamera();
 
 	// Get functions for respective camera characteristics.
+	Transform GetTransform();
 	Matrix4 GetCameraMatrix();
 	Matrix4 GetProjectionMatrix();
 	Matrix4 GetViewMatrix();

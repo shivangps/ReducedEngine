@@ -382,6 +382,9 @@ void Graphics::Initialize(HWND windowHandle, unsigned int width, unsigned int he
 	// Initialize All Shaders.
 	GAM->InitializeAllShadersForDeferredRender(device, _countof(gBufferFormats), gBufferFormats, this->depthFramebuffer.GetRenderTargetDepthFormat(), currentMultiSamples);
 
+	// Initialize the skymap.
+	this->skymap.Initialize(this->device, this->commandList, this->skymapFileLocation);
+
 	// Close and execute the command list.
 	HRESULT HR = this->commandList->Close();
 	ExitOnError(HR, "Failed to close the graphics command list.");
@@ -444,6 +447,8 @@ void Graphics::RenderScene(RenderList* renderComponentList)
 	GameAssetManager::GetInstance()->SetDescriptorHeap(this->commandList);
 
 	renderComponentList->DrawAllComponents(this->commandList, this->mainCamera->GetCamera());
+
+	this->skymap.Draw(this->commandList, this->mainCamera->GetCamera());
 
 	this->RemoveDeferredFramebuffers(this->commandList, 1, &rtvHandle, &dsvHandle);
 

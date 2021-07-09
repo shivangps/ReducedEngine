@@ -146,6 +146,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AssetManager\GameAssetManager.cpp" />
+    <ClCompile Include="Assets\CubemapShader\CubemapShader.cpp" />
     <ClCompile Include="Assets\Objects\Box\BoxObject.cpp" />
     <ClCompile Include="Assets\Objects\Player\PlayerObject.cpp" />
     <ClCompile Include="Assets\Scenes\MainScene.cpp" />
@@ -159,6 +160,7 @@
     <ClCompile Include="Input\XController.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Output\Graphics\Camera.cpp" />
+    <ClCompile Include="Output\Graphics\Cubemap.cpp" />
     <ClCompile Include="Output\Graphics\DepthFramebuffer.cpp" />
     <ClCompile Include="Assets\DisplayShader\DisplayShader.cpp" />
     <ClCompile Include="Output\Graphics\Graphics.cpp" />
@@ -178,6 +180,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AssetManager\GameAssetManager.h" />
+    <ClInclude Include="Assets\CubemapShader\CubemapShader.h" />
     <ClInclude Include="Assets\Objects\Box\BoxObject.h" />
     <ClInclude Include="Assets\Objects\Player\PlayerObject.h" />
     <ClInclude Include="Assets\Scenes\MainScene.h" />
@@ -196,6 +199,7 @@
     <ClInclude Include="Input\XController.h" />
     <ClInclude Include="MathEngine.h" />
     <ClInclude Include="Output\Graphics\Camera.h" />
+    <ClInclude Include="Output\Graphics\Cubemap.h" />
     <ClInclude Include="Output\Graphics\d3dx12.h" />
     <ClInclude Include="Output\Graphics\DepthFramebuffer.h" />
     <ClInclude Include="Assets\DisplayShader\DisplayShader.h" />
@@ -215,6 +219,26 @@
     <ClInclude Include="Output\Output.h" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="Assets\CubemapShader\cubemap_pixel_shader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)/CompiledShaders/%(Filename).cso</ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)/CompiledShaders/%(Filename).cso</ObjectFileOutput>
+    </FxCompile>
+    <FxCompile Include="Assets\CubemapShader\cubemap_vertex_shader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)/CompiledShaders/%(Filename).cso</ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)/CompiledShaders/%(Filename).cso</ObjectFileOutput>
+    </FxCompile>
     <FxCompile Include="Assets\DisplayShader\display_pixel_shader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
