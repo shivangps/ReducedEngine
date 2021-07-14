@@ -10,6 +10,7 @@
 #include <dxgi1_4.h>
 #include "Camera.h"
 #include "Cubemap.h"
+#include "LightComponent.h"
 
 // Class that handles the rendering of objects present in the scene.
 
@@ -83,13 +84,15 @@ class Graphics
 	void CloseCommandList(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList);
 	// Function to present the frame.
 	void PresentFrame(Microsoft::WRL::ComPtr<IDXGISwapChain3> swapChain, unsigned int* currentFrame);
+	// Function to initialize all the graphics engine shaders.
+	void InitilizeGraphicsEngineShaders(Microsoft::WRL::ComPtr<ID3D12Device5> device, unsigned int numRT, DXGI_FORMAT* renderTargetFormats, DXGI_FORMAT depthStencilFormat, unsigned int samples);
 
 private:
 	// Deffered rendering.
 	// Framebuffer render target.
 	enum GBufferRenderTarget
 	{
-		Position_RT = 0,
+		FragmentPosition_RT = 0,
 		Normal_RT,
 		AlbedoSpecular_RT,
 		Size_RT
@@ -107,7 +110,7 @@ private:
 		{ 0.0f, 0.0f, 0.0f, 0.0f },			// Normal
 		{ 0.0f, 0.0f, 0.0f, 0.0f },			// Albedo & Specular
 	};
-	RenderFramebuffer positionFramebuffer = {};
+	RenderFramebuffer fragmentPositionFramebuffer = {};
 	RenderFramebuffer normalFramebuffer = {};
 	RenderFramebuffer albedoSpecFramebuffer = {};
 	
@@ -118,7 +121,7 @@ private:
 	// Framebuffer shader resource.
 	enum GBufferShaderResource
 	{
-		Position_SR = 0,
+		FragmentPosition_SR = 0,
 		Normal_SR,
 		AlbedoSpecular_SR,
 		Depth_SR,
@@ -164,6 +167,15 @@ private:
 private:
 	Cubemap skymap;
 	std::string skymapFileLocation = "Assets/Textures/Skymap/Skymap.dds";
+
+private:
+	// Sun Light as Directional Light.
+	Transform sunLightTransform = {};
+	LightComponent sunLight = { &this->sunLightTransform };
+
+	bool useShadowRender = true;
+	bool useDirectionalLight = true;
+	bool debugFramebuffer = false;
 
 public:
 	// Function to get a single instance of graphics or render engine.

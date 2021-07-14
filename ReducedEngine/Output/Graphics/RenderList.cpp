@@ -19,6 +19,7 @@ void RenderList::InitializeComponents(Microsoft::WRL::ComPtr<ID3D12Device5> devi
 		RenderComponent* renderComponent = renderComponentList[i].renderComponent;
 
 		renderComponent->InitializeComponent(device, commandList);
+		renderComponent->InitializeShadowConstantBuffer(device);
 	}
 }
 
@@ -29,5 +30,15 @@ void RenderList::DrawAllComponents(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandL
 		RenderComponent* renderComponent = this->renderComponentList[i].renderComponent;
 
 		renderComponent->Draw(commandList, camera);
+	}
+}
+
+void RenderList::DrawAllComponentsForShadow(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList, Matrix4 lightSpaceMatrix)
+{
+	for (unsigned int i = 0; i < this->renderComponentList.size(); i++)
+	{
+		RenderComponent* renderComponent = this->renderComponentList[i].renderComponent;
+
+		renderComponent->DrawForShadow(commandList, lightSpaceMatrix);
 	}
 }

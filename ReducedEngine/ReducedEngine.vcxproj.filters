@@ -168,6 +168,12 @@
     <ClCompile Include="Assets\CubemapShader\CubemapShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Output\Graphics\LightComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\DirectionalLightShader\DirectionalLightShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CommonHeader.h">
@@ -284,6 +290,12 @@
     <ClInclude Include="Assets\CubemapShader\CubemapShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Output\Graphics\LightComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets\DirectionalLightShader\DirectionalLightShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Assets\DisplayShader\display_pixel_shader.hlsl">
@@ -306,5 +318,7 @@
     </FxCompile>
     <FxCompile Include="Assets\CubemapShader\cubemap_vertex_shader.hlsl" />
     <FxCompile Include="Assets\CubemapShader\cubemap_pixel_shader.hlsl" />
+    <FxCompile Include="Assets\DirectionalLightShader\directional_light_vertex_shader.hlsl" />
+    <FxCompile Include="Assets\DirectionalLightShader\directional_light_pixel_shader.hlsl" />
   </ItemGroup>
 </Project>

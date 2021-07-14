@@ -30,6 +30,7 @@ private:
 	unsigned int maximumHeaps = 0;
 	D3D12_CPU_DESCRIPTOR_HANDLE startCPUHandle = {};
 	D3D12_GPU_DESCRIPTOR_HANDLE startGPUHandle = {};
+	D3D12_DESCRIPTOR_HEAP_TYPE heapType = {};
 
 public:
 	// Initialization function.
@@ -38,6 +39,10 @@ public:
 	D3D12_CPU_DESCRIPTOR_HANDLE GetCPUHandle(unsigned int offsetIndex);
 	// Function to get the GPU handle offset from start of heap.
 	D3D12_GPU_DESCRIPTOR_HANDLE GetGPUHandle(unsigned int offsetIndex);
+	// Function to get heap size.
+	unsigned int GetHeapSize();
+	// Function to get heap type.
+	D3D12_DESCRIPTOR_HEAP_TYPE GetHeapType();
 	// Function to get the pointer of the heap.
 	ID3D12DescriptorHeap* Get();
 };

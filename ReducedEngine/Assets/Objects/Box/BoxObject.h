@@ -7,8 +7,12 @@ private:
 	RenderComponent renderComponent = { &this->objectTransform };
 
 	void LoadCubeMesh();
+
+	float rotationX = 0.0f;
 public:
 	BoxObject();
 
 	void Initialize(RenderList* renderList);
+
+	void Update();
 };

@@ -20,6 +20,6 @@ ps_out main(in ps_in IN)
     // Retrieve data of pixel from G-Buffer.
     float3 color = displayTexture.Sample(mainSampler, modTexCoord).xyz;
 
-    OUT.color = float4(color, 1.0f);
+    OUT.color = float4(color.rrr, 1.0f);
     return OUT;
 }

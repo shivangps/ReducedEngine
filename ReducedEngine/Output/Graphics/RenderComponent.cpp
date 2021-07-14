@@ -29,7 +29,11 @@ void RenderComponent::UpdateCameraMatrix(Camera camera)
 	model = model.Rotation(transform.GetGlobalRotation());
 	model = model.Scale(transform.GetGlobalScale());
 
-	this->localData.cameraMatrix = (model * camera.GetViewProjectionMatrix()).GetFloat4x4();
+	this->localData.cameraMatrix = model * camera.GetViewProjectionMatrix();
+	this->localData.modelMatrix = model.Transpose();
+	this->localData.viewMatrix = camera.view.Transpose();
+	this->localData.normalMatrix = model.Inverse();
+
 	memcpy(this->pLocalDataCBV, &this->localData, sizeof(this->localData));
 }
 
@@ -101,6 +105,12 @@ void RenderComponent::InitializeComponent(Microsoft::WRL::ComPtr<ID3D12Device5> 
 
 	// Initialize local data such as camera matrix.
 	this->InitializeLocalData(device);
+
+	// Initialize shadow descriptor heap.
+	this->shadowDataHeap.Initialize(device, 1, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
+
+	// Initialze the shadow data constant buffer.
+	this->InitializeShadowConstantBuffer(device);
 }
 
 void RenderComponent::Draw(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList, Camera camera)
@@ -114,6 +124,54 @@ void RenderComponent::Draw(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> co
 
 	commandList->SetGraphicsRootDescriptorTable(0, this->heap.GetGPUHandle(0));
 	commandList->SetGraphicsRootDescriptorTable(1, this->heap.GetGPUHandle(1));
+
+	for (unsigned int i = 0; i < this->meshes.size(); i++)
+	{
+		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		commandList->IASetVertexBuffers(0, 1, &this->meshes[i].vertexBufferView);
+		commandList->IASetIndexBuffer(&this->meshes[i].indexBufferView);
+		commandList->DrawIndexedInstanced(this->meshes[i].numberOfIndices, 1, 0, 0, 0);
+	}
+}
+
+void RenderComponent::InitializeShadowConstantBuffer(Microsoft::WRL::ComPtr<ID3D12Device5> device)
+{
+	// Create resource. 
+	unsigned int size = sizeof(this->shadowData);
+	InitializeResource(&this->shadowDataResource, device, &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), &CD3DX12_RESOURCE_DESC::Buffer(GetAggregateSize(size)), D3D12_RESOURCE_STATE_GENERIC_READ, nullptr);
+	this->shadowDataResource->SetName(L"Render Component Shadow Data Resource");
+
+	// Create constant buffer view.
+	D3D12_CONSTANT_BUFFER_VIEW_DESC constantBufferViewDesc = {};
+	constantBufferViewDesc.BufferLocation = this->shadowDataResource->GetGPUVirtualAddress();
+	constantBufferViewDesc.SizeInBytes = GetAggregateSize(size);
+	device->CreateConstantBufferView(&constantBufferViewDesc, this->shadowDataHeap.GetCPUHandle(0));
+
+	// Create data pointer to cbv memory space.
+	CD3DX12_RANGE readRange = {};
+	this->shadowDataResource->Map(0, &readRange, reinterpret_cast<void**>(&this->pShadowDataCBV));
+	this->shadowDataResource->Unmap(0, nullptr);
+}
+
+void RenderComponent::DrawForShadow(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList, Matrix4 lightSpaceMatrix)
+{
+	// Update objects transform for constant buffer update.
+	Transform transform = *this->transform;
+
+	Matrix4 model;
+
+	model = model.Translation(transform.GetGlobalPostion());
+	model = model.Rotation(transform.GetGlobalRotation());
+	model = model.Scale(transform.GetGlobalScale());
+
+	this->shadowData.lightSpaceMatrix = model * lightSpaceMatrix;
+
+	memcpy(this->pShadowDataCBV, &this->shadowData, sizeof(this->shadowData));
+
+	ID3D12DescriptorHeap* ppHeaps[] = { this->shadowDataHeap.Get() };
+	commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
+
+	commandList->SetGraphicsRootDescriptorTable(0, this->shadowDataHeap.GetGPUHandle(0));
 
 	for (unsigned int i = 0; i < this->meshes.size(); i++)
 	{

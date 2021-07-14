@@ -7,6 +7,7 @@ void DescriptorHeap::Initialize(Microsoft::WRL::ComPtr<ID3D12Device5> device, un
 
 	this->device = device;
 	this->maximumHeaps = numberOfHeaps;
+	this->heapType = type;
 
 	// Describe descriptor heaps;
 	D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
@@ -40,6 +41,16 @@ D3D12_GPU_DESCRIPTOR_HANDLE DescriptorHeap::GetGPUHandle(unsigned int offsetInde
 	handle.ptr = this->startGPUHandle.ptr + (offsetIndex * heapSize);
 
 	return handle;
+}
+
+unsigned int DescriptorHeap::GetHeapSize()
+{
+	return this->heapSize;
+}
+
+D3D12_DESCRIPTOR_HEAP_TYPE DescriptorHeap::GetHeapType()
+{
+	return this->heapType;
 }
 
 ID3D12DescriptorHeap* DescriptorHeap::Get()

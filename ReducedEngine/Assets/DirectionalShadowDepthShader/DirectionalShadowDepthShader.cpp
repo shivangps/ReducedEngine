@@ -1,11 +1,10 @@
-#include "TextureShader.h"
+#include "DirectionalShadowDepthShader.h"
 
-void TextureShader::Initialize(Microsoft::WRL::ComPtr<ID3D12Device5> device, unsigned int numRT, DXGI_FORMAT renderTargetFormats[], DXGI_FORMAT depthStencilFormat, unsigned int samples)
+void DirectionalShadowDepthShader::Initialize(Microsoft::WRL::ComPtr<ID3D12Device5> device, unsigned int numRT, DXGI_FORMAT renderTargetFormats[], DXGI_FORMAT depthStencilFormat, unsigned int samples)
 {
-	this->CreateShaderFromFile("Assets/TextureShader/texture_vertex_shader.hlsl", "Assets/TextureShader/texture_pixel_shader.hlsl");
+	this->CreateShaderFromFile("Assets/DirectionalShadowDepthShader/directional_shadow_depth_vertex_shader.hlsl", "Assets/DirectionalShadowDepthShader/directional_shadow_depth_pixel_shader.hlsl");
 
 	this->CreateConstantBufferTable(device, 1);
-	this->CreateTextureTable(device, 1);
 
 	D3D12_INPUT_ELEMENT_DESC inputLayout[]
 	{

@@ -7,9 +7,17 @@
 
 // This header file contains the class definition for render components present in entities visible in the scene.
 
+struct ShadowData
+{
+	Matrix4 lightSpaceMatrix;
+};
+
 struct LocalData
 {
-	DirectX::XMFLOAT4X4 cameraMatrix;
+	Matrix4 cameraMatrix;
+	Matrix4 modelMatrix;
+	Matrix4 viewMatrix;
+	Matrix4 normalMatrix;
 };
 
 class RenderComponent
@@ -29,7 +37,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> localDataResource = nullptr;
 
 protected:
-
+	// To store the pointer of the transform of its corresponding gameobject.
 	Transform* transform = nullptr;
 
 	Shader* shader = nullptr;
@@ -70,4 +78,20 @@ public:
 	void InitializeComponent(Microsoft::WRL::ComPtr<ID3D12Device5> device, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList);
 	// Function to draw the render component.
 	void Draw(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList, Camera camera);
+
+private:
+	// Shadow render.
+	DescriptorHeap shadowDataHeap = {};
+
+	ShadowData shadowData = {};
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> shadowDataResource = nullptr;
+
+	unsigned char* pShadowDataCBV = nullptr;
+
+public:
+	// Function to initialize the constant buffer for shadows.
+	void InitializeShadowConstantBuffer(Microsoft::WRL::ComPtr<ID3D12Device5> device);
+	// Function to draw the component for shadows. (without traditional shaders or textures);
+	void DrawForShadow(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList, Matrix4 lightSpaceMatrix);
 };

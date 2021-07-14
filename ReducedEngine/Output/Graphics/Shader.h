@@ -45,6 +45,8 @@ protected:
 	// Function to create graphics pipeline.
 	void CreateGraphicsPipelineState(Microsoft::WRL::ComPtr<ID3D12Device5> device, unsigned int numRT, DXGI_FORMAT renderTargetFormats[], DXGI_FORMAT depthStencilFormat,
 		unsigned int samples, D3D12_INPUT_LAYOUT_DESC inputElementDesc);
+	void CreateGraphicsPipelineState(Microsoft::WRL::ComPtr<ID3D12Device5> device, unsigned int numRT, DXGI_FORMAT renderTargetFormats[], DXGI_FORMAT depthStencilFormat,
+		unsigned int samples, D3D12_INPUT_LAYOUT_DESC inputElementDesc, D3D12_CULL_MODE cullMode);
 
 public:
 	// Function to set the shader for rendering.
