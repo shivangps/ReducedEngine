@@ -30,13 +30,24 @@ Transform LightComponent::GetTransform()
 
 void LightComponent::Initialize(Microsoft::WRL::ComPtr<ID3D12Device5> device)
 {
+	this->shadowViewport.TopLeftX = 0.0f;
+	this->shadowViewport.TopLeftY = 0.0f;
+	this->shadowViewport.Width = (float)this->shadowWidth;
+	this->shadowViewport.Height = (float)this->shadowHeight;
+
+	this->shadowViewport.MinDepth = 0.0f;
+	this->shadowViewport.MaxDepth = 1.0f;
+
+	this->shadowClippingRect.left = 0.0f;
+	this->shadowClippingRect.top = 0.0f;
+	this->shadowClippingRect.right = (float)this->shadowWidth;
+	this->shadowClippingRect.bottom = (float)this->shadowHeight;
+
 	this->lightDescriptorHeap.Initialize(device, Slot::Size, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
 	this->shadowHeap.Initialize(device, 1, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
 
 	this->BuildLightConstantBuffer(device);
 
-	this->shadowWidth = Output::GetInstance()->GetWindowWidth();
-	this->shadowHeight = Output::GetInstance()->GetWindowHeight();
 	this->DLCharacteristics.shadowWidth = this->shadowWidth;
 	this->DLCharacteristics.shadowHeight = this->shadowHeight;
 	this->shadowDepth.Initialize(device, this->shadowWidth, this->shadowHeight, 1, L"Shadow Depth Buffer for Directional Light");
@@ -115,8 +126,13 @@ void LightComponent::RenderSceneToShadow(Microsoft::WRL::ComPtr<ID3D12GraphicsCo
 	D3D12_CPU_DESCRIPTOR_HANDLE* pRenderTargetHandle, 
 	bool RTsSingleHandleToDescriptorRange, 
 	D3D12_CPU_DESCRIPTOR_HANDLE* pDepthStencilTargetHandle, 
-	RenderList* renderComponentList, Vector3 shadowPosition)
+	RenderList* renderComponentList, Vector3 shadowPosition,
+	D3D12_VIEWPORT* currentSetViewport,
+	D3D12_RECT* currentSetClipRect)
 {
+	commandList->RSSetViewports(1, &this->shadowViewport);
+	commandList->RSSetScissorRects(1, &this->shadowClippingRect);
+
 	Matrix4 view = DirectX::XMMatrixLookAtLH(shadowPosition.GetVector(), this->transform->GetLocalDown().GetVector(), this->transform->GetLocalUp().GetVector());
 	Matrix4 projection = DirectX::XMMatrixOrthographicLH(5.0f, 5.0f, 0.1f, 10.0f);
 
@@ -133,4 +149,7 @@ void LightComponent::RenderSceneToShadow(Microsoft::WRL::ComPtr<ID3D12GraphicsCo
 	commandList->OMSetRenderTargets(numberOfRenderTargets, pRenderTargetHandle, RTsSingleHandleToDescriptorRange, pDepthStencilTargetHandle);
 
 	this->shadowDepth.CopyResource(commandList);
+
+	commandList->RSSetViewports(1, currentSetViewport);
+	commandList->RSSetScissorRects(1, currentSetClipRect);
 }

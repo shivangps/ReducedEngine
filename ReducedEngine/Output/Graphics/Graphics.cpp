@@ -481,7 +481,7 @@ void Graphics::RenderScene(RenderList* renderComponentList)
 
 	if (this->useShadowRender)
 	{
-		this->sunLight.RenderSceneToShadow(this->commandList, 1, &rtvHandle, true, &dsvHandle, renderComponentList, Vector3(0.0f, 5.0f, 0.0f));
+		this->sunLight.RenderSceneToShadow(this->commandList, 1, &rtvHandle, true, &dsvHandle, renderComponentList, Vector3(0.0f, 5.0f, 0.0f), &this->viewport, &this->clippingRect);
 	}
 
 	//----------------X-----------------//

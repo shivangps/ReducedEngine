@@ -83,8 +83,10 @@ public:
 private:
 	// Shadows for directional light.
 
-	unsigned int shadowHeight = 720;
-	unsigned int shadowWidth = 1280;
+	unsigned int shadowHeight = 1000;
+	unsigned int shadowWidth = 1000;
+	D3D12_VIEWPORT shadowViewport = {};
+	D3D12_RECT shadowClippingRect = {};
 
 	DepthFramebuffer shadowDepth = {};
 
@@ -104,5 +106,7 @@ public:
 		D3D12_CPU_DESCRIPTOR_HANDLE* pRenderTargetHandle,
 		bool RTsSingleHandleToDescriptorRange,
 		D3D12_CPU_DESCRIPTOR_HANDLE* pDepthStencilTargetHandle,
-		RenderList* renderComponentList, Vector3 shadowPosition);
+		RenderList* renderComponentList, Vector3 shadowPosition,
+		D3D12_VIEWPORT* currentSetViewport,
+		D3D12_RECT* currentSetClipRect);
 };

@@ -90,7 +90,7 @@ void BoxObject::LoadCubeMesh()
 BoxObject::BoxObject()
 {
 	this->objectTransform.SetPosition(0.0f, 2.0f, 0.0f);
-	this->objectTransform.SetRotation(45.0f, 0.0f, 45.0f);
+	this->objectTransform.SetRotation(0.0f, 45.0f, 0.0f);
 	this->objectTransform.SetScale(Vector3(0.5f));
 
 	this->renderComponent.LoadModel("Assets/3D_Objects/Crate/Crate.obj");
@@ -104,6 +104,4 @@ void BoxObject::Initialize(RenderList* renderList)
 
 void BoxObject::Update()
 {
-	this->rotationX = 0.1f;
-	this->objectTransform.RotateX(this->rotationX);
 }

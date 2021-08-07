@@ -28,7 +28,7 @@ cbuffer DirectionalLightCharacteristics : register(b0)
 Texture2D fragmentPositionTexture : register(t0);   // 4
 Texture2D normalTexture : register(t1);             // 4
 Texture2D albedoSpecTexture : register(t2);         // 4
-Texture2D shadowDepthTexture : register(t3);        // 1
+Texture2D shadowDepthTexture : register(t3);        // 2
 
 SamplerState mainSampler : register(s0);
 
@@ -44,7 +44,7 @@ float CalculateShadow(float4 fragmentPositionLightSpace, float3 surfaceNormal, f
     // perform perspective divide
     float3 projectionCoords = fragmentPositionLightSpace.xyz / fragmentPositionLightSpace.w;
     
-    // bring the coordinates to NDC.
+    // bring the coordinates to Normalized Device Coordinates.
     projectionCoords.x = 0.5f + projectionCoords.x * 0.5f;
     projectionCoords.y = 0.5f - projectionCoords.y * 0.5f;
     
@@ -97,14 +97,14 @@ void main(in ps_in IN, out ps_out OUT)
     // Calculate.
     if(length(normal) > 0.1f)
     {
-        float ambientFactor = 0.5f;
+        float ambientFactor = 0.43f;
         float shadowFactor = CalculateShadow(fragmentPositionLightSpace, normal, lightDirection.rgb);
         float diffuseFactor = CalculateDirectionalDiffuseFactor(lightDirection.rgb, normal);
         if (diffuseFactor < ambientFactor)
             diffuseFactor = ambientFactor;
         if (shadowFactor < ambientFactor)
             shadowFactor = ambientFactor;
-        float3 diffuse = lightDiffuse.rgb * color * diffuseFactor * shadowFactor * 2.0f;
+        float3 diffuse = lightDiffuse.rgb * color * (diffuseFactor + shadowFactor) / 2.0f * 2.0f;
         
         resultColor = diffuse;
     }
