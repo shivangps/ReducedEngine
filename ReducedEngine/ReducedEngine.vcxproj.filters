@@ -174,6 +174,33 @@
     <ClCompile Include="Assets\DirectionalLightShader\DirectionalLightShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Assets\DirectionalShadowDepthShader\DirectionalShadowDepthShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\InstanceShader\InstanceShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\Objects\Plane\PlaneObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Tools\TimeTool.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\SSAOShader\SSAOShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Output\Graphics\Quad\Quad.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Output\Graphics\SSAO\SSAO.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\SSAOBlurShader\SSAOBlurShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Output\Graphics\INSTANCE_EXPERIMENT.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CommonHeader.h">
@@ -296,6 +323,33 @@
     <ClInclude Include="Assets\DirectionalLightShader\DirectionalLightShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Assets\DirectionalShadowDepthShader\DirectionalShadowDepthShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets\InstanceShader\InstanceShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets\Objects\Plane\PlaneObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Tools\TimeTool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets\SSAOShader\SSAOShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Output\Graphics\Quad\Quad.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Output\Graphics\SSAO\SSAO.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets\SSAOBlurShader\SSAOBlurShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Output\Graphics\INSTANCE_EXPERIMENT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Assets\DisplayShader\display_pixel_shader.hlsl">
@@ -320,5 +374,13 @@
     <FxCompile Include="Assets\CubemapShader\cubemap_pixel_shader.hlsl" />
     <FxCompile Include="Assets\DirectionalLightShader\directional_light_vertex_shader.hlsl" />
     <FxCompile Include="Assets\DirectionalLightShader\directional_light_pixel_shader.hlsl" />
+    <FxCompile Include="Assets\DirectionalShadowDepthShader\directional_shadow_depth_pixel_shader.hlsl" />
+    <FxCompile Include="Assets\DirectionalShadowDepthShader\directional_shadow_depth_vertex_shader.hlsl" />
+    <FxCompile Include="Assets\InstanceShader\instance_vertex_shader.hlsl" />
+    <FxCompile Include="Assets\InstanceShader\instance_pixel_shader.hlsl" />
+    <FxCompile Include="Assets\SSAOShader\ssao_vertex_shader.hlsl" />
+    <FxCompile Include="Assets\SSAOShader\ssao_pixel_shader.hlsl" />
+    <FxCompile Include="Assets\SSAOBlurShader\ssao_blur_vertex_shader.hlsl" />
+    <FxCompile Include="Assets\SSAOBlurShader\ssao_blur_pixel_shader.hlsl" />
   </ItemGroup>
 </Project>

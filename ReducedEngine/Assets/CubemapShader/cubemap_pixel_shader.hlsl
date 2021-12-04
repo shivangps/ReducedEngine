@@ -7,8 +7,9 @@ struct ps_in
 struct ps_out
 {
     float4 position : SV_TARGET0;
-    float4 normal : SV_TARGET1;
-    float4 albedoSpec : SV_TARGET2;
+    float4 fragmentViewPosition : SV_TARGET1;
+    float4 normal : SV_TARGET2;
+    float4 albedoSpec : SV_TARGET3;
 };
 
 TextureCube cubeMap : register(t0);

@@ -4,6 +4,7 @@
 #include "../AssetManager/GameAssetManager.h"
 #include "GraphicsHelper.h"
 #include "../../MathEngine.h"
+#include "../Helper.h"
 
 // This header file contains the class definition for render components present in entities visible in the scene.
 
@@ -18,11 +19,15 @@ struct LocalData
 	Matrix4 modelMatrix;
 	Matrix4 viewMatrix;
 	Matrix4 normalMatrix;
+	Matrix4 modelViewMatrix;
 };
 
 class RenderComponent
 {
 private:
+	// Booleanto keep track if the render component is to be rendered or not.
+	Boolean* enable = nullptr;
+
 	// Uninitialzed data.
 	struct MeshData
 	{
@@ -94,4 +99,9 @@ public:
 	void InitializeShadowConstantBuffer(Microsoft::WRL::ComPtr<ID3D12Device5> device);
 	// Function to draw the component for shadows. (without traditional shaders or textures);
 	void DrawForShadow(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList, Matrix4 lightSpaceMatrix);
+	// Function to assign pointer to the enble bool variable.
+	void SetEnable(Boolean* pBool);
+	// Funtion to enable or disable rendering of the component in the list.
+	void EnableRendering();
+	void DisableRendering();
 };

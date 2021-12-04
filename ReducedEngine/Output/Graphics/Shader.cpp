@@ -68,6 +68,17 @@ void Shader::CreateDescriptorTable(Microsoft::WRL::ComPtr<ID3D12Device5> device,
 	this->CreateRootSignature(device);
 }
 
+void Shader::CreateDescriptorTable(Microsoft::WRL::ComPtr<ID3D12Device5> device, D3D12_DESCRIPTOR_RANGE_TYPE type, unsigned int slot, unsigned int registerSpace)
+{
+	CD3DX12_DESCRIPTOR_RANGE1* pRange;
+	pRange = new CD3DX12_DESCRIPTOR_RANGE1;
+	pRange->Init(type, 1, slot, registerSpace, D3D12_DESCRIPTOR_RANGE_FLAG_DATA_STATIC);
+	CD3DX12_ROOT_PARAMETER1 rootParameter;
+	rootParameter.InitAsDescriptorTable(1, pRange, D3D12_SHADER_VISIBILITY_ALL);
+	this->rootParameters.push_back(rootParameter);
+	this->CreateRootSignature(device);
+}
+
 void Shader::CreateConstantBufferTable(Microsoft::WRL::ComPtr<ID3D12Device5> device, unsigned int numOfConstants)
 {
 	for (unsigned int i = 0; i < numOfConstants; i++)
@@ -82,6 +93,24 @@ void Shader::CreateTextureTable(Microsoft::WRL::ComPtr<ID3D12Device5> device, un
 	for (unsigned int i = 0; i < numOfTextures; i++)
 	{
 		this->CreateDescriptorTable(device, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, this->numberOfSRV++);
+		this->numberOfSlots++;
+	}
+}
+
+void Shader::CreateTextureTable(Microsoft::WRL::ComPtr<ID3D12Device5> device, unsigned int numOfTextures, unsigned int registerSpace)
+{
+	for (unsigned int i = 0; i < numOfTextures; i++)
+	{
+		this->CreateDescriptorTable(device, D3D12_DESCRIPTOR_RANGE_TYPE_SRV, this->numberOfSRV++, registerSpace);
+		this->numberOfSlots++;
+	}
+}
+
+void Shader::CreateUnorderedAccessTable(Microsoft::WRL::ComPtr<ID3D12Device5> device, unsigned int numOfUnorderedAccess)
+{
+	for (unsigned int i = 0; i < numOfUnorderedAccess; i++)
+	{
+		this->CreateDescriptorTable(device, D3D12_DESCRIPTOR_RANGE_TYPE_UAV, this->numberOfUAV++);
 		this->numberOfSlots++;
 	}
 }
@@ -148,6 +177,37 @@ void Shader::CreateGraphicsPipelineState(Microsoft::WRL::ComPtr<ID3D12Device5> d
 	pipelineDesc.SampleDesc.Count = samples;
 	pipelineDesc.SampleDesc.Quality = 0;
 	pipelineDesc.DSVFormat = depthStencilFormat;
+
+	HR = device->CreateGraphicsPipelineState(&pipelineDesc, IID_PPV_ARGS(this->graphicsPipelineState.GetAddressOf()));
+	ExitOnError(HR, "Failed to create graphics pipeline state.");
+}
+
+void Shader::CreateGraphicsPipelineState(Microsoft::WRL::ComPtr<ID3D12Device5> device, unsigned int numRT, DXGI_FORMAT renderTargetFormats[], unsigned int samples, D3D12_INPUT_LAYOUT_DESC inputElementDesc)
+{
+	HRESULT HR;
+
+	// Describe the rasterization process.
+	D3D12_RASTERIZER_DESC rasterizerDesc = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+	rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
+
+	// Descride the pipeline state.
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC pipelineDesc = {};
+	ZeroMemory(&pipelineDesc, sizeof(pipelineDesc));
+	pipelineDesc.InputLayout = inputElementDesc;
+	pipelineDesc.pRootSignature = this->rootSignature.Get();
+	pipelineDesc.VS = CD3DX12_SHADER_BYTECODE(this->vertexShader.Get());
+	pipelineDesc.PS = CD3DX12_SHADER_BYTECODE(this->pixelShader.Get());
+	pipelineDesc.RasterizerState = rasterizerDesc;
+	pipelineDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+	pipelineDesc.SampleMask = UINT_MAX;
+	pipelineDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	pipelineDesc.NumRenderTargets = numRT;
+	for (unsigned int i = 0; i < numRT; i++)
+	{
+		pipelineDesc.RTVFormats[i] = renderTargetFormats[i];
+	}
+	pipelineDesc.SampleDesc.Count = samples;
+	pipelineDesc.SampleDesc.Quality = 0;
 
 	HR = device->CreateGraphicsPipelineState(&pipelineDesc, IID_PPV_ARGS(this->graphicsPipelineState.GetAddressOf()));
 	ExitOnError(HR, "Failed to create graphics pipeline state.");

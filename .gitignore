@@ -338,3 +338,5 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
+/ReducedEngine/Output/Graphics/INSTANCE_EXPERIMENT.h
+/ReducedEngine/Output/Graphics/INSTANCE_EXPERIMENT.cpp

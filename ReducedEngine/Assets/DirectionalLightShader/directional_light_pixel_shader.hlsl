@@ -29,6 +29,7 @@ Texture2D fragmentPositionTexture : register(t0);   // 4
 Texture2D normalTexture : register(t1);             // 4
 Texture2D albedoSpecTexture : register(t2);         // 4
 Texture2D shadowDepthTexture : register(t3);        // 2
+Texture2D ssaoTexture : register(t4);               // 4
 
 SamplerState mainSampler : register(s0);
 
@@ -89,6 +90,7 @@ void main(in ps_in IN, out ps_out OUT)
     float3 color = albedoSpecTexture.Sample(mainSampler, modTexCoord).rgb;
     float specular = albedoSpecTexture.Sample(mainSampler, modTexCoord).a;
     float3 fragmentPosition = fragmentPositionTexture.Sample(mainSampler, modTexCoord).rgb;
+    float ambientOcclusion = ssaoTexture.Sample(mainSampler, modTexCoord).r;
     
     float4 fragmentPositionLightSpace = mul(lightSpaceMatrix, float4(fragmentPosition, 1.0f));
     
@@ -97,17 +99,17 @@ void main(in ps_in IN, out ps_out OUT)
     // Calculate.
     if(length(normal) > 0.1f)
     {
-        float ambientFactor = 0.43f;
+        float ambientFactor = 0.3f;
         float shadowFactor = CalculateShadow(fragmentPositionLightSpace, normal, lightDirection.rgb);
         float diffuseFactor = CalculateDirectionalDiffuseFactor(lightDirection.rgb, normal);
         if (diffuseFactor < ambientFactor)
-            diffuseFactor = ambientFactor;
+            diffuseFactor = ambientFactor * ambientOcclusion * 2.0f;
         if (shadowFactor < ambientFactor)
-            shadowFactor = ambientFactor;
-        float3 diffuse = lightDiffuse.rgb * color * (diffuseFactor + shadowFactor) / 2.0f * 2.0f;
+            shadowFactor = ambientFactor * ambientOcclusion * 2.0f;
+        float3 diffuse = lightDiffuse.rgb * color * (diffuseFactor + shadowFactor) / 2.0f * 1.5f;
         
         resultColor = diffuse;
     }
-
+    
     OUT.color = float4(resultColor, 1.0f);
 }

@@ -11,7 +11,7 @@ PlayerObject::PlayerObject()
 
 	MainCamera::GetInstance()->SetNewCamera(&this->camera);
 
-	this->objectTransform.SetPosition(0.0f, 0.0f, 3.0f);
+	this->objectTransform.SetPosition(0.0f, 0.0f, 5.0f);
 }
 
 void PlayerObject::Update()

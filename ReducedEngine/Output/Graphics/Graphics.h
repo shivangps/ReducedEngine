@@ -11,6 +11,9 @@
 #include "Camera.h"
 #include "Cubemap.h"
 #include "LightComponent.h"
+#include "../Tools/TimeTool.h"
+#include "Quad/Quad.h"
+#include "SSAO/SSAO.h"
 
 // Class that handles the rendering of objects present in the scene.
 
@@ -93,6 +96,7 @@ private:
 	enum GBufferRenderTarget
 	{
 		FragmentPosition_RT = 0,
+		FragmentViewPosition_RT,
 		Normal_RT,
 		AlbedoSpecular_RT,
 		Size_RT
@@ -101,16 +105,19 @@ private:
 
 	DXGI_FORMAT gBufferFormats[GBufferRenderTarget::Size_RT] = {
 		DXGI_FORMAT_R16G16B16A16_FLOAT,				// Position
+		DXGI_FORMAT_R16G16B16A16_FLOAT,				// View Position
 		DXGI_FORMAT_R16G16B16A16_FLOAT,				// Normal
 		DXGI_FORMAT_R16G16B16A16_FLOAT,				// Albedo & Specular
 	};
 	float gBufferClearColor[GBufferRenderTarget::Size_RT][4] =
 	{
 		{ 0.0f, 0.0f, 0.0f, 0.0f },			// Position
+		{ 0.0f, 0.0f, 0.0f, 0.0f },			// View Position
 		{ 0.0f, 0.0f, 0.0f, 0.0f },			// Normal
 		{ 0.0f, 0.0f, 0.0f, 0.0f },			// Albedo & Specular
 	};
 	RenderFramebuffer fragmentPositionFramebuffer = {};
+	RenderFramebuffer fragmentViewPositionFramebuffer = {};
 	RenderFramebuffer normalFramebuffer = {};
 	RenderFramebuffer albedoSpecFramebuffer = {};
 	
@@ -122,9 +129,11 @@ private:
 	enum GBufferShaderResource
 	{
 		FragmentPosition_SR = 0,
+		FragmentViewPosition_SR,
 		Normal_SR,
 		AlbedoSpecular_SR,
 		Depth_SR,
+		SSAO_SR,
 		Size_SR
 	};
 	DescriptorHeap gBufferHeap_SRV = {};
@@ -134,7 +143,7 @@ private:
 	unsigned int sampleCount = 4;
 
 	// Function to initialize the deferred rendering process.
-	void InitializeDeferredRendering(Microsoft::WRL::ComPtr<ID3D12Device5> device, unsigned int width, unsigned int height, unsigned int multiSamples);
+	void InitializeDeferredRendering(Microsoft::WRL::ComPtr<ID3D12Device5> device, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList, unsigned int width, unsigned int height, unsigned int multiSamples);
 	// Function to set the framebuffers for rendering the scene.
 	void SetDeferredFramebuffers(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList);
 	// Function to remove the framebuffers from rendering.
@@ -144,22 +153,8 @@ private:
 	// Deferred render display.
 	Shader* quadShader = nullptr;
 
-	// The following definition is for rendering the quad and applying the texture of a post processed scene.
-	// Vertex for quad.
-	struct QuadVertex
-	{
-		DirectX::XMFLOAT3 position;
-		DirectX::XMFLOAT2 texCoord;
-
-		QuadVertex(float x,float y,float z,float u,float v) : position(x, y, z), texCoord(u, v) {}
-	};
-	Microsoft::WRL::ComPtr<ID3D12Resource> quadVertexBuffer = nullptr;
-	D3D12_VERTEX_BUFFER_VIEW quadVBV = {};
-	
-	// Function to initialize the geometry of a quad covering the whole scene.
-	void InitializeQuadGeometry(Microsoft::WRL::ComPtr<ID3D12Device5> device);
-	// Function to call for drawing the whole scene.
-	void DrawQuadGeometry(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList);
+	// Single instance class to store and render a quad geometry covering the whole screen for post-processing effects.
+	Quad* quad = nullptr;
 
 private:
 	MainCamera* mainCamera = MainCamera::GetInstance();
@@ -173,10 +168,17 @@ private:
 	Transform sunLightTransform = {};
 	LightComponent sunLight = { &this->sunLightTransform };
 
-	bool useShadowRender = true;
-	bool useDirectionalLight = true;
 	bool debugFramebuffer = false;
 
+private:
+	// Applying time marking tool for debugging purposes.
+	TimeTool timeDebugger;
+
+private:
+	// Ambient Occlusion.
+	SSAO* ambientOcclusion = SSAO::GetInstance();
+
+	void IntializeSSAO(Microsoft::WRL::ComPtr<ID3D12Device5> device, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList, unsigned int width, unsigned int height);
 public:
 	// Function to get a single instance of graphics or render engine.
 	static Graphics* GetInstance()

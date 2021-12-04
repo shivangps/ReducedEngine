@@ -11,6 +11,7 @@ private:
 	float rotationX = 0.0f;
 public:
 	BoxObject();
+	BoxObject(Transform transform);
 
 	void Initialize(RenderList* renderList);
 

@@ -6,13 +6,18 @@
 class RenderList
 {
 private:
+	bool stateEnableChange = false;
 	struct RenderComponentInfo
 	{
+		Boolean enable = Boolean(false, nullptr);
 		UINT64 componentIndex = 0;
 		RenderComponent* renderComponent = nullptr;
 	};
 	std::vector<RenderComponentInfo> renderComponentList = {};
 	UINT64 currentRenderComponentIndex = 0;
+
+	// Function to swap the contents of an element in the list in two poistions.
+	void SwapContents(unsigned int firstPosition, unsigned int secondPosition);
 
 public:
 

@@ -60,3 +60,24 @@ static std::string SanitizeBackSlashFileDirectory(std::string fileDirectory)
 
 	return fileDirectory;
 }
+
+// Class to store bool values, but also has a pointer to another bool to indicate state changes to bool.
+class Boolean
+{
+private:
+	bool state;
+	bool* stateChange;
+
+public:
+	Boolean(bool setState, bool* setChangePointer) : state(setState), stateChange(setChangePointer) {}
+
+	// Function to set true to boolean.
+	void SetTrue() { this->state = true; *this->stateChange = true; }
+	// Function to set false to boolean.
+	void SetFalse() { this->state = false; *this->stateChange = true; }
+
+	// Function to set new state change pointer.
+	void SetStateChangePointer(bool* newStateChangePointer) { this->stateChange = newStateChangePointer; }
+	// Function to get the bool value.
+	bool GetBool() { return this->state; }
+};

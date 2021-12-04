@@ -16,6 +16,7 @@ public:
 		normal,
 		albedoSpecular,
 		shadowDepth,
+		ssao,
 		Size
 	}Slot;
 

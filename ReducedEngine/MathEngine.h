@@ -12,6 +12,10 @@ private:
 	{
 		return Vector3(aValue * vector.X(), aValue * vector.Y(), aValue * vector.Z());
 	}
+	Vector3 Multiply(Vector3 firstVector, Vector3 secondVector)
+	{
+		return Vector3(firstVector.X() * secondVector.X(), firstVector.Y() * secondVector.Y(), firstVector.Z() * secondVector.Z());
+	}
 	Vector3 Divide(Vector3 vector, float aValue)
 	{
 		return Vector3(vector.X() / aValue, vector.Y() / aValue, vector.Z() / aValue);
@@ -83,9 +87,21 @@ public:
 	{
 		return this->Multiply(*this, aValue);
 	}
+	void operator*=(Vector3 otherVector3)
+	{
+		*this = this->Multiply(*this, otherVector3);
+	}
+	void operator*=(float aValue)
+	{
+		*this = this->Multiply(*this, aValue);
+	}
 	Vector3 operator/(float aValue)
 	{
 		return this->Divide(*this, aValue);
+	}
+	Vector3 Normalize()
+	{
+		return DirectX::XMVector3Normalize(this->GetVector());
 	}
 };
 

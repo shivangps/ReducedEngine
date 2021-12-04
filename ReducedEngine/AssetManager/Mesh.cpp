@@ -35,7 +35,7 @@ void Mesh::Initialize(Microsoft::WRL::ComPtr<ID3D12Device5> device, std::vector<
 
 	// Create an upload buffer to upload the index to GPU memory.
 	InitializeResource(&this->indexUploadBuffer, device, &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), &CD3DX12_RESOURCE_DESC::Buffer(sizeOfVertices), D3D12_RESOURCE_STATE_GENERIC_READ, nullptr);
-	this->indexUploadBuffer->SetName(L"Mesh Index Default Buffer");
+	this->indexUploadBuffer->SetName(L"Mesh Index Upload Buffer");
 
 	this->indices = indices;
 	this->indexData.RowPitch = sizeOfIndices;

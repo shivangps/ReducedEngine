@@ -24,6 +24,7 @@ private:
 		normal,
 		albedoSpecular,
 		shadowDepthSlot,
+		ssao,
 		Size
 	}Slot;
 
@@ -71,6 +72,8 @@ public:
 	void SetFramebufferToNormalHandle(Microsoft::WRL::ComPtr<ID3D12Device5> device, RenderFramebuffer normalFramebuffer);
 	// Function to set the framebuffer to albedo and specular handle.
 	void SetFramebufferToAlbedoSpecular(Microsoft::WRL::ComPtr<ID3D12Device5> device, RenderFramebuffer albedoSpecFramebuffer);
+	// Function to set the framebuffer to ssao handle.
+	void SetFramebufferToSSAO(Microsoft::WRL::ComPtr<ID3D12Device5> device, RenderFramebuffer ssaoFramenbuffer);
 
 public:
 	// Function to set the ambient light value.
@@ -83,8 +86,8 @@ public:
 private:
 	// Shadows for directional light.
 
-	unsigned int shadowHeight = 1000;
-	unsigned int shadowWidth = 1000;
+	unsigned int shadowHeight = 500;
+	unsigned int shadowWidth = 500;
 	D3D12_VIEWPORT shadowViewport = {};
 	D3D12_RECT shadowClippingRect = {};
 

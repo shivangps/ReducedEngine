@@ -25,14 +25,15 @@ void RenderComponent::UpdateCameraMatrix(Camera camera)
 
 	Matrix4 model;
 
-	model = model.Translation(transform.GetGlobalPostion());
 	model = model.Rotation(transform.GetGlobalRotation());
 	model = model.Scale(transform.GetGlobalScale());
+	model = model.Translation(transform.GetGlobalPostion());
 
 	this->localData.cameraMatrix = model * camera.GetViewProjectionMatrix();
 	this->localData.modelMatrix = model.Transpose();
 	this->localData.viewMatrix = camera.view.Transpose();
-	this->localData.normalMatrix = model.Inverse();
+	this->localData.normalMatrix = (camera.view * model).Inverse();
+	this->localData.modelViewMatrix = (model * camera.view).Transpose();
 
 	memcpy(this->pLocalDataCBV, &this->localData, sizeof(this->localData));
 }
@@ -180,4 +181,19 @@ void RenderComponent::DrawForShadow(Microsoft::WRL::ComPtr<ID3D12GraphicsCommand
 		commandList->IASetIndexBuffer(&this->meshes[i].indexBufferView);
 		commandList->DrawIndexedInstanced(this->meshes[i].numberOfIndices, 1, 0, 0, 0);
 	}
+}
+
+void RenderComponent::SetEnable(Boolean* pBool)
+{
+	this->enable = pBool;
+}
+
+void RenderComponent::EnableRendering()
+{
+	this->enable->SetTrue();
+}
+
+void RenderComponent::DisableRendering()
+{
+	this->enable->SetFalse();
 }

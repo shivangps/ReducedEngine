@@ -30,6 +30,7 @@ Transform LightComponent::GetTransform()
 
 void LightComponent::Initialize(Microsoft::WRL::ComPtr<ID3D12Device5> device)
 {
+	// Create a viewport for shadow resolution.
 	this->shadowViewport.TopLeftX = 0.0f;
 	this->shadowViewport.TopLeftY = 0.0f;
 	this->shadowViewport.Width = (float)this->shadowWidth;
@@ -38,6 +39,7 @@ void LightComponent::Initialize(Microsoft::WRL::ComPtr<ID3D12Device5> device)
 	this->shadowViewport.MinDepth = 0.0f;
 	this->shadowViewport.MaxDepth = 1.0f;
 
+	// Create a clipping rectangle for shadow resolution.
 	this->shadowClippingRect.left = 0.0f;
 	this->shadowClippingRect.top = 0.0f;
 	this->shadowClippingRect.right = (float)this->shadowWidth;
@@ -76,6 +78,7 @@ void LightComponent::SetLightForRendering(Microsoft::WRL::ComPtr<ID3D12GraphicsC
 	commandList->SetGraphicsRootDescriptorTable(DirectionalLightShader::Slot::normal, this->lightDescriptorHeap.GetGPUHandle(Slot::normal));
 	commandList->SetGraphicsRootDescriptorTable(DirectionalLightShader::Slot::albedoSpecular, this->lightDescriptorHeap.GetGPUHandle(Slot::albedoSpecular));
 	commandList->SetGraphicsRootDescriptorTable(DirectionalLightShader::Slot::shadowDepth, this->lightDescriptorHeap.GetGPUHandle(Slot::shadowDepthSlot));
+	commandList->SetGraphicsRootDescriptorTable(DirectionalLightShader::Slot::ssao, this->lightDescriptorHeap.GetGPUHandle(Slot::ssao));
 }
 
 void LightComponent::UpdateConstantBuffer(Camera camera)
@@ -104,6 +107,11 @@ void LightComponent::SetFramebufferToNormalHandle(Microsoft::WRL::ComPtr<ID3D12D
 void LightComponent::SetFramebufferToAlbedoSpecular(Microsoft::WRL::ComPtr<ID3D12Device5> device, RenderFramebuffer albedoSpecFramebuffer)
 {
 	albedoSpecFramebuffer.SetFramebufferToSRVHandle(device, this->lightDescriptorHeap.GetCPUHandle(Slot::albedoSpecular));
+}
+
+void LightComponent::SetFramebufferToSSAO(Microsoft::WRL::ComPtr<ID3D12Device5> device, RenderFramebuffer ssaoFramenbuffer)
+{
+	ssaoFramenbuffer.SetFramebufferToSRVHandle(device, this->lightDescriptorHeap.GetCPUHandle(Slot::ssao));
 }
 
 void LightComponent::SetAmbientColor(Vector3 ambient)

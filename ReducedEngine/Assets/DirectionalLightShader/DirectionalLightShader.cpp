@@ -4,8 +4,13 @@ void DirectionalLightShader::Initialize(Microsoft::WRL::ComPtr<ID3D12Device5> de
 {
 	this->CreateShaderFromFile("Assets/DirectionalLightShader/directional_light_vertex_shader.hlsl", "Assets/DirectionalLightShader/directional_light_pixel_shader.hlsl");
 
+	// Making the texture sampler borderless.
+	this->samplerDesc.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	this->samplerDesc.AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	this->samplerDesc.AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+
 	this->CreateConstantBufferTable(device, 1);
-	this->CreateTextureTable(device, 4);
+	this->CreateTextureTable(device, 5);
 
 	D3D12_INPUT_ELEMENT_DESC inputLayout[] =
 	{

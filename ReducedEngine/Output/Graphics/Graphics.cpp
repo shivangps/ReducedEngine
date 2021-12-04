@@ -3,6 +3,7 @@
 #include "Graphics.h"
 #include "..//..//Assets/DisplayShader/DisplayShader.h"
 #include "..//..//Assets/DirectionalLightShader/DirectionalLightShader.h"
+#include <random>
 
 void Graphics::CreateDevice()
 {
@@ -252,16 +253,21 @@ void Graphics::InitilizeGraphicsEngineShaders(Microsoft::WRL::ComPtr<ID3D12Devic
 	dirLightShader->Initialize(device, numRT, renderTargetFormats, depthStencilFormat, samples);
 }
 
-void Graphics::InitializeDeferredRendering(Microsoft::WRL::ComPtr<ID3D12Device5> device, unsigned int width, unsigned int height, unsigned int multiSamples)
+void Graphics::InitializeDeferredRendering(Microsoft::WRL::ComPtr<ID3D12Device5> device, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList, unsigned int width, unsigned int height, unsigned int multiSamples)
 {
 	this->gBufferHeap_RTV.Initialize(device, GBufferRenderTarget::Size_RT, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);	// Remove one count for depth.
 	this->gBufferHeap_DSV.Initialize(device, 1, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
 	this->gBufferHeap_SRV.Initialize(device, GBufferShaderResource::Size_SR, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
 
 	// Position
-	this->fragmentPositionFramebuffer.Initialize(device, gBufferFormats[GBufferRenderTarget::FragmentPosition_RT], width, height, multiSamples, this->gBufferClearColor[GBufferRenderTarget::FragmentPosition_RT], L"Position");
+	this->fragmentPositionFramebuffer.Initialize(device, gBufferFormats[GBufferRenderTarget::FragmentPosition_RT], width, height, multiSamples, this->gBufferClearColor[GBufferRenderTarget::FragmentPosition_RT], L"Fragment Position");
 	this->fragmentPositionFramebuffer.SetFramebufferToRTVHandle(device, this->gBufferHeap_RTV.GetCPUHandle(GBufferRenderTarget::FragmentPosition_RT));
 	this->fragmentPositionFramebuffer.SetFramebufferToSRVHandle(device, this->gBufferHeap_SRV.GetCPUHandle(GBufferShaderResource::FragmentPosition_SR));
+
+	// View Position
+	this->fragmentViewPositionFramebuffer.Initialize(device, gBufferFormats[GBufferRenderTarget::FragmentViewPosition_RT], width, height, multiSamples, this->gBufferClearColor[GBufferRenderTarget::FragmentViewPosition_RT], L"Fragment View Position");
+	this->fragmentViewPositionFramebuffer.SetFramebufferToRTVHandle(device, this->gBufferHeap_RTV.GetCPUHandle(GBufferRenderTarget::FragmentViewPosition_RT));
+	this->fragmentViewPositionFramebuffer.SetFramebufferToSRVHandle(device, this->gBufferHeap_SRV.GetCPUHandle(GBufferShaderResource::FragmentViewPosition_SR));
 
 	// Normal
 	this->normalFramebuffer.Initialize(device, gBufferFormats[GBufferRenderTarget::Normal_RT], width, height, multiSamples, this->gBufferClearColor[GBufferRenderTarget::Normal_RT], L"Normal");
@@ -277,12 +283,17 @@ void Graphics::InitializeDeferredRendering(Microsoft::WRL::ComPtr<ID3D12Device5>
 	this->depthFramebuffer.Initialize(device, width, height, multiSamples, L"");
 	this->depthFramebuffer.SetDepthBufferToDSVHandle(device, this->gBufferHeap_DSV.GetCPUHandle(0));
 	this->depthFramebuffer.SetDepthBufferToSRVHandle(device, this->gBufferHeap_SRV.GetCPUHandle(GBufferShaderResource::Depth_SR));
+
+	// SSAO
+	this->IntializeSSAO(device, commandList, width, height);
 }
 
 void Graphics::SetDeferredFramebuffers(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList)
 {
 	// Position
 	commandList->ClearRenderTargetView(this->gBufferHeap_RTV.GetCPUHandle(GBufferRenderTarget::FragmentPosition_RT), this->gBufferClearColor[GBufferRenderTarget::FragmentPosition_RT], 0, nullptr);
+	// View Position
+	commandList->ClearRenderTargetView(this->gBufferHeap_RTV.GetCPUHandle(GBufferRenderTarget::FragmentViewPosition_RT), this->gBufferClearColor[GBufferRenderTarget::FragmentViewPosition_RT], 0, nullptr);
 	// Normal
 	commandList->ClearRenderTargetView(this->gBufferHeap_RTV.GetCPUHandle(GBufferRenderTarget::Normal_RT), this->gBufferClearColor[GBufferRenderTarget::Normal_RT], 0, nullptr);
 	// Albedo
@@ -298,44 +309,18 @@ void Graphics::RemoveDeferredFramebuffers(Microsoft::WRL::ComPtr<ID3D12GraphicsC
 	commandList->OMSetRenderTargets(numRT, newRTHandle, (newDepthHandle == nullptr) ? false : true, newDepthHandle);
 
 	this->fragmentPositionFramebuffer.CopyResource(commandList);
+	this->fragmentViewPositionFramebuffer.CopyResource(commandList);
 	this->normalFramebuffer.CopyResource(commandList);
 	this->albedoSpecFramebuffer.CopyResource(commandList);
 	this->depthFramebuffer.CopyResource(commandList);
 }
 
-void Graphics::InitializeQuadGeometry(Microsoft::WRL::ComPtr<ID3D12Device5> device)
+void Graphics::IntializeSSAO(Microsoft::WRL::ComPtr<ID3D12Device5> device, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList, unsigned int width, unsigned int height)
 {
-	QuadVertex quadVertex[] =
-	{
-		QuadVertex(-1.0f, 1.0f, 0.0f, 0.0f, 1.0f),
-		QuadVertex(-1.0f,-1.0f, 0.0f, 0.0f, 0.0f),
-		QuadVertex( 1.0f, 1.0f, 0.0f, 1.0f, 1.0f),
-		QuadVertex( 1.0f,-1.0f, 0.0f, 1.0f, 0.0f),
-	};
-	unsigned int quadBufferSize = sizeof(quadVertex);
-
-	// Create the vertex buffer resource for quad.
-	InitializeResource(&this->quadVertexBuffer, device, &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), &CD3DX12_RESOURCE_DESC::Buffer(quadBufferSize), D3D12_RESOURCE_STATE_GENERIC_READ, nullptr);
-	this->quadVertexBuffer->SetName(L"Quad Vertex Upload Buffer");
-
-	// Fill the quad vertex data.
-	unsigned char* pQuadVertexDataBegin;
-	CD3DX12_RANGE readRange(0, 0);
-	this->quadVertexBuffer->Map(0, &readRange, reinterpret_cast<void**>(&pQuadVertexDataBegin));
-	memcpy(pQuadVertexDataBegin, quadVertex, quadBufferSize);
-	this->quadVertexBuffer->Unmap(0, nullptr);
-
-	// Initialize vertex buffer view.
-	this->quadVBV.BufferLocation = this->quadVertexBuffer->GetGPUVirtualAddress();
-	this->quadVBV.SizeInBytes = quadBufferSize;
-	this->quadVBV.StrideInBytes = sizeof(QuadVertex);
-}
-
-void Graphics::DrawQuadGeometry(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList)
-{
-	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-	commandList->IASetVertexBuffers(0, 1, &this->quadVBV);
-	commandList->DrawInstanced(4, 1, 0, 0);
+	this->ambientOcclusion->Initialize(device, commandList, width, height);
+	this->ambientOcclusion->SetFragmentViewPositionFramebufferToHeap(device, &this->fragmentViewPositionFramebuffer);
+	this->ambientOcclusion->ApplyOutputTextureHandle(device, this->gBufferHeap_SRV.GetCPUHandle(GBufferShaderResource::SSAO_SR));	// For debugging.
+	this->ambientOcclusion->SetNormalFramebufferToHeap(device, &this->normalFramebuffer);
 }
 
 void Graphics::Initialize(HWND windowHandle, unsigned int width, unsigned int height)
@@ -377,7 +362,7 @@ void Graphics::Initialize(HWND windowHandle, unsigned int width, unsigned int he
 	unsigned int currentMultiSamples = (this->multiSampling) ? this->sampleCount : 1;
 
 	// Create framebuffer.
-	this->InitializeDeferredRendering(this->device, width, height, currentMultiSamples);
+	this->InitializeDeferredRendering(this->device, this->commandList, width, height, currentMultiSamples);
 
 	// Initialize all graphics engine shaders.
 	this->InitilizeGraphicsEngineShaders(device, 1, &this->renderTargetFormat, this->depthStencilFormat, 1);
@@ -388,7 +373,8 @@ void Graphics::Initialize(HWND windowHandle, unsigned int width, unsigned int he
 	GAM->SetGraphicsDevice(this->device);
 
 	// Initialize the quad geometry.
-	this->InitializeQuadGeometry(this->device);
+	this->quad = Quad::GetInstance();
+	this->quad->Initialize(device);
 
 	// Initialize All Shaders.
 	GAM->InitializeAllShadersForDeferredRender(device, _countof(gBufferFormats), gBufferFormats, this->depthFramebuffer.GetRenderTargetDepthFormat(), currentMultiSamples);
@@ -402,6 +388,7 @@ void Graphics::Initialize(HWND windowHandle, unsigned int width, unsigned int he
 	this->sunLight.SetFramebufferToFragmentPositionHandle(this->device, this->fragmentPositionFramebuffer);
 	this->sunLight.SetFramebufferToNormalHandle(this->device, this->normalFramebuffer);
 	this->sunLight.SetFramebufferToAlbedoSpecular(this->device, this->albedoSpecFramebuffer);
+	this->sunLight.SetFramebufferToSSAO(this->device, this->ambientOcclusion->GetOutputFramebuffer());
 	this->sunLight.SetAmbientColor(Vector3(0.1f, 0.1f, 0.4f));
 	this->sunLight.SetDiffuseColor(Vector3(1.0f, 1.0f, 1.0f));
 	this->sunLight.SetSpecularColor(Vector3(1.0f, 1.0f, 1.0f));
@@ -445,6 +432,8 @@ void Graphics::InitializeRenderList(RenderList* renderComponentList)
 
 void Graphics::RenderScene(RenderList* renderComponentList)
 {
+	this->timeDebugger.MarkTime();
+
 	this->WaitForFenceValue(this->fence, this->commandFenceValue);
 
 	this->PresentFrame(this->swapChain, &this->currentFrame);
@@ -479,15 +468,18 @@ void Graphics::RenderScene(RenderList* renderComponentList)
 	// SHADOW RENDERING.
 	// Draw all the objects in the scene for shadow mapping.
 
-	if (this->useShadowRender)
+	if (!this->debugFramebuffer)
 	{
 		this->sunLight.RenderSceneToShadow(this->commandList, 1, &rtvHandle, true, &dsvHandle, renderComponentList, Vector3(0.0f, 5.0f, 0.0f), &this->viewport, &this->clippingRect);
 	}
 
 	//----------------X-----------------//
+	// SSAO
+	this->ambientOcclusion->PostProcessAmbientOcclusion(this->commandList, this->mainCamera->GetCamera());
+
+	//----------------X-----------------//
 	// POST-PROCESS DEBUG.
 	// Clear the buffer and set render targets.
-	static bool flag;
 	float refreshColor[4] = { 0.0f, 0.5f, 0.0f, 1.0f };
 	this->commandList->ClearRenderTargetView(rtvHandle, refreshColor, 0, nullptr);
 
@@ -496,7 +488,7 @@ void Graphics::RenderScene(RenderList* renderComponentList)
 	this->commandList->OMSetRenderTargets(1, &rtvHandle, true, &dsvHandle);
 
 	// Debug framebuffer using display shader on a quad geometry.
-	if (this->useDirectionalLight)
+	if (!this->debugFramebuffer)
 	{
 		this->sunLight.SetLightForRendering(this->commandList, this->mainCamera->GetCamera());
 	}
@@ -507,10 +499,10 @@ void Graphics::RenderScene(RenderList* renderComponentList)
 		ID3D12DescriptorHeap* ppHeaps[] = { this->gBufferHeap_SRV.Get() };
 		this->commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 
-		this->commandList->SetGraphicsRootDescriptorTable(0, this->gBufferHeap_SRV.GetGPUHandle(GBufferShaderResource::AlbedoSpecular_SR));
+		this->commandList->SetGraphicsRootDescriptorTable(0, this->gBufferHeap_SRV.GetGPUHandle(GBufferShaderResource::SSAO_SR));
 	}
 
-	this->DrawQuadGeometry(commandList);
+	this->quad->Draw(commandList);
 	//----------------X-----------------//
 	TransitionResourceState(currentRenderBuffer, this->commandList, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 	this->CloseCommandList(this->commandList);
@@ -520,4 +512,6 @@ void Graphics::RenderScene(RenderList* renderComponentList)
 
 	this->commandFenceValue = this->GetCurrentSetFence();
 	SignalFence(this->commandQueue, this->fence, this->commandFenceValue);
+
+	this->timeDebugger.MarkAndDisplayTime("Overall Render Duration");
 }

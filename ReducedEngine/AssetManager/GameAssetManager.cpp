@@ -205,10 +205,12 @@ void GameAssetManager::SetGraphicsDevice(Microsoft::WRL::ComPtr<ID3D12Device5> d
 #include "../Assets/UnlitShader/UnlitShader.h"
 #include "../Assets/TextureShader/TextureShader.h"
 #include "../Assets/CubemapShader/CubemapShader.h"
+#include "../Assets/InstanceShader/InstanceShader.h"
 
 void GameAssetManager::InitializeAllShadersForDeferredRender(Microsoft::WRL::ComPtr<ID3D12Device5> device, unsigned int numberOfRenderTarget, DXGI_FORMAT* renderTargetFormats, DXGI_FORMAT depthStencilFormat, unsigned int samples)
 {
 	UnlitShader::GetInstance()->Initialize(device, numberOfRenderTarget, renderTargetFormats, depthStencilFormat, samples);
 	TextureShader::GetInstance()->Initialize(device, numberOfRenderTarget, renderTargetFormats, depthStencilFormat, samples);
 	CubemapShader::GetInstance()->Initialize(device, numberOfRenderTarget, renderTargetFormats, depthStencilFormat, samples);
+	InstanceShader::GetInstance()->Initialize(device, numberOfRenderTarget, renderTargetFormats, depthStencilFormat, samples);
 }
