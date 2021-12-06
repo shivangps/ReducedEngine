@@ -41,6 +41,14 @@ private:
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> localDataResource = nullptr;
 
+	enum SLOT
+	{
+		local_data_cbv = 0,
+		color_texture_srv,
+		normal_texture_srv,
+		size
+	};
+
 protected:
 	// To store the pointer of the transform of its corresponding gameobject.
 	Transform* transform = nullptr;
@@ -60,6 +68,7 @@ protected:
 	DescriptorHeap heap = {};
 
 	UINT64 colorTextureIndex = 0;
+	UINT64 normalTextureIndex = 0;
 
 	LocalData localData = {};
 	unsigned char* pLocalDataCBV = nullptr;

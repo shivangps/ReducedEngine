@@ -52,13 +52,22 @@ UINT64 GameAssetManager::ProcessMesh(aiMesh* mesh)
 	
 		// Load Texture Coordinates.
 		DirectX::XMFLOAT2 texCoords = {};
+
+		aiVector3D toLoadTangents = mesh->mTangents[i];
+		// Load Tangents.
+		DirectX::XMFLOAT3 tangent = { toLoadTangents.x, toLoadTangents.y, toLoadTangents.z };
+
+		aiVector3D toLoadBitangents = mesh->mBitangents[i];
+		// Load Bitangents.
+		DirectX::XMFLOAT3 bitangent = { toLoadBitangents.x, toLoadBitangents.y, toLoadBitangents.z };
+
 		if (mesh->mTextureCoords[0])
 		{
 			aiVector3D toLoadTextureCoordinates = mesh->mTextureCoords[0][i];
 			texCoords = { toLoadTextureCoordinates.x, toLoadTextureCoordinates.y };
 		}
 	
-		vertices.push_back(MeshVertex(position, normals, texCoords));
+		vertices.push_back(MeshVertex(position, normals, texCoords, tangent, bitangent));
 	}
 	
 	// For each index
@@ -81,11 +90,30 @@ UINT64 GameAssetManager::ProcessColorTexture(aiMesh* mesh, const aiScene* scene,
 
 		aiString fileLocationStr;
 		material->GetTexture(aiTextureType_DIFFUSE, 0, &fileLocationStr);
-
-		return this->SetNewTexture((modelFileLocation + fileLocationStr.C_Str()).c_str());
+		if (std::strcmp(fileLocationStr.C_Str(), "") != 0)
+		{
+			return this->SetNewTexture((modelFileLocation + fileLocationStr.C_Str()).c_str());
+		}
 	}
 
 	return this->SetNewTexture(DefaultTextureDirectory::WhiteTexture);
+}
+
+UINT64 GameAssetManager::ProcessNormalTexture(aiMesh* mesh, const aiScene* scene, std::string modelFileLocation)
+{
+	if (mesh->mMaterialIndex >= 0)
+	{
+		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+
+		aiString fileLocationStr;
+		material->GetTexture(aiTextureType_HEIGHT, 0, &fileLocationStr);
+		if (std::strcmp(fileLocationStr.C_Str(), "") != 0)
+		{
+			return this->SetNewTexture((modelFileLocation + fileLocationStr.C_Str()).c_str());
+		}
+	}
+
+	return this->SetNewTexture(DefaultTextureDirectory::NormalTexture);
 }
 
 // Function to process individual nodes of the mesh of the model.
@@ -103,6 +131,9 @@ void GameAssetManager::ProcessNode(aiNode* node, const aiScene* scene, ModelInfo
 
 		// Color texture assignment.
 		mBit.colorTextureIndex = ProcessColorTexture(mesh, scene, modelFileLocation);
+
+		// Normal texture assignment.
+		mBit.normalTextureIndex = ProcessNormalTexture(mesh, scene, modelFileLocation);
 
 		modelInfo->modelFragments.push_back(mBit);
 	}
@@ -128,7 +159,7 @@ ModelInfo GameAssetManager::LoadModel(std::string fileLocation)
 
 	// If the file name does not exist in the model list then create a new model and return its related info.
 	Assimp::Importer modelImporter;
-	const aiScene* scene = modelImporter.ReadFile(fileLocation, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_ConvertToLeftHanded);
+	const aiScene* scene = modelImporter.ReadFile(fileLocation, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_ConvertToLeftHanded | aiProcess_CalcTangentSpace);
 
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
 	{

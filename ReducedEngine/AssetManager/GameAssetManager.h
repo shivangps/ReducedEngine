@@ -15,6 +15,7 @@ struct ModelFragment
 {
 	UINT64 meshIndex;
 	UINT64 colorTextureIndex;
+	UINT64 normalTextureIndex;
 };
 struct ModelInfo
 {
@@ -65,12 +66,14 @@ private:
 	UINT64 ProcessMesh(aiMesh* mesh);
 	// Function to process the textures from the model, submit it to Texture Asset Manager and return the texture index.
 	UINT64 ProcessColorTexture(aiMesh* mesh, const aiScene* scene, std::string modelFileLocation);
+	// Function to process the normal textures from the model, submit it to the Texture Asset Manager and return the texture index.
+	UINT64 ProcessNormalTexture(aiMesh* mesh, const aiScene* scene, std::string modelFileLocation);
 	// Function to process individual nodes of the mesh of the model.
 	void ProcessNode(aiNode* node, const aiScene* scene, ModelInfo* modelInfo, std::string modelFileLocation);
 
 public:
 
-	// Function to import the model with mesh and assigned amterial textures.
+	// Function to import the model with mesh and assigned material textures.
 	ModelInfo LoadModel(std::string fileLocation);
 	// Function to set new mesh.
 	UINT64 SetNewMesh(std::vector<MeshVertex> vertices, std::vector<unsigned short> indices);

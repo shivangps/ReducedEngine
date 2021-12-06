@@ -7,12 +7,14 @@
 struct MeshVertex
 {
 public:
-	MeshVertex(float x, float y, float z, float nx, float ny, float nz, float u, float v) : position(x, y, z), normal(nx, ny, nz), texCoord(u, v) {}
-	MeshVertex(DirectX::XMFLOAT3 position, DirectX::XMFLOAT3 normal, DirectX::XMFLOAT2 texCoord) : position(position), normal(normal), texCoord(texCoord) {}
+	MeshVertex(float x, float y, float z, float nx, float ny, float nz, float u, float v, float tx, float ty, float tz, float bx, float by, float bz) : position(x, y, z), normal(nx, ny, nz), texCoord(u, v), tangent(tx, ty, tz), bitangent(bx, by, bz) {}
+	MeshVertex(DirectX::XMFLOAT3 position, DirectX::XMFLOAT3 normal, DirectX::XMFLOAT2 texCoord, DirectX::XMFLOAT3 tangent, DirectX::XMFLOAT3 bitangent) : position(position), normal(normal), texCoord(texCoord), tangent(tangent), bitangent(bitangent)  {}
 
 	DirectX::XMFLOAT3 position;
 	DirectX::XMFLOAT3 normal;
 	DirectX::XMFLOAT2 texCoord;
+	DirectX::XMFLOAT3 tangent;
+	DirectX::XMFLOAT3 bitangent;
 };
 
 class Mesh

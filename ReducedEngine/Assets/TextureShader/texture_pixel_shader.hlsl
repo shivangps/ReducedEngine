@@ -5,6 +5,7 @@ struct ps_in
     float4 fragPosition : FRAGPOSITION;
     float4 fragViewPosition : FRAGVIEW;
     float2 texCoord : TEXCOORD;
+    float3x3 tbnMatrix : TBNMAT;
 };
 
 struct ps_out
@@ -16,6 +17,8 @@ struct ps_out
 };
 
 Texture2D colorTexture : register(t0);
+Texture2D normalTexture : register(t1);
+
 SamplerState mainSampler : register(s0);
 
 void main(in ps_in IN, out ps_out OUT)
@@ -24,6 +27,10 @@ void main(in ps_in IN, out ps_out OUT)
     
     OUT.fragmentPosition.rgb = IN.fragPosition;
     OUT.fragmentViewPosition = IN.fragViewPosition;
-    OUT.normal.rgb = IN.normal;
     OUT.albedoSpec.rgb = coreColor;
+    
+    // Normals calculations based on normal map texture.
+    float3 normalTexColor = normalTexture.Sample(mainSampler, IN.texCoord).rgb;
+    normalTexColor = normalTexColor * 2.0f - 1.0f;
+    OUT.normal.rgb = normalize(mul(normalTexColor, IN.tbnMatrix));
 }

@@ -499,7 +499,7 @@ void Graphics::RenderScene(RenderList* renderComponentList)
 		ID3D12DescriptorHeap* ppHeaps[] = { this->gBufferHeap_SRV.Get() };
 		this->commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 
-		this->commandList->SetGraphicsRootDescriptorTable(0, this->gBufferHeap_SRV.GetGPUHandle(GBufferShaderResource::SSAO_SR));
+		this->commandList->SetGraphicsRootDescriptorTable(0, this->gBufferHeap_SRV.GetGPUHandle(GBufferShaderResource::Normal_SR));
 	}
 
 	this->quad->Draw(commandList);

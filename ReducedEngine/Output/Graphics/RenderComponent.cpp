@@ -11,7 +11,7 @@ void RenderComponent::InitializeLocalData(Microsoft::WRL::ComPtr<ID3D12Device5> 
 	D3D12_CONSTANT_BUFFER_VIEW_DESC constantBufferViewDesc = {};
 	constantBufferViewDesc.BufferLocation = this->localDataResource->GetGPUVirtualAddress();
 	constantBufferViewDesc.SizeInBytes = GetAggregateSize(size);
-	device->CreateConstantBufferView(&constantBufferViewDesc, this->heap.GetCPUHandle(0));
+	device->CreateConstantBufferView(&constantBufferViewDesc, this->heap.GetCPUHandle(SLOT::local_data_cbv));
 
 	// Create data pointer to cbv memory space.
 	CD3DX12_RANGE readRange = {};
@@ -72,7 +72,7 @@ void RenderComponent::SetShaderToComponent(Shader* shader)
 
 void RenderComponent::InitializeComponent(Microsoft::WRL::ComPtr<ID3D12Device5> device, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList)
 {
-	this->heap.Initialize(device, 2, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
+	this->heap.Initialize(device, SLOT::size, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
 	GameAssetManager* GAM = GameAssetManager::GetInstance();
 
 	// Load custom meshes.
@@ -84,7 +84,7 @@ void RenderComponent::InitializeComponent(Microsoft::WRL::ComPtr<ID3D12Device5> 
 		this->meshes.push_back({ mesh, mesh->GetVertexBufferView(), mesh->GetIndexBufferView(), mesh->GetNumberOfVertices(), mesh->GetNumberOfIndices() });
 
 		this->colorTextureIndex = GAM->SetNewTexture(meshData.colorTextureFileDirectory);
-		GAM->AssignTextureViewToHeap(this->colorTextureIndex, this->heap.GetCPUHandle(1));
+		GAM->AssignTextureViewToHeap(this->colorTextureIndex, this->heap.GetCPUHandle(SLOT::color_texture_srv));
 	}
 	this->meshDataToBeLoaded.clear();
 
@@ -100,7 +100,10 @@ void RenderComponent::InitializeComponent(Microsoft::WRL::ComPtr<ID3D12Device5> 
 			this->meshes.push_back({ mesh, mesh->GetVertexBufferView(), mesh->GetIndexBufferView(), mesh->GetNumberOfVertices(), mesh->GetNumberOfIndices() });
 
 			this->colorTextureIndex = modelInfo.modelFragments[j].colorTextureIndex;
-			GAM->AssignTextureViewToHeap(this->colorTextureIndex, this->heap.GetCPUHandle(1));
+			GAM->AssignTextureViewToHeap(this->colorTextureIndex, this->heap.GetCPUHandle(SLOT::color_texture_srv));
+
+			this->normalTextureIndex = modelInfo.modelFragments[j].normalTextureIndex;
+			GAM->AssignTextureViewToHeap(this->normalTextureIndex, this->heap.GetCPUHandle(SLOT::normal_texture_srv));
 		}
 	}
 
@@ -123,8 +126,9 @@ void RenderComponent::Draw(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> co
 	ID3D12DescriptorHeap* ppHeaps[] = { this->heap.Get() };
 	commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 
-	commandList->SetGraphicsRootDescriptorTable(0, this->heap.GetGPUHandle(0));
-	commandList->SetGraphicsRootDescriptorTable(1, this->heap.GetGPUHandle(1));
+	commandList->SetGraphicsRootDescriptorTable(0, this->heap.GetGPUHandle(SLOT::local_data_cbv));
+	commandList->SetGraphicsRootDescriptorTable(1, this->heap.GetGPUHandle(SLOT::color_texture_srv));
+	commandList->SetGraphicsRootDescriptorTable(2, this->heap.GetGPUHandle(SLOT::normal_texture_srv));
 
 	for (unsigned int i = 0; i < this->meshes.size(); i++)
 	{

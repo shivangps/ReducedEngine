@@ -8,7 +8,7 @@ namespace DefaultTextureDirectory
 {
 	static const std::string WhiteTexture = "Assets/Textures/White.jpg";
 	static const std::string BlackTexture = "Assets/Textures/Black.jpg";
-	static const std::string NormalTextur = "Assets/Textures/Normal.jpg";
+	static const std::string NormalTexture = "Assets/Textures/Normal.jpg";
 }
 
 class TextureAssetManager
