@@ -383,8 +383,7 @@ void Graphics::Initialize(HWND windowHandle, unsigned int width, unsigned int he
 	this->skymap.Initialize(this->device, this->commandList, this->skymapFileLocation);
 
 	// LIGHT TEST.
-	
-	this->sunLight.Initialize(this->device);
+	this->sunLight.Initialize(this->device, width, height);
 	this->sunLight.SetFramebufferToFragmentPositionHandle(this->device, this->fragmentPositionFramebuffer);
 	this->sunLight.SetFramebufferToNormalHandle(this->device, this->normalFramebuffer);
 	this->sunLight.SetFramebufferToAlbedoSpecular(this->device, this->albedoSpecFramebuffer);
@@ -468,14 +467,18 @@ void Graphics::RenderScene(RenderList* renderComponentList)
 	// SHADOW RENDERING.
 	// Draw all the objects in the scene for shadow mapping.
 
-	if (!this->debugFramebuffer)
+	if (true)
 	{
-		this->sunLight.RenderSceneToShadow(this->commandList, 1, &rtvHandle, true, &dsvHandle, renderComponentList, Vector3(0.0f, 5.0f, 0.0f), &this->viewport, &this->clippingRect);
+		this->sunLight.RenderSceneToShadowDepth(this->commandList, 1, &rtvHandle, true, &dsvHandle, renderComponentList, Vector3(1.0f, 5.0f, 0.0f), &this->viewport, &this->clippingRect);
 	}
 
 	//----------------X-----------------//
 	// SSAO
 	this->ambientOcclusion->PostProcessAmbientOcclusion(this->commandList, this->mainCamera->GetCamera());
+
+	//----------------X-----------------//
+	// Shadow Rendering
+	this->sunLight.RenderShadow(this->commandList);
 
 	//----------------X-----------------//
 	// POST-PROCESS DEBUG.
@@ -494,15 +497,11 @@ void Graphics::RenderScene(RenderList* renderComponentList)
 	}
 	if (this->debugFramebuffer)
 	{
+
 		this->quadShader->SetShaderForRender(commandList);
 
-		ID3D12DescriptorHeap* ppHeaps[] = { this->gBufferHeap_SRV.Get() };
-		this->commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
-
-		this->commandList->SetGraphicsRootDescriptorTable(0, this->gBufferHeap_SRV.GetGPUHandle(GBufferShaderResource::Normal_SR));
+		this->quad->Draw(commandList);
 	}
-
-	this->quad->Draw(commandList);
 	//----------------X-----------------//
 	TransitionResourceState(currentRenderBuffer, this->commandList, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
 	this->CloseCommandList(this->commandList);

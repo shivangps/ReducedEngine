@@ -201,6 +201,12 @@
     <ClCompile Include="Output\Graphics\INSTANCE_EXPERIMENT.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Assets\DirectionalShadowShader\DirectionalShadowShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\ShadowPostProcessShader\ShadowPostProcessShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CommonHeader.h">
@@ -350,6 +356,12 @@
     <ClInclude Include="Output\Graphics\INSTANCE_EXPERIMENT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Assets\DirectionalShadowShader\DirectionalShadowShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets\ShadowPostProcessShader\ShadowPostProcessShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Assets\DisplayShader\display_pixel_shader.hlsl">
@@ -382,5 +394,9 @@
     <FxCompile Include="Assets\SSAOShader\ssao_pixel_shader.hlsl" />
     <FxCompile Include="Assets\SSAOBlurShader\ssao_blur_vertex_shader.hlsl" />
     <FxCompile Include="Assets\SSAOBlurShader\ssao_blur_pixel_shader.hlsl" />
+    <FxCompile Include="Assets\DirectionalShadowShader\directional_shadow_vertex_shader.hlsl" />
+    <FxCompile Include="Assets\DirectionalShadowShader\directional_shadow_pixel_shader.hlsl" />
+    <FxCompile Include="Assets\ShadowPostProcessShader\shadow_post_process_vertex_shader.hlsl" />
+    <FxCompile Include="Assets\ShadowPostProcessShader\shadow_post_process_pixel_shader.hlsl" />
   </ItemGroup>
 </Project>

@@ -149,11 +149,13 @@
     <ClCompile Include="Assets\CubemapShader\CubemapShader.cpp" />
     <ClCompile Include="Assets\DirectionalLightShader\DirectionalLightShader.cpp" />
     <ClCompile Include="Assets\DirectionalShadowDepthShader\DirectionalShadowDepthShader.cpp" />
+    <ClCompile Include="Assets\DirectionalShadowShader\DirectionalShadowShader.cpp" />
     <ClCompile Include="Assets\InstanceShader\InstanceShader.cpp" />
     <ClCompile Include="Assets\Objects\Box\BoxObject.cpp" />
     <ClCompile Include="Assets\Objects\Plane\PlaneObject.cpp" />
     <ClCompile Include="Assets\Objects\Player\PlayerObject.cpp" />
     <ClCompile Include="Assets\Scenes\MainScene.cpp" />
+    <ClCompile Include="Assets\ShadowPostProcessShader\ShadowPostProcessShader.cpp" />
     <ClCompile Include="Assets\SSAOBlurShader\SSAOBlurShader.cpp" />
     <ClCompile Include="Assets\SSAOShader\SSAOShader.cpp" />
     <ClCompile Include="Assets\TextureShader\TextureShader.cpp" />
@@ -194,11 +196,13 @@
     <ClInclude Include="Assets\CubemapShader\CubemapShader.h" />
     <ClInclude Include="Assets\DirectionalLightShader\DirectionalLightShader.h" />
     <ClInclude Include="Assets\DirectionalShadowDepthShader\DirectionalShadowDepthShader.h" />
+    <ClInclude Include="Assets\DirectionalShadowShader\DirectionalShadowShader.h" />
     <ClInclude Include="Assets\InstanceShader\InstanceShader.h" />
     <ClInclude Include="Assets\Objects\Box\BoxObject.h" />
     <ClInclude Include="Assets\Objects\Plane\PlaneObject.h" />
     <ClInclude Include="Assets\Objects\Player\PlayerObject.h" />
     <ClInclude Include="Assets\Scenes\MainScene.h" />
+    <ClInclude Include="Assets\ShadowPostProcessShader\ShadowPostProcessShader.h" />
     <ClInclude Include="Assets\SSAOBlurShader\SSAOBlurShader.h" />
     <ClInclude Include="Assets\SSAOShader\SSAOShader.h" />
     <ClInclude Include="Assets\TextureShader\TextureShader.h" />
@@ -301,6 +305,22 @@
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)/CompiledShaders/%(Filename).cso</ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)/CompiledShaders/%(Filename).cso</ObjectFileOutput>
     </FxCompile>
+    <FxCompile Include="Assets\DirectionalShadowShader\directional_shadow_pixel_shader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Assets\DirectionalShadowShader\directional_shadow_vertex_shader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
     <FxCompile Include="Assets\DisplayShader\display_pixel_shader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
@@ -340,6 +360,22 @@
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)/CompiledShaders/%(Filename).cso</ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)/CompiledShaders/%(Filename).cso</ObjectFileOutput>
+    </FxCompile>
+    <FxCompile Include="Assets\ShadowPostProcessShader\shadow_post_process_pixel_shader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Assets\ShadowPostProcessShader\shadow_post_process_vertex_shader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
     </FxCompile>
     <FxCompile Include="Assets\SSAOBlurShader\ssao_blur_pixel_shader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
