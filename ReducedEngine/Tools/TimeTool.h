@@ -13,6 +13,8 @@ private:
 public:
 	// Function to mark the time.
 	void MarkTime();
+	// Function to display the delta of previous marked time.
+	void DisplayDeltaTime(std::string displayString);
 	// Function to display the delta of previous marked time and mark the new time.
 	void MarkAndDisplayTime(std::string markingString);
 };

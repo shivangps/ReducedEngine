@@ -24,4 +24,6 @@ public:
 	void RemoveTextureDataFrom_CPU_RAM();
 	// Function to create shader resource view from this texture.
 	void CreateResourceView(Microsoft::WRL::ComPtr<ID3D12Device5> device, D3D12_CPU_DESCRIPTOR_HANDLE handle);
+	// Function to get the texture resource.
+	ID3D12Resource* GetResource();
 };

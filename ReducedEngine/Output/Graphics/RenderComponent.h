@@ -25,7 +25,9 @@ struct LocalData
 class RenderComponent
 {
 private:
-	// Booleanto keep track if the render component is to be rendered or not.
+	UniversalDescriptorHeap* universalDescHeap = UniversalDescriptorHeap::GetInstance();
+
+	// Boolean to keep track if the render component is to be rendered or not.
 	Boolean* enable = nullptr;
 
 	// Uninitialzed data.
@@ -49,6 +51,10 @@ private:
 		size
 	};
 
+	D3D12_GPU_DESCRIPTOR_HANDLE localDataCbvHandle = {};
+	D3D12_GPU_DESCRIPTOR_HANDLE colorTextureHandle = {};
+	D3D12_GPU_DESCRIPTOR_HANDLE normalTextureHandle = {};
+
 protected:
 	// To store the pointer of the transform of its corresponding gameobject.
 	Transform* transform = nullptr;
@@ -65,13 +71,14 @@ protected:
 	};
 	std::vector<MeshCharacteristics> meshes = {};
 
-	DescriptorHeap heap = {};
-
 	UINT64 colorTextureIndex = 0;
 	UINT64 normalTextureIndex = 0;
 
 	LocalData localData = {};
 	unsigned char* pLocalDataCBV = nullptr;
+
+	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> bundleListAllocator = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> bundleList = nullptr;
 
 	// Function to initialize the local data constant buffer.
 	void InitializeLocalData(Microsoft::WRL::ComPtr<ID3D12Device5> device);
@@ -92,12 +99,14 @@ public:
 	void InitializeComponent(Microsoft::WRL::ComPtr<ID3D12Device5> device, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList);
 	// Function to draw the render component.
 	void Draw(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList, Camera camera);
+	// Function to set the bundle command list render call.
+	void InitializeBundleListForRender();
 
 private:
-	// Shadow render.
-	DescriptorHeap shadowDataHeap = {};
-
+	// Shadow depth render.
 	ShadowData shadowData = {};
+
+	D3D12_GPU_DESCRIPTOR_HANDLE shadowCbvHandle = {};
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> shadowDataResource = nullptr;
 

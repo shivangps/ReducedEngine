@@ -9,20 +9,21 @@ bool LightComponent::initializedShadowPostProcessShader = false;
 void LightComponent::BuildLightConstantBuffer(Microsoft::WRL::ComPtr<ID3D12Device5> device)
 {
 	// Create Resource.
-	unsigned int size = sizeof(this->DLCharacteristics);
+	unsigned int size = GetAggregateSize(sizeof(this->DLCharacteristics));
 	InitializeResource(&this->DLCConstantBuffer, device, &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), &CD3DX12_RESOURCE_DESC::Buffer(GetAggregateSize(size)), D3D12_RESOURCE_STATE_GENERIC_READ, nullptr);
 	this->DLCConstantBuffer->SetName(L"Directional Light Characteristics Constant Buffer Resource");
 
 	// Create constant buffer view.
 	D3D12_CONSTANT_BUFFER_VIEW_DESC constantBufferViewDesc = {};
 	constantBufferViewDesc.BufferLocation = this->DLCConstantBuffer->GetGPUVirtualAddress();
-	constantBufferViewDesc.SizeInBytes = GetAggregateSize(size);
-	device->CreateConstantBufferView(&constantBufferViewDesc, this->lightDescriptorHeap.GetCPUHandle(Slot::directionalLightCharacteristics));
+	constantBufferViewDesc.SizeInBytes = size;
 
 	// Create data pointer to cbv memory space.
 	CD3DX12_RANGE readRange = {};
 	this->DLCConstantBuffer->Map(0, &readRange, reinterpret_cast<void**>(&this->pLightCharacteristicsCBV));
 	this->DLCConstantBuffer->Unmap(0, nullptr);
+
+	this->dlCharacteristicsHandle = this->universalDescHeap->GetCbvSrvUavGPUHandle(this->universalDescHeap->SetCpuHandle(device, &constantBufferViewDesc));
 }
 
 Transform LightComponent::GetTransform()
@@ -47,7 +48,6 @@ void LightComponent::Initialize(Microsoft::WRL::ComPtr<ID3D12Device5> device, un
 	this->shadowClippingRect.right = (float)this->shadowWidth;
 	this->shadowClippingRect.bottom = (float)this->shadowHeight;
 
-	this->lightDescriptorHeap.Initialize(device, Slot::Size, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
 	this->shadowHeap.Initialize(device, 1, D3D12_DESCRIPTOR_HEAP_TYPE_DSV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
 
 	this->BuildLightConstantBuffer(device);
@@ -80,26 +80,29 @@ void LightComponent::InitializeShadowRender(Microsoft::WRL::ComPtr<ID3D12Device5
 	}
 
 	// Initialize all the resources.
-	this->shadowRenderSrvHeap.Initialize(device, SHADOW_RENDER_SLOT::size, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
 	this->shadowRenderRtvHeap.Initialize(device, 1, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
 	this->shadowRenderBuffer.Initialize(device, this->shadowRenderFormat, width, height, 1, this->shadowClearColor, L"Shadow Render");
 
 	this->shadowRenderBuffer.SetFramebufferToRTVHandle(device, this->shadowRenderRtvHeap.GetCPUHandle(0));
-	this->shadowDepth.SetDepthBufferToSRVHandle(device, this->shadowRenderSrvHeap.GetCPUHandle(SHADOW_RENDER_SLOT::shadowDepth_srv));
+
+	this->shadowRenderDepthHandle = this->universalDescHeap->GetCbvSrvUavGPUHandle(this->universalDescHeap->SetCpuHandle(device,
+		this->shadowDepth.GetResourceTexture(), this->shadowDepth.GetShaderResourceView()));
 
 	this->shadowRenderDataCbv.shadowWidth = this->shadowWidth;
 	this->shadowRenderDataCbv.shadowHeight = this->shadowHeight;
 
 	// Shadow render constant buffer initialization.
 	{
-		unsigned int size = sizeof(this->shadowRenderDataCbv);
+		unsigned int size = GetAggregateSize(sizeof(this->shadowRenderDataCbv));
 		InitializeResource(&this->shadowRenderConstantBuffer, device, &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), &CD3DX12_RESOURCE_DESC::Buffer(size), D3D12_RESOURCE_STATE_GENERIC_READ, nullptr);
 		this->shadowRenderConstantBuffer->SetName(L"Directional Light Shadow Render Constant Buffer");
 
 		D3D12_CONSTANT_BUFFER_VIEW_DESC constantBufferViewDesc = {};
 		constantBufferViewDesc.BufferLocation = this->shadowRenderConstantBuffer->GetGPUVirtualAddress();
-		constantBufferViewDesc.SizeInBytes = GetAggregateSize(size);
-		device->CreateConstantBufferView(&constantBufferViewDesc, this->shadowRenderSrvHeap.GetCPUHandle(SHADOW_RENDER_SLOT::cbv));
+		constantBufferViewDesc.SizeInBytes = size;
+
+		this->shadowRenderContantBufferHandle = this->universalDescHeap->GetCbvSrvUavGPUHandle(this->universalDescHeap->SetCpuHandle(
+			device, &constantBufferViewDesc));
 		
 		CD3DX12_RANGE readRange = {};
 		this->shadowRenderConstantBuffer->Map(0, &readRange, reinterpret_cast<void**>(&this->pShadowRenderData));
@@ -116,23 +119,25 @@ void LightComponent::InitializeShadowRender(Microsoft::WRL::ComPtr<ID3D12Device5
 	}
 
 	// Initialize all the resources.
-	this->shadowPPSrvHeap.Initialize(device, SHADOW_PP_SLOT::ppSize, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
 	this->shadowPPRtvHeap.Initialize(device, 1, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
 	this->shadowPPRenderBuffer.Initialize(device, this->shadowPPFormat, width, height, 1, this->shadowPPClearColor, L"Shadow Post Process Buffer");
 
 	this->shadowPPRenderBuffer.SetFramebufferToRTVHandle(device, this->shadowPPRtvHeap.GetCPUHandle(0));
-	this->shadowRenderBuffer.SetFramebufferToSRVHandle(device, this->shadowPPSrvHeap.GetCPUHandle(SHADOW_PP_SLOT::ppinputTexture_srv));
+
+	this->shadowPostProcessInputTextureHandle = this->universalDescHeap->GetCbvSrvUavGPUHandle(this->universalDescHeap->SetCpuHandle(
+		device, this->shadowRenderBuffer.GetResourceTexture(), this->shadowRenderBuffer.GetShaderResourceView()));
 
 	// Shadow post processing constant buffer initialization.
 	{
-		unsigned int size = sizeof(this->shadowPPData);
+		unsigned int size = GetAggregateSize(sizeof(this->shadowPPData));
 		InitializeResource(&this->shadowPPConstantBuffer, device, &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), &CD3DX12_RESOURCE_DESC::Buffer(size), D3D12_RESOURCE_STATE_GENERIC_READ, nullptr);
 		this->shadowPPConstantBuffer->SetName(L"Shadow Post Processing Constant Buffer");
 
 		D3D12_CONSTANT_BUFFER_VIEW_DESC constantBufferViewDesc = {};
 		constantBufferViewDesc.BufferLocation = this->shadowPPConstantBuffer->GetGPUVirtualAddress();
-		constantBufferViewDesc.SizeInBytes = GetAggregateSize(size);
-		device->CreateConstantBufferView(&constantBufferViewDesc, this->shadowPPSrvHeap.GetCPUHandle(SHADOW_PP_SLOT::ppCbv));
+		constantBufferViewDesc.SizeInBytes = size;
+		this->shadowPostProcessConstantBufferHandle = this->universalDescHeap->GetCbvSrvUavGPUHandle(this->universalDescHeap->SetCpuHandle(
+			device, &constantBufferViewDesc));
 
 		CD3DX12_RANGE readRange = {};
 		this->shadowPPConstantBuffer->Map(0, &readRange, reinterpret_cast<void**>(&this->pShadowPPCBData));
@@ -143,8 +148,9 @@ void LightComponent::InitializeShadowRender(Microsoft::WRL::ComPtr<ID3D12Device5
 		memcpy(this->pShadowPPCBData, &this->shadowPPData, sizeof(this->shadowPPData));
 	}
 
-	// Applying the end result of the shadow render to the input textures of the light shader.
-	this->shadowPPRenderBuffer.SetFramebufferToSRVHandle(device, this->lightDescriptorHeap.GetCPUHandle(Slot::shadowRenderSlot));
+	// Getting the gpu pointer handle of the shadow post processed texture from the universal descriptor heap.
+	this->shadowRenderHandle = this->universalDescHeap->GetCbvSrvUavGPUHandle(this->universalDescHeap->SetCpuHandle(
+		device, this->shadowPPRenderBuffer.GetResourceTexture(), this->shadowPPRenderBuffer.GetShaderResourceView()));
 }
 
 void LightComponent::RenderShadow(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList)
@@ -160,13 +166,10 @@ void LightComponent::RenderShadow(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandLi
 
 	commandList->OMSetRenderTargets(1, &this->shadowRenderRtvHeap.GetCPUHandle(0), false, nullptr);
 
-	ID3D12DescriptorHeap* ppHeaps[] = { this->shadowRenderSrvHeap.Get() };
-	commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
-
-	commandList->SetGraphicsRootDescriptorTable(SHADOW_RENDER_SLOT::cbv, this->shadowRenderSrvHeap.GetGPUHandle(SHADOW_RENDER_SLOT::cbv));
-	commandList->SetGraphicsRootDescriptorTable(SHADOW_RENDER_SLOT::fragmentPosition_srv, this->shadowRenderSrvHeap.GetGPUHandle(SHADOW_RENDER_SLOT::fragmentPosition_srv));
-	commandList->SetGraphicsRootDescriptorTable(SHADOW_RENDER_SLOT::shadowDepth_srv, this->shadowRenderSrvHeap.GetGPUHandle(SHADOW_RENDER_SLOT::shadowDepth_srv));
-	commandList->SetGraphicsRootDescriptorTable(SHADOW_RENDER_SLOT::normal_srv, this->shadowRenderSrvHeap.GetGPUHandle(SHADOW_RENDER_SLOT::normal_srv));
+	commandList->SetGraphicsRootDescriptorTable(SHADOW_RENDER_SLOT::cbv, this->shadowRenderContantBufferHandle);
+	commandList->SetGraphicsRootDescriptorTable(SHADOW_RENDER_SLOT::fragmentPosition_srv, this->fragmentPositionHandle);
+	commandList->SetGraphicsRootDescriptorTable(SHADOW_RENDER_SLOT::shadowDepth_srv, this->shadowRenderDepthHandle);
+	commandList->SetGraphicsRootDescriptorTable(SHADOW_RENDER_SLOT::normal_srv, this->normalHandle);
 
 	this->quad->Draw(commandList);
 
@@ -180,11 +183,8 @@ void LightComponent::RenderShadow(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandLi
 
 	commandList->OMSetRenderTargets(1, &this->shadowPPRtvHeap.GetCPUHandle(0), false, nullptr);
 
-	ppHeaps[0] = this->shadowPPSrvHeap.Get();
-	commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
-
-	commandList->SetGraphicsRootDescriptorTable(SHADOW_PP_SLOT::ppinputTexture_srv, this->shadowPPSrvHeap.GetGPUHandle(SHADOW_PP_SLOT::ppinputTexture_srv));
-	commandList->SetGraphicsRootDescriptorTable(SHADOW_PP_SLOT::ppCbv, this->shadowPPSrvHeap.GetGPUHandle(SHADOW_PP_SLOT::ppCbv));
+	commandList->SetGraphicsRootDescriptorTable(SHADOW_PP_SLOT::ppinputTexture_srv, this->shadowPostProcessInputTextureHandle);
+	commandList->SetGraphicsRootDescriptorTable(SHADOW_PP_SLOT::ppCbv, this->shadowPostProcessConstantBufferHandle);
 
 	this->quad->Draw(commandList);
 
@@ -197,15 +197,12 @@ void LightComponent::SetLightForRendering(Microsoft::WRL::ComPtr<ID3D12GraphicsC
 
 	this->directionalLightShader->SetShaderForRender(commandList);
 
-	ID3D12DescriptorHeap* ppHeaps[] = { this->lightDescriptorHeap.Get() };
-	commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
-
-	commandList->SetGraphicsRootDescriptorTable(DirectionalLightShader::Slot::directionalLightCharacteristics, this->lightDescriptorHeap.GetGPUHandle(Slot::directionalLightCharacteristics));
-	commandList->SetGraphicsRootDescriptorTable(DirectionalLightShader::Slot::fragmentPosition, this->lightDescriptorHeap.GetGPUHandle(Slot::fragmentPosition));
-	commandList->SetGraphicsRootDescriptorTable(DirectionalLightShader::Slot::normal, this->lightDescriptorHeap.GetGPUHandle(Slot::normal));
-	commandList->SetGraphicsRootDescriptorTable(DirectionalLightShader::Slot::albedoSpecular, this->lightDescriptorHeap.GetGPUHandle(Slot::albedoSpecular));
-	commandList->SetGraphicsRootDescriptorTable(DirectionalLightShader::Slot::shadowDepth, this->lightDescriptorHeap.GetGPUHandle(Slot::shadowRenderSlot));
-	commandList->SetGraphicsRootDescriptorTable(DirectionalLightShader::Slot::ssao, this->lightDescriptorHeap.GetGPUHandle(Slot::ssao));
+	commandList->SetGraphicsRootDescriptorTable(DirectionalLightShader::Slot::directionalLightCharacteristics, this->dlCharacteristicsHandle);
+	commandList->SetGraphicsRootDescriptorTable(DirectionalLightShader::Slot::fragmentPosition, this->fragmentPositionHandle);
+	commandList->SetGraphicsRootDescriptorTable(DirectionalLightShader::Slot::normal, this->normalHandle);
+	commandList->SetGraphicsRootDescriptorTable(DirectionalLightShader::Slot::albedoSpecular, this->albedoSpecHandle);
+	commandList->SetGraphicsRootDescriptorTable(DirectionalLightShader::Slot::shadowDepth, this->shadowRenderHandle);
+	commandList->SetGraphicsRootDescriptorTable(DirectionalLightShader::Slot::ssao, this->ssaoHandle);
 
 	this->quad->Draw(commandList);
 }
@@ -223,26 +220,24 @@ void LightComponent::UpdateConstantBuffer(Camera camera)
 	memcpy(this->pLightCharacteristicsCBV, &this->DLCharacteristics, sizeof(this->DLCharacteristics));
 }
 
-void LightComponent::SetFramebufferToFragmentPositionHandle(Microsoft::WRL::ComPtr<ID3D12Device5> device, RenderFramebuffer fragmentPositionFramebuffer)
+void LightComponent::SetGpuHandleForFragmentPosition(D3D12_GPU_DESCRIPTOR_HANDLE handle)
 {
-	fragmentPositionFramebuffer.SetFramebufferToSRVHandle(device, this->lightDescriptorHeap.GetCPUHandle(Slot::fragmentPosition));
-	fragmentPositionFramebuffer.SetFramebufferToSRVHandle(device, this->shadowRenderSrvHeap.GetCPUHandle(SHADOW_RENDER_SLOT::fragmentPosition_srv));
+	this->fragmentPositionHandle = handle;
 }
 
-void LightComponent::SetFramebufferToNormalHandle(Microsoft::WRL::ComPtr<ID3D12Device5> device, RenderFramebuffer normalFramebuffer)
+void LightComponent::SetGpuHandleForNormals(D3D12_GPU_DESCRIPTOR_HANDLE handle)
 {
-	normalFramebuffer.SetFramebufferToSRVHandle(device, this->lightDescriptorHeap.GetCPUHandle(Slot::normal));
-	normalFramebuffer.SetFramebufferToSRVHandle(device, this->shadowRenderSrvHeap.GetCPUHandle(SHADOW_RENDER_SLOT::normal_srv));
+	this->normalHandle = handle;
 }
 
-void LightComponent::SetFramebufferToAlbedoSpecular(Microsoft::WRL::ComPtr<ID3D12Device5> device, RenderFramebuffer albedoSpecFramebuffer)
+void LightComponent::SetGpuHandleForAlbedoSpecular(D3D12_GPU_DESCRIPTOR_HANDLE handle)
 {
-	albedoSpecFramebuffer.SetFramebufferToSRVHandle(device, this->lightDescriptorHeap.GetCPUHandle(Slot::albedoSpecular));
+	this->albedoSpecHandle = handle;
 }
 
-void LightComponent::SetFramebufferToSSAO(Microsoft::WRL::ComPtr<ID3D12Device5> device, RenderFramebuffer ssaoFramenbuffer)
+void LightComponent::SetGpuHandleForAmbientOcclusion(D3D12_GPU_DESCRIPTOR_HANDLE handle)
 {
-	ssaoFramenbuffer.SetFramebufferToSRVHandle(device, this->lightDescriptorHeap.GetCPUHandle(Slot::ssao));
+	this->ssaoHandle = handle;
 }
 
 void LightComponent::SetAmbientColor(Vector3 ambient)

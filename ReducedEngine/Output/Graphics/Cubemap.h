@@ -5,6 +5,7 @@
 #include "Camera.h"
 #include "../ErrorLogger.h"
 #include <DirectXTK/DDSTextureLoader.h>
+#include "UniversalDescriptorHeap.h"
 
 struct TransformMatrix
 {
@@ -28,7 +29,8 @@ public:
 	Cubemap() {}
 	~Cubemap() {}
 
-	//std::vector<Texture> sides;
+	UniversalDescriptorHeap* universalDescriptorHeap = UniversalDescriptorHeap::GetInstance();
+
 	Microsoft::WRL::ComPtr<ID3D12Resource> textureResource = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Resource> uploadResource = nullptr;
 
@@ -36,12 +38,10 @@ public:
 	TransformMatrix matrix = {};
 	UINT8* pCBVMatrix = nullptr;
 
-	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> heap = nullptr;
-	unsigned int heapSize = 0;
+	D3D12_GPU_DESCRIPTOR_HANDLE textureHandle = {};
+	D3D12_GPU_DESCRIPTOR_HANDLE constantBufferHandle = {};
 
 	Shader* shader = nullptr;
-
-	//MainCamera* camera = MainCamera::GetInstance();
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> VertexUploadBuffer = nullptr;
 	D3D12_VERTEX_BUFFER_VIEW VertexBufferView;

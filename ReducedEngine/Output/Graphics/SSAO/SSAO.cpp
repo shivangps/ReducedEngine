@@ -7,20 +7,11 @@ void SSAO::InitializeBlurConstantBuffer(Microsoft::WRL::ComPtr<ID3D12Device5> de
 	this->blur_cb.width = width;
 	this->blur_cb.height = height;
 
-	unsigned int size = GetAggregateSize(sizeof(this->blur_cb));
-	InitializeResource(&this->blurConstantBufferResource, device, &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), &CD3DX12_RESOURCE_DESC::Buffer(size), D3D12_RESOURCE_STATE_GENERIC_READ, nullptr);
-	this->blurConstantBufferResource->SetName(L"Blur Constant Buffer");
+	this->blurConstantBuffer.Initialize(device, sizeof(blur_cb), L"SSAO Blur Constant Buffer");
 
-	D3D12_CONSTANT_BUFFER_VIEW_DESC constantBufferViewDesc = {};
-	constantBufferViewDesc.BufferLocation = this->blurConstantBufferResource->GetGPUVirtualAddress();
-	constantBufferViewDesc.SizeInBytes = size;
-	device->CreateConstantBufferView(&constantBufferViewDesc, this->blurSrvHeap.GetCPUHandle(BLUR_SRV_SLOT::constantBuffer));
+	this->blurConstantBufferHandle = this->universalDescHeap->GetCbvSrvUavGPUHandle(this->universalDescHeap->SetCpuHandle(device, this->blurConstantBuffer.GetConstantBufferViewDesc()));
 
-	CD3DX12_RANGE readRange = {};
-	this->blurConstantBufferResource->Map(0, &readRange, reinterpret_cast<void**>(&this->pBlurCB));
-	this->blurConstantBufferResource->Unmap(0, nullptr);
-
-	memcpy(this->pBlurCB, &this->blur_cb, size);
+	this->blurConstantBuffer.CopyDataToConstantBufferLocation(&this->blur_cb);
 }
 
 void SSAO::Initialize(Microsoft::WRL::ComPtr<ID3D12Device5> device, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList, unsigned int width, unsigned int height)
@@ -34,8 +25,6 @@ void SSAO::Initialize(Microsoft::WRL::ComPtr<ID3D12Device5> device, Microsoft::W
 	// Initialize all the heaps.
 	// Heap for render target.
 	this->rtvHeap.Initialize(device, 1, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
-	// Heap for G-Buffers.
-	this->sourceHeap.Initialize(device, SLOT::size, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
 
 	// Initialize the framebuffer.
 	this->mainFramebuffer.Initialize(device, this->ssaoFormat, width, height, 1, this->ssaoClearColor, L"SSAO");
@@ -123,7 +112,9 @@ void SSAO::Initialize(Microsoft::WRL::ComPtr<ID3D12Device5> device, Microsoft::W
 		srvDesc.Format = this->noiseTextureFormat;
 		srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 		srvDesc.Texture2D.MipLevels = 1;
-		device->CreateShaderResourceView(this->noiseTexture.Get(), &srvDesc, this->sourceHeap.GetCPUHandle(SLOT::noise_srv));
+
+		this->noiseHandle = this->universalDescHeap->GetCbvSrvUavGPUHandle(this->universalDescHeap->SetCpuHandle(
+			device, this->noiseTexture.Get(), &srvDesc));
 	}
 
 	// SSAO samples constant buffer.
@@ -133,21 +124,10 @@ void SSAO::Initialize(Microsoft::WRL::ComPtr<ID3D12Device5> device, Microsoft::W
 	this->SampleDesc.noiseWidth = this->noiseCols;
 	this->SampleDesc.noiseHeight = this->noiseRows;
 
-	unsigned int constantBufferSize = GetAggregateSize(sizeof(this->SampleDesc));
-	InitializeResource(&this->kernelsDescResource, device, &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), &CD3DX12_RESOURCE_DESC::Buffer(constantBufferSize), D3D12_RESOURCE_STATE_GENERIC_READ, nullptr);
-	this->kernelsDescResource->SetName(L"SSAO Sample Description Resource");
-
-	D3D12_CONSTANT_BUFFER_VIEW_DESC constantBufferViewDesc = {};
-	constantBufferViewDesc.BufferLocation = this->kernelsDescResource->GetGPUVirtualAddress();
-	constantBufferViewDesc.SizeInBytes = constantBufferSize;
-	device->CreateConstantBufferView(&constantBufferViewDesc, this->sourceHeap.GetCPUHandle(SLOT::sample_description_cbv));
-
-	// Create data pointer to cbv memory space.
-	CD3DX12_RANGE readRange = {};
-	this->kernelsDescResource->Map(0, &readRange, reinterpret_cast<void**>(&this->pKernelsDescData));
-	this->kernelsDescResource->Unmap(0, nullptr);
-
-	memcpy(this->pKernelsDescData, &this->SampleDesc, constantBufferSize);
+	this->ssaoConstantBuffer.Initialize(device, sizeof(this->SampleDesc), L"SSAO Constant Buffer");
+	this->sampleDescriptionHandle = this->universalDescHeap->GetCbvSrvUavGPUHandle(this->universalDescHeap->SetCpuHandle(
+		device, this->ssaoConstantBuffer.GetConstantBufferViewDesc()));
+	this->ssaoConstantBuffer.CopyDataToConstantBufferLocation(&this->SampleDesc);
 
 	// BLUR.
 
@@ -155,13 +135,16 @@ void SSAO::Initialize(Microsoft::WRL::ComPtr<ID3D12Device5> device, Microsoft::W
 	this->blurShader->Initialize(device, 1, blurFramebufferFormat, 1);
 
 	this->blurRtvHeap.Initialize(device, 1, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
-	this->blurSrvHeap.Initialize(device, BLUR_SRV_SLOT::Size, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
 	this->blurFramebuffer.Initialize(device, this->ssaoFormat, width, height, 1, this->blurClearColor, L"SSAO Blur");
 
-	this->mainFramebuffer.SetFramebufferToSRVHandle(device, this->blurSrvHeap.GetCPUHandle(BLUR_SRV_SLOT::inputTexture));
+	this->blurInputTextureHandle = this->mainFramebuffer.GetGpuHandleForShaderResource();
 
 	this->blurFramebuffer.SetFramebufferToRTVHandle(device, this->blurRtvHeap.GetCPUHandle(0));
 	this->InitializeBlurConstantBuffer(device, width, height);
+
+	// Assign the render framebuffer to the universal descriptor heap.
+	this->ssaoHandle = this->universalDescHeap->GetCbvSrvUavGPUHandle(this->universalDescHeap->SetCpuHandle(
+		device, this->blurFramebuffer.GetResourceTexture(), this->blurFramebuffer.GetShaderResourceView()));
 }
 
 void SSAO::ApplyOutputTextureHandle(Microsoft::WRL::ComPtr<ID3D12Device5> device, D3D12_CPU_DESCRIPTOR_HANDLE handle)
@@ -176,12 +159,12 @@ RenderFramebuffer SSAO::GetOutputFramebuffer()
 
 void SSAO::SetFragmentViewPositionFramebufferToHeap(Microsoft::WRL::ComPtr<ID3D12Device5> device, RenderFramebuffer* fragmentViewPositionBuffer)
 {
-	fragmentViewPositionBuffer->SetFramebufferToSRVHandle(device, this->sourceHeap.GetCPUHandle(SLOT::fragment_view_position_srv));
+	this->fragmentViewPositionHandle = fragmentViewPositionBuffer->GetGpuHandleForShaderResource();
 }
 
 void SSAO::SetNormalFramebufferToHeap(Microsoft::WRL::ComPtr<ID3D12Device5> device, RenderFramebuffer* normalBuffer)
 {
-	normalBuffer->SetFramebufferToSRVHandle(device, this->sourceHeap.GetCPUHandle(SLOT::normal_srv));
+	this->normalPositionHandle = normalBuffer->GetGpuHandleForShaderResource();
 }
 
 void SSAO::PostProcessAmbientOcclusion(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList, Camera camera)
@@ -191,7 +174,7 @@ void SSAO::PostProcessAmbientOcclusion(Microsoft::WRL::ComPtr<ID3D12GraphicsComm
 	// Update constant buffer data for ssao.
 	this->SampleDesc.projection = camera.projection.Transpose();
 
-	memcpy(this->pKernelsDescData, &this->SampleDesc, GetAggregateSize(sizeof(this->SampleDesc)));
+	this->ssaoConstantBuffer.CopyDataToConstantBufferLocation(&this->SampleDesc);
 
 	this->ssaoShader->SetShaderForRender(commandList);
 
@@ -199,13 +182,10 @@ void SSAO::PostProcessAmbientOcclusion(Microsoft::WRL::ComPtr<ID3D12GraphicsComm
 
 	commandList->OMSetRenderTargets(1, &this->rtvHeap.GetCPUHandle(0), false, nullptr);
 
-	ID3D12DescriptorHeap* ppHeaps[] = { this->sourceHeap.Get() };
-	commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
-
-	commandList->SetGraphicsRootDescriptorTable(SLOT::fragment_view_position_srv, this->sourceHeap.GetGPUHandle(SLOT::fragment_view_position_srv));
-	commandList->SetGraphicsRootDescriptorTable(SLOT::normal_srv, this->sourceHeap.GetGPUHandle(SLOT::normal_srv));
-	commandList->SetGraphicsRootDescriptorTable(SLOT::noise_srv, this->sourceHeap.GetGPUHandle(SLOT::noise_srv));
-	commandList->SetGraphicsRootDescriptorTable(SLOT::sample_description_cbv, this->sourceHeap.GetGPUHandle(SLOT::sample_description_cbv));
+	commandList->SetGraphicsRootDescriptorTable(SLOT::fragment_view_position_srv, this->fragmentViewPositionHandle);
+	commandList->SetGraphicsRootDescriptorTable(SLOT::normal_srv, this->normalPositionHandle);
+	commandList->SetGraphicsRootDescriptorTable(SLOT::noise_srv, this->noiseHandle);
+	commandList->SetGraphicsRootDescriptorTable(SLOT::sample_description_cbv, this->sampleDescriptionHandle);
 	commandList->SetGraphicsRootShaderResourceView(SLOT::sample_kernels_srv, this->kernelSamplesUploadBuffer->GetGPUVirtualAddress());
 
 	this->quad->Draw(commandList);
@@ -220,13 +200,15 @@ void SSAO::PostProcessAmbientOcclusion(Microsoft::WRL::ComPtr<ID3D12GraphicsComm
 
 	commandList->OMSetRenderTargets(1, &this->blurRtvHeap.GetCPUHandle(0), false, nullptr);
 
-	ID3D12DescriptorHeap* blurHeaps[] = { this->blurSrvHeap.Get() };
-	commandList->SetDescriptorHeaps(_countof(blurHeaps), blurHeaps);
-
-	commandList->SetGraphicsRootDescriptorTable(0, this->blurSrvHeap.GetGPUHandle(BLUR_SRV_SLOT::inputTexture));
-	commandList->SetGraphicsRootDescriptorTable(1, this->blurSrvHeap.GetGPUHandle(BLUR_SRV_SLOT::constantBuffer));
+	commandList->SetGraphicsRootDescriptorTable(BLUR_SRV_SLOT::inputTexture, this->blurInputTextureHandle);
+	commandList->SetGraphicsRootDescriptorTable(BLUR_SRV_SLOT::constantBuffer, this->blurConstantBufferHandle);
 
 	this->quad->Draw(commandList);
 
 	this->blurFramebuffer.CopyResource(commandList);
+}
+
+D3D12_GPU_DESCRIPTOR_HANDLE* SSAO::GetGPUHandleForOutput()
+{
+	return &this->ssaoHandle;
 }

@@ -11,7 +11,8 @@ void RenderComponent::InitializeLocalData(Microsoft::WRL::ComPtr<ID3D12Device5> 
 	D3D12_CONSTANT_BUFFER_VIEW_DESC constantBufferViewDesc = {};
 	constantBufferViewDesc.BufferLocation = this->localDataResource->GetGPUVirtualAddress();
 	constantBufferViewDesc.SizeInBytes = GetAggregateSize(size);
-	device->CreateConstantBufferView(&constantBufferViewDesc, this->heap.GetCPUHandle(SLOT::local_data_cbv));
+
+	this->localDataCbvHandle = this->universalDescHeap->GetCbvSrvUavGPUHandle(this->universalDescHeap->SetCpuHandle(device, &constantBufferViewDesc));
 
 	// Create data pointer to cbv memory space.
 	CD3DX12_RANGE readRange = {};
@@ -36,6 +37,27 @@ void RenderComponent::UpdateCameraMatrix(Camera camera)
 	this->localData.modelViewMatrix = (model * camera.view).Transpose();
 
 	memcpy(this->pLocalDataCBV, &this->localData, sizeof(this->localData));
+}
+
+void RenderComponent::InitializeBundleListForRender()
+{
+	this->shader->SetShaderForRender(this->bundleList);
+
+	universalDescHeap->AssignToGraphicsCommandList(this->bundleList);
+
+	this->bundleList->SetGraphicsRootDescriptorTable(0, this->localDataCbvHandle);
+	this->bundleList->SetGraphicsRootDescriptorTable(1, this->colorTextureHandle);
+	this->bundleList->SetGraphicsRootDescriptorTable(2, this->normalTextureHandle);
+
+	for (unsigned int i = 0; i < this->meshes.size(); i++)
+	{
+		this->bundleList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		this->bundleList->IASetVertexBuffers(0, 1, &this->meshes[i].vertexBufferView);
+		this->bundleList->IASetIndexBuffer(&this->meshes[i].indexBufferView);
+		this->bundleList->DrawIndexedInstanced(this->meshes[i].numberOfIndices, 1, 0, 0, 0);
+	}
+
+	this->bundleList->Close();
 }
 
 void RenderComponent::InitializeNewMesh(std::vector<MeshVertex> vertices, std::vector<unsigned short> indices)
@@ -72,7 +94,6 @@ void RenderComponent::SetShaderToComponent(Shader* shader)
 
 void RenderComponent::InitializeComponent(Microsoft::WRL::ComPtr<ID3D12Device5> device, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList)
 {
-	this->heap.Initialize(device, SLOT::size, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
 	GameAssetManager* GAM = GameAssetManager::GetInstance();
 
 	// Load custom meshes.
@@ -84,7 +105,8 @@ void RenderComponent::InitializeComponent(Microsoft::WRL::ComPtr<ID3D12Device5> 
 		this->meshes.push_back({ mesh, mesh->GetVertexBufferView(), mesh->GetIndexBufferView(), mesh->GetNumberOfVertices(), mesh->GetNumberOfIndices() });
 
 		this->colorTextureIndex = GAM->SetNewTexture(meshData.colorTextureFileDirectory);
-		GAM->AssignTextureViewToHeap(this->colorTextureIndex, this->heap.GetCPUHandle(SLOT::color_texture_srv));
+
+		this->colorTextureHandle = GAM->GetTextureHandle(this->colorTextureIndex);
 	}
 	this->meshDataToBeLoaded.clear();
 
@@ -100,43 +122,29 @@ void RenderComponent::InitializeComponent(Microsoft::WRL::ComPtr<ID3D12Device5> 
 			this->meshes.push_back({ mesh, mesh->GetVertexBufferView(), mesh->GetIndexBufferView(), mesh->GetNumberOfVertices(), mesh->GetNumberOfIndices() });
 
 			this->colorTextureIndex = modelInfo.modelFragments[j].colorTextureIndex;
-			GAM->AssignTextureViewToHeap(this->colorTextureIndex, this->heap.GetCPUHandle(SLOT::color_texture_srv));
+			this->colorTextureHandle = GAM->GetTextureHandle(this->colorTextureIndex);
 
 			this->normalTextureIndex = modelInfo.modelFragments[j].normalTextureIndex;
-			GAM->AssignTextureViewToHeap(this->normalTextureIndex, this->heap.GetCPUHandle(SLOT::normal_texture_srv));
+			this->normalTextureHandle = GAM->GetTextureHandle(this->normalTextureIndex);
 		}
 	}
 
 	// Initialize local data such as camera matrix.
 	this->InitializeLocalData(device);
 
-	// Initialize shadow descriptor heap.
-	this->shadowDataHeap.Initialize(device, 1, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
-
 	// Initialze the shadow data constant buffer.
 	this->InitializeShadowConstantBuffer(device);
+
+	// Initialization of bundle command list.
+	device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_BUNDLE, IID_PPV_ARGS(this->bundleListAllocator.GetAddressOf()));
+	device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_BUNDLE, this->bundleListAllocator.Get(), nullptr, IID_PPV_ARGS(this->bundleList.GetAddressOf()));
 }
 
 void RenderComponent::Draw(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList, Camera camera)
 {
 	this->UpdateCameraMatrix(camera);
 
-	this->shader->SetShaderForRender(commandList);
-
-	ID3D12DescriptorHeap* ppHeaps[] = { this->heap.Get() };
-	commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
-
-	commandList->SetGraphicsRootDescriptorTable(0, this->heap.GetGPUHandle(SLOT::local_data_cbv));
-	commandList->SetGraphicsRootDescriptorTable(1, this->heap.GetGPUHandle(SLOT::color_texture_srv));
-	commandList->SetGraphicsRootDescriptorTable(2, this->heap.GetGPUHandle(SLOT::normal_texture_srv));
-
-	for (unsigned int i = 0; i < this->meshes.size(); i++)
-	{
-		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		commandList->IASetVertexBuffers(0, 1, &this->meshes[i].vertexBufferView);
-		commandList->IASetIndexBuffer(&this->meshes[i].indexBufferView);
-		commandList->DrawIndexedInstanced(this->meshes[i].numberOfIndices, 1, 0, 0, 0);
-	}
+	commandList->ExecuteBundle(bundleList.Get());
 }
 
 void RenderComponent::InitializeShadowConstantBuffer(Microsoft::WRL::ComPtr<ID3D12Device5> device)
@@ -150,7 +158,8 @@ void RenderComponent::InitializeShadowConstantBuffer(Microsoft::WRL::ComPtr<ID3D
 	D3D12_CONSTANT_BUFFER_VIEW_DESC constantBufferViewDesc = {};
 	constantBufferViewDesc.BufferLocation = this->shadowDataResource->GetGPUVirtualAddress();
 	constantBufferViewDesc.SizeInBytes = GetAggregateSize(size);
-	device->CreateConstantBufferView(&constantBufferViewDesc, this->shadowDataHeap.GetCPUHandle(0));
+
+	this->shadowCbvHandle = this->universalDescHeap->GetCbvSrvUavGPUHandle(this->universalDescHeap->SetCpuHandle(device, &constantBufferViewDesc));
 
 	// Create data pointer to cbv memory space.
 	CD3DX12_RANGE readRange = {};
@@ -169,14 +178,13 @@ void RenderComponent::DrawForShadow(Microsoft::WRL::ComPtr<ID3D12GraphicsCommand
 	model = model.Rotation(transform.GetGlobalRotation());
 	model = model.Scale(transform.GetGlobalScale());
 
+	this->universalDescHeap->AssignToGraphicsCommandList(commandList);
+
 	this->shadowData.lightSpaceMatrix = model * lightSpaceMatrix;
 
 	memcpy(this->pShadowDataCBV, &this->shadowData, sizeof(this->shadowData));
 
-	ID3D12DescriptorHeap* ppHeaps[] = { this->shadowDataHeap.Get() };
-	commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
-
-	commandList->SetGraphicsRootDescriptorTable(0, this->shadowDataHeap.GetGPUHandle(0));
+	commandList->SetGraphicsRootDescriptorTable(0, this->shadowCbvHandle);
 
 	for (unsigned int i = 0; i < this->meshes.size(); i++)
 	{

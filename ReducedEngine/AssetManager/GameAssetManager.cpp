@@ -16,11 +16,6 @@ void GameAssetManager::RemoveAssetsFrom_CPU_RAM()
 	this->Texture_AM->RemoveAllTextureDataFrom_CPU_RAM();
 }
 
-void GameAssetManager::SetDescriptorHeap(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList)
-{
-	this->Texture_AM->SetDescriptorHeap(commandList);
-}
-
 void GameAssetManager::SetAllTextureViewToRespectiveHeaps(Microsoft::WRL::ComPtr<ID3D12Device5> device)
 {
 	Texture* texture = nullptr;

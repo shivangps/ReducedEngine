@@ -63,6 +63,9 @@ void RenderFramebuffer::Initialize(Microsoft::WRL::ComPtr<ID3D12Device5> device,
 	this->srvDesc.Format = format;
 	this->srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 	this->srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+
+	UniversalDescriptorHeap* UDH = UniversalDescriptorHeap::GetInstance();
+	this->gpuSrvHandle = UDH->GetCbvSrvUavGPUHandle(UDH->SetCpuHandle(device, this->textureBuffer.Get(), &this->srvDesc));
 }
 
 void RenderFramebuffer::SetFramebufferToRTVHandle(Microsoft::WRL::ComPtr<ID3D12Device5> device, D3D12_CPU_DESCRIPTOR_HANDLE handle)
@@ -113,4 +116,19 @@ void RenderFramebuffer::CopyResource(Microsoft::WRL::ComPtr<ID3D12GraphicsComman
 	TransitionResourceState(this->renderTargetBuffer, commandList, copyFromResourceState, previousFromResourceState);
 	TransitionResourceState(this->textureBuffer, commandList, copyToResourceState, previousToResourceState);
 
+}
+
+D3D12_SHADER_RESOURCE_VIEW_DESC* RenderFramebuffer::GetShaderResourceView()
+{
+	return &this->srvDesc;
+}
+
+ID3D12Resource* RenderFramebuffer::GetResourceTexture()
+{
+	return this->textureBuffer.Get();
+}
+
+D3D12_GPU_DESCRIPTOR_HANDLE RenderFramebuffer::GetGpuHandleForShaderResource()
+{
+	return this->gpuSrvHandle;
 }

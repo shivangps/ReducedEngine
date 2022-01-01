@@ -101,3 +101,13 @@ void DepthFramebuffer::CopyResource(Microsoft::WRL::ComPtr<ID3D12GraphicsCommand
 	TransitionResourceState(this->depthStencilBuffer, commandList, copyFromResourceState, previousFromResourceState);
 	TransitionResourceState(this->textureBuffer, commandList, copyToResourceState, previousToResourceState);
 }
+
+D3D12_SHADER_RESOURCE_VIEW_DESC* DepthFramebuffer::GetShaderResourceView()
+{
+	return &this->srvDesc;
+}
+
+ID3D12Resource* DepthFramebuffer::GetResourceTexture()
+{
+	return this->textureBuffer.Get();
+}

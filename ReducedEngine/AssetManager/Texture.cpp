@@ -34,3 +34,8 @@ void Texture::CreateResourceView(Microsoft::WRL::ComPtr<ID3D12Device5> device, D
 {
 	device->CreateShaderResourceView(this->mainTextureResource.Get(), nullptr, handle);
 }
+
+ID3D12Resource* Texture::GetResource()
+{
+	return this->mainTextureResource.Get();
+}

@@ -3,16 +3,17 @@
 
 // This header file contains the class definition of render compoenent collection class that is to be used for rendering.
 
+struct RenderComponentInfo
+{
+	Boolean enable = Boolean(false, nullptr);
+	UINT64 componentIndex = 0;
+	RenderComponent* renderComponent = nullptr;
+};
+
 class RenderList
 {
 private:
 	bool stateEnableChange = false;
-	struct RenderComponentInfo
-	{
-		Boolean enable = Boolean(false, nullptr);
-		UINT64 componentIndex = 0;
-		RenderComponent* renderComponent = nullptr;
-	};
 	std::vector<RenderComponentInfo> renderComponentList = {};
 	UINT64 currentRenderComponentIndex = 0;
 
@@ -27,6 +28,10 @@ public:
 	void InitializeComponents(Microsoft::WRL::ComPtr<ID3D12Device5> device, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList);
 	// Function to render all the render component.
 	void DrawAllComponents(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList, Camera camera);
+	// Function to draw all render components using multi-threading.
+	void DrawAllComponents(std::vector<ID3D12GraphicsCommandList4*> commandList, Camera camera);
 	// Function to render all the render components for shadow depth mapping.
 	void DrawAllComponentsForShadow(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList, Matrix4 lightSpaceMatrix);
+	// Function to initilize the command list bundles for all the render components.
+	void InitializeAllBundleLists();
 };

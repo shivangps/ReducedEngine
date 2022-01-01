@@ -5,8 +5,6 @@
 void TextureAssetManager::SetDevice(Microsoft::WRL::ComPtr<ID3D12Device5> device)
 {
 	this->graphicsDevice = device;
-
-	this->texturesHeap.Initialize(this->graphicsDevice, 100, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
 }
 
 int TextureAssetManager::SetNewTexture(std::string fileDirectory)
@@ -23,7 +21,8 @@ int TextureAssetManager::SetNewTexture(std::string fileDirectory)
 		this->textures.push_back(textureInfo);
 
 		// Assign the texture view into the descriptor heap.
-		textureInfo->texture.CreateResourceView(this->graphicsDevice, this->texturesHeap.GetCPUHandle(textureInfo->textureIndex));
+		textureInfo->handle = this->universalDescriptorHeap->GetCbvSrvUavGPUHandle(this->universalDescriptorHeap->SetCpuHandle(
+			this->graphicsDevice, textureInfo->texture.GetResource(), nullptr));
 
 		return textureInfo->textureIndex;
 	}
@@ -36,7 +35,16 @@ int TextureAssetManager::SetNewTexture(std::string fileDirectory)
 
 D3D12_GPU_DESCRIPTOR_HANDLE TextureAssetManager::GetTextureHandleForRender(UINT64 textureIndex)
 {
-	return this->texturesHeap.GetGPUHandle(textureIndex);
+	D3D12_GPU_DESCRIPTOR_HANDLE handle = this->textures[0]->handle;		// Assigning white texture handle for fail safe.
+
+	if (textureIndex <= this->currentTextureIndex)
+		for (unsigned int i = 0; i < this->textures.size(); i++)
+		{
+			if (textureIndex == this->textures[i]->textureIndex)
+				handle = this->textures[i]->handle;
+		}
+
+	return handle;
 }
 
 void TextureAssetManager::LoadAllTextureDataTo_GPU_RAM(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList)
@@ -53,12 +61,6 @@ void TextureAssetManager::RemoveAllTextureDataFrom_CPU_RAM()
 	{
 		this->textures[i]->texture.RemoveTextureDataFrom_CPU_RAM();
 	}
-}
-
-void TextureAssetManager::SetDescriptorHeap(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList)
-{
-	ID3D12DescriptorHeap* ppHeaps[] = { this->texturesHeap.Get() };
-	commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 }
 
 Texture* TextureAssetManager::GetTexture(UINT64 textureIndex)

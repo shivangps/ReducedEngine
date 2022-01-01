@@ -46,3 +46,18 @@ public:
 	// Function to get the pointer of the heap.
 	ID3D12DescriptorHeap* Get();
 };
+
+// Class to create and manage constant buffer.
+class ConstantBuffer
+{
+private:
+	Microsoft::WRL::ComPtr<ID3D12Resource> resource = nullptr;
+	D3D12_CONSTANT_BUFFER_VIEW_DESC constantBufferViewDesc = {};
+	unsigned int size = 0;
+	unsigned char* pointer = nullptr;
+
+public:
+	void Initialize(Microsoft::WRL::ComPtr<ID3D12Device5> device, unsigned int size, LPCWSTR name);
+	D3D12_CONSTANT_BUFFER_VIEW_DESC* GetConstantBufferViewDesc();
+	void CopyDataToConstantBufferLocation(const void* data);
+};

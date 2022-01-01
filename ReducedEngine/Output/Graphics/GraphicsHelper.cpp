@@ -81,3 +81,32 @@ unsigned int GetAggregateSize(unsigned int size)
 {
 	return ((size + 255) & ~255);
 }
+
+void ConstantBuffer::Initialize(Microsoft::WRL::ComPtr<ID3D12Device5> device, unsigned int size, LPCWSTR name)
+{
+	// Reassign the size for the aggregate size of the constant buffer.
+	this->size = GetAggregateSize(size);
+
+	// Initialize the constant buffer.
+	InitializeResource(&this->resource, device, &CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), &CD3DX12_RESOURCE_DESC::Buffer(this->size), D3D12_RESOURCE_STATE_GENERIC_READ, nullptr);
+	this->resource->SetName(name);
+
+	// Create the constant buffer view.
+	this->constantBufferViewDesc.BufferLocation = this->resource->GetGPUVirtualAddress();
+	this->constantBufferViewDesc.SizeInBytes = this->size;
+
+	// Get the pointer location for copying the data to constant buffer.
+	CD3DX12_RANGE readRange = {};
+	this->resource->Map(0, &readRange, reinterpret_cast<void**>(&this->pointer));
+	this->resource->Unmap(0, nullptr);
+}
+
+D3D12_CONSTANT_BUFFER_VIEW_DESC* ConstantBuffer::GetConstantBufferViewDesc()
+{
+	return &this->constantBufferViewDesc;
+}
+
+void ConstantBuffer::CopyDataToConstantBufferLocation(const void* data)
+{
+	memcpy(this->pointer, data, this->size);
+}

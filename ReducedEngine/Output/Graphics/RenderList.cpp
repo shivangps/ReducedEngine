@@ -1,4 +1,5 @@
 #include "RenderList.h"
+#include <thread>
 
 void RenderList::SwapContents(unsigned int firstPosition, unsigned int secondPosition)
 {
@@ -38,6 +39,16 @@ void RenderList::InitializeComponents(Microsoft::WRL::ComPtr<ID3D12Device5> devi
 	this->stateEnableChange = false;
 }
 
+void RenderList::InitializeAllBundleLists()
+{
+	for (unsigned int i = 0; i < this->renderComponentList.size(); i++)
+	{
+		RenderComponent* renderComponent = renderComponentList[i].renderComponent;
+
+		renderComponent->InitializeBundleListForRender();
+	}
+}
+
 void RenderList::DrawAllComponents(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList, Camera camera)
 {
 	for (unsigned int i = 0; i < this->renderComponentList.size(); i++)
@@ -48,6 +59,62 @@ void RenderList::DrawAllComponents(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandL
 
 			renderComponent->Draw(commandList, camera);
 		}
+	}
+}
+
+void DrawRenderComponents(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList, std::vector<RenderComponentInfo> renderComponents, unsigned int start, unsigned int size, Camera camera)
+{
+	for (unsigned int i = start; i < (start + size); i++)
+	{
+		if (renderComponents[i].enable.GetBool())
+		{
+			RenderComponent* renderComponent = renderComponents[i].renderComponent;
+
+			renderComponent->Draw(commandList, camera);
+		}
+	}
+}
+
+void RenderList::DrawAllComponents(std::vector<ID3D12GraphicsCommandList4*> commandList, Camera camera)
+{
+	// Calculate the assignment of render components to draw given the amount of threads.
+	unsigned int renderComponentsPresent = this->renderComponentList.size();
+	unsigned int commandListPresent = commandList.size();
+
+	unsigned int oneExtraTaskPerThread = renderComponentsPresent % commandListPresent;
+	unsigned int minimumTasksAllotedPerThread = renderComponentsPresent / commandListPresent;
+
+	// Loop to draw all the components using threads.
+	static std::vector<std::thread> thread_objects;
+	thread_objects.reserve(commandListPresent);
+
+	unsigned int start = 0;
+	unsigned int size = 0;
+
+	for(unsigned int i = 0; i < commandListPresent && (minimumTasksAllotedPerThread != 0 || oneExtraTaskPerThread != 0); i++)
+	{
+		// Calculate the render component alignment.
+		start = start + size;
+
+		if (oneExtraTaskPerThread != 0)
+		{
+			oneExtraTaskPerThread--;
+			size = minimumTasksAllotedPerThread + 1;
+		}
+		else
+		{
+			size = minimumTasksAllotedPerThread;
+		}
+
+		// Spawn threads.
+		thread_objects.emplace_back(DrawRenderComponents, commandList[i], std::ref(this->renderComponentList), start, size, camera);
+	}
+	
+	// Wait for each thread to rejoin.
+	for (unsigned int i = 0; i < thread_objects.size(); i++)
+	{
+		if(thread_objects[i].joinable())
+			thread_objects[i].join();
 	}
 }
 

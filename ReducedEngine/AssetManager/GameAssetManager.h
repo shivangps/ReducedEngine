@@ -46,8 +46,6 @@ public:
 	void LoadAllAssetsTo_GPU_RAM(Microsoft::WRL::ComPtr<ID3D12Device5> device, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList);
 	// Function to remove all assets from CPU RAM (WARNING: To be called after loading assets to GPU RAM).
 	void RemoveAssetsFrom_CPU_RAM();
-	// Function to set the Texture Asset Manager Descriptor Heap.
-	void SetDescriptorHeap(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList);
 	// Function to apply the texture view to heaps that are to be set. (To be called by Graphics Engine).
 	void SetAllTextureViewToRespectiveHeaps(Microsoft::WRL::ComPtr<ID3D12Device5> device);
 

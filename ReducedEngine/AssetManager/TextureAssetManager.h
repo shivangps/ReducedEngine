@@ -2,6 +2,7 @@
 #include <vector>
 #include "Texture.h"
 #include "../Output/Graphics/GraphicsHelper.h"
+#include "../Output/Graphics/UniversalDescriptorHeap.h"
 
 // This header file consists a singleton(single instance) class that maintains the texture assets loaded on GPU RAM.
 namespace DefaultTextureDirectory
@@ -18,14 +19,15 @@ class TextureAssetManager
 	{
 		UINT64 textureIndex = 0;
 		Texture texture;
+		D3D12_GPU_DESCRIPTOR_HANDLE handle = {};
 	};
+
+	UniversalDescriptorHeap* universalDescriptorHeap = UniversalDescriptorHeap::GetInstance();
 
 	Microsoft::WRL::ComPtr<ID3D12Device5> graphicsDevice = nullptr;
 
 	std::vector<TextureAssetInfo*> textures = {};
 	UINT64 currentTextureIndex = 0;
-
-	DescriptorHeap texturesHeap = {};
 
 	TextureAssetManager() {}
 
@@ -43,8 +45,6 @@ public:
 	void LoadAllTextureDataTo_GPU_RAM(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList);
 	// Function to call for removal of all texture data from CPU RAM.
 	void RemoveAllTextureDataFrom_CPU_RAM();
-	// Function to set the descriptor heap.
-	void SetDescriptorHeap(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList);
 
 
 	// Function to get the texture pointer base on texture index entered.

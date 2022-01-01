@@ -17,6 +17,20 @@
 
 // Class that handles the rendering of objects present in the scene.
 
+// Command list and command allocator for each thread.
+struct CommandSet
+{
+	D3D12_COMMAND_LIST_TYPE type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator = nullptr;
+
+	void CreateSet(Microsoft::WRL::ComPtr<ID3D12Device5> device);
+	void CloseCommandList();
+	void ResetCommandList();
+	void ResetCommandAllocator();
+	void ResetAll();
+};
+
 // This is a singleton.
 class Graphics
 {
@@ -91,6 +105,8 @@ class Graphics
 	void InitilizeGraphicsEngineShaders(Microsoft::WRL::ComPtr<ID3D12Device5> device, unsigned int numRT, DXGI_FORMAT* renderTargetFormats, DXGI_FORMAT depthStencilFormat, unsigned int samples);
 
 private:
+	UniversalDescriptorHeap* universalDescriptorHeap = UniversalDescriptorHeap::GetInstance();
+
 	// Deffered rendering.
 	// Framebuffer render target.
 	enum GBufferRenderTarget
@@ -125,6 +141,10 @@ private:
 
 	DescriptorHeap gBufferHeap_DSV = {};
 
+	CommandSet preRenderCommandList = {};
+	CommandSet renderCommandList = {};
+	CommandSet postRenderingCommandList = {};
+
 	// Framebuffer shader resource.
 	enum GBufferShaderResource
 	{
@@ -138,16 +158,30 @@ private:
 	};
 	DescriptorHeap gBufferHeap_SRV = {};
 
+	D3D12_GPU_DESCRIPTOR_HANDLE fragmentPositionHandle = {};
+	D3D12_GPU_DESCRIPTOR_HANDLE fragmentViewPositionHandle = {};
+	D3D12_GPU_DESCRIPTOR_HANDLE normalPositionHandle = {};
+	D3D12_GPU_DESCRIPTOR_HANDLE albedoSpecularHandle = {};
+	D3D12_GPU_DESCRIPTOR_HANDLE depthHandle = {};
+	D3D12_GPU_DESCRIPTOR_HANDLE screenSpaceAmbientOcclusionHandle = {};
+
 	// Boolean to apply anti aliasing using mutli sampling.
 	bool multiSampling = true;
 	unsigned int sampleCount = 4;
 
 	// Function to initialize the deferred rendering process.
 	void InitializeDeferredRendering(Microsoft::WRL::ComPtr<ID3D12Device5> device, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList, unsigned int width, unsigned int height, unsigned int multiSamples);
+	// Function to clear the framebuffers.
+	void ClearDeferredFramebuffers(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList);
 	// Function to set the framebuffers for rendering the scene.
 	void SetDeferredFramebuffers(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList);
 	// Function to remove the framebuffers from rendering.
 	void RemoveDeferredFramebuffers(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList, unsigned int numRT, D3D12_CPU_DESCRIPTOR_HANDLE* newRTHandle, D3D12_CPU_DESCRIPTOR_HANDLE* newDepthHandle);
+	// Function to initialize command lists for seperate rendering sections.
+	void InitalizeCommandLists(Microsoft::WRL::ComPtr<ID3D12Device5> device);
+	// Function to immediately start executing command list set.
+	void ExecuteCommandListsImmediately(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList, Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator);
+	void ExecuteCommandListsImmediately(CommandSet commandSet);
 
 private:
 	// Deferred render display.
@@ -179,6 +213,18 @@ private:
 	SSAO* ambientOcclusion = SSAO::GetInstance();
 
 	void IntializeSSAO(Microsoft::WRL::ComPtr<ID3D12Device5> device, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList, unsigned int width, unsigned int height);
+
+private:
+	// Multi-threaded rendering.
+	bool enableMultiThreadedRendering = false;
+	unsigned int number_of_cpu_cores = 0;
+	std::vector<CommandSet> threadCommandSet = {};
+	std::vector<ID3D12GraphicsCommandList4*> threadedCommandLists = {};
+	// 0 - As many as the logical cores of cpu.
+	unsigned int maximumThreadsToSpawn = 4;
+
+	void InitializeMultipleCommandLists(Microsoft::WRL::ComPtr<ID3D12Device5> device);
+
 public:
 	// Function to get a single instance of graphics or render engine.
 	static Graphics* GetInstance()

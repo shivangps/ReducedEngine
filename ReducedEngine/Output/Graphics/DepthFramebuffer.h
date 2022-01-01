@@ -29,4 +29,8 @@ public:
 	void SetDepthBufferToSRVHandle(Microsoft::WRL::ComPtr<ID3D12Device5> device, D3D12_CPU_DESCRIPTOR_HANDLE handle);
 	// Function to copy the image from multi sampled depth buffer resource to unsampled shader resource.
 	void CopyResource(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList);
+	// Function to get the shader resource view of the depthbuffer.
+	D3D12_SHADER_RESOURCE_VIEW_DESC* GetShaderResourceView();
+	// Function to get the resource of the texture depthbuffer.
+	ID3D12Resource* GetResourceTexture();
 };

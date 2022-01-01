@@ -7,6 +7,7 @@
 #include "../Assets/SSAOBlurShader/SSAOBlurShader.h"
 #include "../Camera.h"
 #include "../Quad/Quad.h"
+#include "../UniversalDescriptorHeap.h"
 
 // Class to handle the post-processing effect of creating ambient occlusion in screen space.
 
@@ -24,6 +25,8 @@ private:
 	// Shaders.
 	Shader* ssaoShader = SSAOShader::GetInstance();
 
+	UniversalDescriptorHeap* universalDescHeap = UniversalDescriptorHeap::GetInstance();
+
 	// Enum for easy shader input mapping.
 	enum SLOT
 	{
@@ -35,12 +38,16 @@ private:
 		size,
 	};
 
-	DescriptorHeap sourceHeap = {};
+	D3D12_GPU_DESCRIPTOR_HANDLE fragmentViewPositionHandle = {};
+	D3D12_GPU_DESCRIPTOR_HANDLE normalPositionHandle = {};
+	D3D12_GPU_DESCRIPTOR_HANDLE noiseHandle = {};
+	D3D12_GPU_DESCRIPTOR_HANDLE sampleDescriptionHandle = {};
+	D3D12_GPU_DESCRIPTOR_HANDLE sampleKernelsHandle = {};
+
 	DescriptorHeap rtvHeap = {};
 
 	RenderFramebuffer mainFramebuffer = {};
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> kernelsDescResource = nullptr;
 	unsigned char* pKernelsDescData = nullptr;
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> noiseTexture = nullptr;
@@ -52,7 +59,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> kernelSamplesUploadBuffer = nullptr;
 
 	DXGI_FORMAT ssaoFormat = DXGI_FORMAT_R32_FLOAT;
-	float ssaoClearColor[4] = { 1.0f, 1.0f, 1.0f , 1.0f };
+	float ssaoClearColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 	const unsigned int numOfKernelSamples = 32;
 
@@ -69,11 +76,15 @@ private:
 		Matrix4 projection;
 	}SampleDesc;
 
+	ConstantBuffer ssaoConstantBuffer = {};
+
 	struct SampleData
 	{
 		Vector3 samplePosition;
 		int Pad0 = 0;
 	};
+
+	D3D12_GPU_DESCRIPTOR_HANDLE ssaoHandle = {};
 
 private:
 	// BLURRING PART.
@@ -81,7 +92,6 @@ private:
 
 	Shader* blurShader = SSAOBlurShader::GetInstance();
 
-	DescriptorHeap blurSrvHeap = {};
 	DescriptorHeap blurRtvHeap = {};
 
 	RenderFramebuffer blurFramebuffer = {};
@@ -95,6 +105,9 @@ private:
 		Size
 	};
 
+	D3D12_GPU_DESCRIPTOR_HANDLE blurInputTextureHandle = {};
+	D3D12_GPU_DESCRIPTOR_HANDLE blurConstantBufferHandle = {};
+
 	struct BlurCB
 	{
 		unsigned int width = 0;
@@ -102,9 +115,8 @@ private:
 		int Pad0 = 0;
 		int Pad1 = 0;
 	}blur_cb;
+	ConstantBuffer blurConstantBuffer = {};
 	void InitializeBlurConstantBuffer(Microsoft::WRL::ComPtr<ID3D12Device5> device, unsigned int width, unsigned int height);
-	Microsoft::WRL::ComPtr<ID3D12Resource> blurConstantBufferResource = nullptr;
-	UINT8* pBlurCB = 0;
 
 	// Quad geometry to render the post processed texture.
 	Quad* quad = Quad::GetInstance();
@@ -132,4 +144,7 @@ public:
 
 	// Function to perform ambient occlusion on the drawn G-Buffers.
 	void PostProcessAmbientOcclusion(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList, Camera camera);
+
+	// Function to get the gpu handle of the resulting ssao frame buffer texture in the universal descriptor heap.
+	D3D12_GPU_DESCRIPTOR_HANDLE* GetGPUHandleForOutput();
 };

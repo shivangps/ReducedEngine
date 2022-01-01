@@ -65,7 +65,10 @@ void main(in ps_in IN, out ps_out OUT)
         if (diffuseFactor < ambientFactor)
             diffuseFactor = ambientFactor * ambientOcclusion * 2.0f;
         if (shadowFactor < ambientFactor)
+        {
             shadowFactor = ambientFactor * ambientOcclusion * 2.0f;
+            diffuseFactor = shadowFactor;
+        }
         float3 diffuse = lightDiffuse.rgb * color * (diffuseFactor + shadowFactor) / 2.0f * 1.5f;
         
         resultColor = diffuse;

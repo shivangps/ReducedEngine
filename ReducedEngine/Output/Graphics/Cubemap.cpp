@@ -6,13 +6,6 @@ void Cubemap::Initialize(Microsoft::WRL::ComPtr<ID3D12Device5> device, Microsoft
 {
 	HRESULT HR;
 
-	D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
-	heapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-	heapDesc.NodeMask = 0;
-	heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-	heapDesc.NumDescriptors = 2;
-	device->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(this->heap.GetAddressOf()));
-
 	// SHADER RESOURCE VIEW
 	std::unique_ptr<uint8_t[]> decodedData;
 	std::vector<D3D12_SUBRESOURCE_DATA> subresources;
@@ -54,12 +47,7 @@ void Cubemap::Initialize(Microsoft::WRL::ComPtr<ID3D12Device5> device, Microsoft
 	srvDesc.TextureCube.ResourceMinLODClamp = 0.0f;
 	srvDesc.Format = this->textureResource->GetDesc().Format;
 
-	D3D12_CPU_DESCRIPTOR_HANDLE heapHandle = this->heap->GetCPUDescriptorHandleForHeapStart();
-	D3D12_CPU_DESCRIPTOR_HANDLE handle;
-	heapSize = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-
-	handle.ptr = heapHandle.ptr + (0 * heapSize);
-	device->CreateShaderResourceView(this->textureResource.Get(), &srvDesc, handle);
+	this->textureHandle = this->universalDescriptorHeap->GetCbvSrvUavGPUHandle(this->universalDescriptorHeap->SetCpuHandle(device, this->textureResource.Get(), &srvDesc));
 
 	// CONSTANT BUFFER VIEW
 	HR = device->CreateCommittedResource(
@@ -80,8 +68,7 @@ void Cubemap::Initialize(Microsoft::WRL::ComPtr<ID3D12Device5> device, Microsoft
 	cbvDesc.BufferLocation = this->constantResource->GetGPUVirtualAddress();
 	cbvDesc.SizeInBytes = (sizeof(matrix) + 255) & ~255;
 
-	handle.ptr = heapHandle.ptr + (1 * heapSize);
-	device->CreateConstantBufferView(&cbvDesc, handle);
+	this->constantBufferHandle = this->universalDescriptorHeap->GetCbvSrvUavGPUHandle(this->universalDescriptorHeap->SetCpuHandle(device, &cbvDesc));
 
 	CD3DX12_RANGE readRange(0, 0);
 	HR = this->constantResource->Map(0, &readRange, reinterpret_cast<void**>(&this->pCBVMatrix));
@@ -189,17 +176,9 @@ void Cubemap::Draw(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandLis
 
 	shader->SetShaderForRender(commandList);
 
-	ID3D12DescriptorHeap* ppHeaps[] = { this->heap.Get() };
-	commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
+	commandList->SetGraphicsRootDescriptorTable(0, this->textureHandle);
 
-	D3D12_GPU_DESCRIPTOR_HANDLE heapHandle = this->heap->GetGPUDescriptorHandleForHeapStart();
-	D3D12_GPU_DESCRIPTOR_HANDLE handle;
-
-	handle.ptr = heapHandle.ptr + (0 * heapSize);
-	commandList->SetGraphicsRootDescriptorTable(0, handle);
-
-	handle.ptr = heapHandle.ptr + (1 * heapSize);
-	commandList->SetGraphicsRootDescriptorTable(1, handle);
+	commandList->SetGraphicsRootDescriptorTable(1, this->constantBufferHandle);
 
 	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	commandList->IASetVertexBuffers(0, 1, &VertexBufferView);

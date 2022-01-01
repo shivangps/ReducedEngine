@@ -9,6 +9,7 @@
 #include "RenderList.h"
 #include "Camera.h"
 #include "Quad/Quad.h"
+#include "UniversalDescriptorHeap.h"
 
 // This header file contains the class implementation for light in the rendering environment.
 
@@ -20,6 +21,8 @@ private:
 
 	Shader* directionalLightShader = DirectionalLightShader::GetInstance();
 
+	UniversalDescriptorHeap* universalDescHeap = UniversalDescriptorHeap::GetInstance();
+
 	typedef enum Slot
 	{
 		directionalLightCharacteristics = 0,
@@ -30,6 +33,13 @@ private:
 		ssao,
 		Size
 	}Slot;
+
+	D3D12_GPU_DESCRIPTOR_HANDLE dlCharacteristicsHandle = {};
+	D3D12_GPU_DESCRIPTOR_HANDLE fragmentPositionHandle = {};
+	D3D12_GPU_DESCRIPTOR_HANDLE normalHandle = {};
+	D3D12_GPU_DESCRIPTOR_HANDLE	albedoSpecHandle = {};
+	D3D12_GPU_DESCRIPTOR_HANDLE shadowRenderHandle = {};
+	D3D12_GPU_DESCRIPTOR_HANDLE ssaoHandle = {};
 
 	struct DirectionalLightCahracteristics
 	{
@@ -48,7 +58,6 @@ private:
 	}DLCharacteristics = {};
 
 	// Light characteristics constant buffer.
-	DescriptorHeap lightDescriptorHeap = {};
 	Microsoft::WRL::ComPtr<ID3D12Resource> DLCConstantBuffer = nullptr;
 	unsigned char* pLightCharacteristicsCBV = nullptr;
 
@@ -71,14 +80,14 @@ public:
 	// Function to update constant buffer data.
 	void UpdateConstantBuffer(Camera camera);
 
-	// Function to set the framebuffer to fragment position handle.
-	void SetFramebufferToFragmentPositionHandle(Microsoft::WRL::ComPtr<ID3D12Device5> device, RenderFramebuffer fragmentPositionFramebuffer);
-	// Function to set the framebuffer to normal handle.
-	void SetFramebufferToNormalHandle(Microsoft::WRL::ComPtr<ID3D12Device5> device, RenderFramebuffer normalFramebuffer);
-	// Function to set the framebuffer to albedo and specular handle.
-	void SetFramebufferToAlbedoSpecular(Microsoft::WRL::ComPtr<ID3D12Device5> device, RenderFramebuffer albedoSpecFramebuffer);
-	// Function to set the framebuffer to ssao handle.
-	void SetFramebufferToSSAO(Microsoft::WRL::ComPtr<ID3D12Device5> device, RenderFramebuffer ssaoFramenbuffer);
+	// Function to set the gpu handle from the universal descriptor heap for the fragment position framebuffer.
+	void SetGpuHandleForFragmentPosition(D3D12_GPU_DESCRIPTOR_HANDLE handle);
+	// Function to set the gpu handle from the universal descriptor heap for the normal framebuffer.
+	void SetGpuHandleForNormals(D3D12_GPU_DESCRIPTOR_HANDLE handle);
+	// Function to set the gpu handle from the universal descriptor heap for the albedo and specular framebuffer.
+	void SetGpuHandleForAlbedoSpecular(D3D12_GPU_DESCRIPTOR_HANDLE handle);
+	// Function to set the gpu handle from the universal descriptor heap for the ssao framebuffer.
+	void SetGpuHandleForAmbientOcclusion(D3D12_GPU_DESCRIPTOR_HANDLE handle);
 
 public:
 	// Function to set the ambient light value.
@@ -132,6 +141,8 @@ private:
 		normal_srv,
 		size,
 	};
+	D3D12_GPU_DESCRIPTOR_HANDLE shadowRenderContantBufferHandle = {};
+	D3D12_GPU_DESCRIPTOR_HANDLE shadowRenderDepthHandle = {};
 
 	struct ShadowRenderCbv
 	{
@@ -144,7 +155,6 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> shadowRenderConstantBuffer = nullptr;
 	UINT8* pShadowRenderData = nullptr;
 
-	DescriptorHeap shadowRenderSrvHeap = {};
 	DescriptorHeap shadowRenderRtvHeap = {};
 	RenderFramebuffer shadowRenderBuffer = {};
 	DXGI_FORMAT shadowRenderFormat = DXGI_FORMAT_R32_FLOAT;
@@ -162,6 +172,9 @@ private:
 		ppSize,
 	};
 
+	D3D12_GPU_DESCRIPTOR_HANDLE shadowPostProcessInputTextureHandle = {};
+	D3D12_GPU_DESCRIPTOR_HANDLE shadowPostProcessConstantBufferHandle = {};
+
 	struct ShadowPostProcessData
 	{
 		unsigned int width = 0;
@@ -172,11 +185,11 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> shadowPPConstantBuffer = nullptr;
 	UINT8* pShadowPPCBData = nullptr;
 
-	DescriptorHeap shadowPPSrvHeap = {};
+
 	DescriptorHeap shadowPPRtvHeap = {};
 	RenderFramebuffer shadowPPRenderBuffer = {};
 	DXGI_FORMAT shadowPPFormat = DXGI_FORMAT_R32_FLOAT;
-	float shadowPPClearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	float shadowPPClearColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
 
 	void InitializeShadowRender(Microsoft::WRL::ComPtr<ID3D12Device5> device, unsigned int width, unsigned int height);
