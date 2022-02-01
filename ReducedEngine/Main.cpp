@@ -1,6 +1,7 @@
 #include "GameEngine.h"
 
 #include "Assets/Scenes/MainScene.h"
+#include "Assets/2D_Assets/Scenes/MainScene2D.h"
 
 // Main function.
 
@@ -13,7 +14,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	mainEngine->Initialize(hInstance);
 
-	mainEngine->SetScene(new MainScene());
+	Scene* scene = new MainScene();
+#ifdef DX2D
+	scene = new MainScene2D();
+#endif // DX2D
+	mainEngine->SetScene(scene);
 
 	mainEngine->RunGame();
 

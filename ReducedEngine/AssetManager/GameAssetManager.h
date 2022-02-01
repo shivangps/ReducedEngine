@@ -42,6 +42,9 @@ public:
 	// Function to initialize all the shaders.
 	void InitializeAllShadersForDeferredRender(Microsoft::WRL::ComPtr<ID3D12Device5> device, unsigned int numberOfRenderTarget,
 		DXGI_FORMAT* renderTargetFormats, DXGI_FORMAT depthStencilFormat, unsigned int samples);
+	// Function to initialize all the shaders for 2D render.
+	void InitializeAllShadersFor2DDeferredRender(Microsoft::WRL::ComPtr<ID3D12Device5> device, unsigned int numberOfRenderTarget,
+		DXGI_FORMAT* renderTargetFormats, DXGI_FORMAT depthStencilFormat, unsigned int samples);
 	// Function to load all the mesh and textures on GPU RAM.
 	void LoadAllAssetsTo_GPU_RAM(Microsoft::WRL::ComPtr<ID3D12Device5> device, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList);
 	// Function to remove all assets from CPU RAM (WARNING: To be called after loading assets to GPU RAM).
@@ -75,6 +78,7 @@ public:
 	ModelInfo LoadModel(std::string fileLocation);
 	// Function to set new mesh.
 	UINT64 SetNewMesh(std::vector<MeshVertex> vertices, std::vector<unsigned short> indices);
+	UINT64 SetNewGeometry2D(std::vector<MeshVertex2D> vertices, std::vector<unsigned short> indices);
 	// Function to get the mesh from the Mesh Asset Manager.
 	Mesh* GetMesh(UINT64 meshIndex);
 	// Function to set a new texture.
@@ -94,4 +98,6 @@ public:
 
 	// Function to assign texture view to descriptor heap.
 	void AssignTextureViewToHeap(UINT64 textureIndex, D3D12_CPU_DESCRIPTOR_HANDLE handle);
+	// Function to release all the assets.
+	void ReleaseAllAssets();
 };

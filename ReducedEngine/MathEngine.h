@@ -1,6 +1,119 @@
 #pragma once
 
 #include "CommonHeader.h"
+#include "box2d/b2_math.h"
+
+// Constants that store the normalized values of 3 axes.
+const DirectX::XMVECTOR global_right = DirectX::XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
+const DirectX::XMVECTOR global_up = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+const DirectX::XMVECTOR global_forward = DirectX::XMVectorSet(0.0f, 0.0f, -1.0f, 0.0f);
+
+// Structure to handle 2 float values namely X and Y. Representing vector in 2D.
+struct Vector2
+{
+private:
+	DirectX::XMFLOAT2 values = DirectX::XMFLOAT2(0.0f, 0.0f);
+
+	Vector2 Multiply(Vector2 vector, float aValue)
+	{
+		return Vector2(aValue * vector.X(), aValue * vector.Y());
+	}
+	Vector2 Multiply(Vector2 firstVector, Vector2 secondVector)
+	{
+		return Vector2(firstVector.X() * secondVector.X(), firstVector.Y() * secondVector.Y());
+	}
+	Vector2 Divide(Vector2 vector, float aValue)
+	{
+		return Vector2(vector.X() / aValue, vector.Y() / aValue);
+	}
+
+public:
+	Vector2() {}
+	Vector2(float x, float y) : values(x, y) {}
+	Vector2(DirectX::XMFLOAT2 newValues) : values(newValues) {}
+	Vector2(DirectX::XMVECTOR vector)
+	{
+		XMStoreFloat2(&this->values, vector);
+	}
+	Vector2(float aValue) : values(aValue, aValue) {}
+	Vector2(b2Vec2 box2dVector2) : values(box2dVector2.x, box2dVector2.y) {}
+
+	// Get & Set functions.
+	DirectX::XMVECTOR GetVector()
+	{
+		return DirectX::XMLoadFloat2(&this->values);
+	}
+	DirectX::XMFLOAT2 GetFloat2()
+	{
+		return this->values;
+	}
+	float X() { return this->values.x; }
+	float Y() { return this->values.y; }
+	void X(float x) { this->values.x = x; }
+	void Y(float y) { this->values.y = y; }
+
+	// Operations. (Using SIMD operations)
+	void operator=(DirectX::XMFLOAT2 newValues)
+	{
+		this->values = newValues;
+	}
+	void operator=(DirectX::XMVECTOR vector)
+	{
+		DirectX::XMStoreFloat2(&this->values, vector);
+	}
+	Vector2 operator+(Vector2 otherVector2)
+	{
+		return DirectX::XMVectorAdd(this->GetVector(), otherVector2.GetVector());
+	}
+	Vector2 operator+(DirectX::XMFLOAT2 otherFloat2)
+	{
+		return DirectX::XMVectorAdd(this->GetVector(), XMLoadFloat2(&otherFloat2));
+	}
+	Vector2 operator+(DirectX::XMVECTOR otherVector)
+	{
+		return DirectX::XMVectorAdd(this->GetVector(), otherVector);
+	}
+	Vector2 operator+(float aValue)
+	{
+		return Vector2(this->X() + aValue, this->Y() + aValue);
+	}
+	void operator+=(Vector2 otherVector2)
+	{
+		*this = *this + otherVector2;
+	}
+	Vector2 operator-(Vector2 otherVector2)
+	{
+		return DirectX::XMVectorSubtract(this->GetVector(), otherVector2.GetVector());
+	}
+	Vector2 operator-()
+	{
+		return Vector2(-this->X(), -this->Y());
+	}
+	Vector2 operator*(float aValue)
+	{
+		return this->Multiply(*this, aValue);
+	}
+	void operator*=(Vector2 otherVector2)
+	{
+		*this = this->Multiply(*this, otherVector2);
+	}
+	void operator*=(float aValue)
+	{
+		*this = this->Multiply(*this, aValue);
+	}
+	Vector2 operator/(float aValue)
+	{
+		return this->Divide(*this, aValue);
+	}
+	Vector2 Normalize()
+	{
+		return DirectX::XMVector2Normalize(this->GetVector());
+	}
+	b2Vec2 GetBox2DVector()
+	{
+		return b2Vec2(this->values.x, this->values.y);
+	}
+};
 
 // Structure to handle 3 float values namely X, Y and Z. Representing a vector.
 struct Vector3
@@ -29,6 +142,8 @@ public:
 		XMStoreFloat3(&this->values, vector);
 	}
 	Vector3(float aValue) : values(aValue, aValue, aValue) {}
+	Vector3(Vector2 vector2d) : values(vector2d.X(), vector2d.Y(), 0.0f) {}
+	Vector3(b2Vec3 box2dVector3) : values(box2dVector3.x, box2dVector3.y, box2dVector3.z) {}
 
 	// Get & Set functions.
 	DirectX::XMVECTOR GetVector()
@@ -102,6 +217,10 @@ public:
 	Vector3 Normalize()
 	{
 		return DirectX::XMVector3Normalize(this->GetVector());
+	}
+	b2Vec3 GetBox2DVector()
+	{
+		return b2Vec3(this->values.x, this->values.y, this->values.z);
 	}
 };
 
@@ -190,6 +309,10 @@ public:
 			DirectX::XMConvertToRadians(rotation.Y()),
 			DirectX::XMConvertToRadians(rotation.Z()))) * this->GetMatrix();
 	}
+	Matrix4 Rotation(float z)
+	{
+		return DirectX::XMMatrixRotationAxis(DirectX::XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f), z);
+	}
 	Matrix4 Scale(Vector3 scale)
 	{
 		return *this * Matrix4(DirectX::XMMatrixScaling(scale.X(), scale.Y(), scale.Z()));
@@ -199,11 +322,6 @@ public:
 		return DirectX::XMMatrixDeterminant(this->GetMatrix());
 	}
 };
-
-// Constants that store the normalized values of 3 axes.
-const DirectX::XMVECTOR global_right = DirectX::XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
-const DirectX::XMVECTOR global_up = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-const DirectX::XMVECTOR global_forward = DirectX::XMVectorSet(0.0f, 0.0f, -1.0f, 0.0f);
 
 // Transform contains the position rotation and scale data of an object.
 // Also allows operation on data.
@@ -345,6 +463,156 @@ public:
 	Transform* GetParent()
 	{
 		Transform* transform = nullptr;
+		if (this->hasParent)
+		{
+			transform = this->parent;
+		}
+		return transform;
+	}
+
+	// Function to get the model matrix relative to its parent.
+	Matrix4 GetGlobalModel()
+	{
+		Matrix4 model;
+		model = model.Translation(this->position);
+		model = model.Rotation(this->rotation);
+		model = model.Scale(this->scale);
+		if (this->HasParent())
+		{
+			Matrix4 parentModel = parent->GetGlobalModel();
+			model *= parentModel;
+		}
+		return model;
+	}
+	// Function to get the local model matrix.
+	Matrix4 GetLocalModel()
+	{
+		Matrix4 model;
+		model = model.Translation(this->position);
+		model = model.Rotation(this->rotation);
+		model = model.Scale(this->scale);
+		return model;
+	}
+};
+
+// Transform component for the 2D space.
+struct Transform2D
+{
+private:
+	// Local transforms.
+	Vector2 position;
+	float rotation = 0.0f;
+	Vector2 scale;
+
+	// Stores the local axes of an object.
+	Vector2 local_up;
+	Vector2 local_right;
+
+	void CalculateNewLocalAxes()
+	{
+		Matrix4 rotationMatrix = DirectX::XMMatrixRotationRollPitchYaw(0.0f, 0.0f, DirectX::XMConvertToRadians(this->rotation));
+		this->local_right = DirectX::XMVector3Normalize(DirectX::XMVector3TransformCoord(global_right, rotationMatrix.GetMatrix()));
+		this->local_up = DirectX::XMVector3Normalize(DirectX::XMVector3TransformCoord(global_up, rotationMatrix.GetMatrix()));
+	}
+
+public:
+	Transform2D()
+	{
+		this->scale = Vector2(1.0f);
+		this->CalculateNewLocalAxes();
+	}
+
+	// Get and Set functions.
+
+	// Get the local position of the object.
+	Vector2 GetPosition() { return this->position; }
+	// Get the position of an object relative to its parent(if any).
+	Vector2 GetGlobalPostion()
+	{
+		Vector2 resultPosition = this->position;
+		if (this->hasParent)
+		{
+			resultPosition += parent->GetGlobalPostion();
+		}
+		return resultPosition;
+	}
+	void SetPosition(Vector2 position) { this->position = position; }
+	void SetPosition(float x, float y) { this->position = Vector2(x, y); }
+	void Translate(Vector2 translationVector)
+	{
+		this->position += translationVector;
+	}
+
+	// Get the local rotation of the object.(In Euler Angles)
+	float GetRotation() { return this->rotation; }
+	// Get the rotation of an object reletive to its parent(if any).
+	float GetGlobalRotation()
+	{
+		float resultRotation = this->rotation;
+		if (this->hasParent)
+		{
+			resultRotation += parent->GetGlobalRotation();
+		}
+		return resultRotation;
+	}
+	void SetRotation(float rotation)
+	{
+		this->rotation = rotation;
+		this->CalculateNewLocalAxes();
+	}
+	// Rotate in local axis(in Degrees).
+	void Rotate(float rotateDegrees)
+	{
+		this->rotation = this->rotation + rotateDegrees;
+		this->CalculateNewLocalAxes();
+	}
+
+	// Get the local scale of an object.
+	Vector2 GetScale() { return this->scale; }
+	// Get the scale of an object relative to its parent(if any).
+	Vector2 GetGlobalScale()
+	{
+		Vector2 resultVector = this->scale;
+		if (this->hasParent)
+		{
+			resultVector += parent->GetGlobalScale();
+		}
+		return resultVector;
+	}
+	void SetScale(Vector2 scale) { this->scale = scale; }
+	void SetScale(float x, float y) { this->scale = Vector2(x, y); }
+
+	Vector2 GetLocalRight() { return this->local_right; }
+	Vector2 GetLocalLeft() { return -this->local_right; }		// Negetive direction
+	Vector2 GetLocalUp() { return this->local_up; }
+	Vector2 GetLocalDown() { return -this->local_up; }			// Negetive direction
+
+private:
+	// Handling of parent transform relationship.
+	bool hasParent = false;
+	Transform2D* parent = nullptr;
+
+public:
+	// Function to set the transform parent.
+	void SetParent(Transform2D* transform)
+	{
+		if (transform != nullptr)
+		{
+			this->parent = transform;
+			this->hasParent = true;
+		}
+
+	}
+	void RemoveParent()
+	{
+		this->parent = nullptr;
+		this->hasParent = false;
+	}
+	bool HasParent() { return this->hasParent; }
+	// Function gives currently set parent transform if any.
+	Transform2D* GetParent()
+	{
+		Transform2D* transform = nullptr;
 		if (this->hasParent)
 		{
 			transform = this->parent;

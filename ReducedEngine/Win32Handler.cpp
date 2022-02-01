@@ -36,6 +36,12 @@ LRESULT CALLBACK HandleInput(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		{
 			output->CloseWindow();
 		}
+
+		// Space bar press.
+		if (wParam == VK_SPACE)
+		{
+			keyboard->OnSpacePressed();
+		}
 	}
 	return 0;
 	// If the key is released.
@@ -43,6 +49,11 @@ LRESULT CALLBACK HandleInput(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		unsigned char keycode = static_cast<unsigned char>(wParam);
 		keyboard->OnKeyReleased(keycode);
+
+		if (wParam == VK_SPACE)
+		{
+			keyboard->OnSpaceReleased();
+		}
 	}
 	return 0;
 

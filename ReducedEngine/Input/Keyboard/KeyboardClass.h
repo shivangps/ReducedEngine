@@ -22,10 +22,14 @@ public:
 	void DisableAutoRepeatChars();
 	bool IsKeyAutoRepeat();
 	bool IsCharAutoRepeat();
+	void OnSpacePressed();
+	void OnSpaceReleased();
+	bool IsSpacePressed();
 private:
 	bool autoRepeatKeys = false;
 	bool autoRepeatChars = false;
 	bool keyStates[256];
 	std::queue<KeyboardEvent> keyBuffer;
 	std::queue<unsigned char> charBuffer;
+	bool spacePressed = false;
 };

@@ -44,4 +44,7 @@ public:
 
 	 // Function to assign the heap to the command list.
 	void AssignToGraphicsCommandList(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList);
+
+	// Function to release all the descriptor heaps.
+	void Release();
 };

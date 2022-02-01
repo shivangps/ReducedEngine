@@ -103,3 +103,9 @@ void UniversalDescriptorHeap::AssignToGraphicsCommandList(Microsoft::WRL::ComPtr
 	ID3D12DescriptorHeap* ppHeaps[] = { this->srvCbvUavHeap.Get(), this->samplerHeap.Get() };
 	commandList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 }
+
+void UniversalDescriptorHeap::Release()
+{
+	this->srvCbvUavHeap.Release();
+	this->samplerHeap.Release();
+}

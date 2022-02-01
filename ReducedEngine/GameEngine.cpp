@@ -18,6 +18,17 @@ void GameEngine::UpdateGameObjects()
 {
 	if (this->currentScene)
 	{
+#ifdef DX2D
+		// Get the number of game objects present in the currently assigned scene.
+		unsigned int sceneObject2DCount = this->currentScene->GetSize2D();
+		// Update each game objects in the scene.
+		for (unsigned int i = 0; i < sceneObject2DCount; i++)
+		{
+			GameObject2D* objectPointer = this->currentScene->GetGameObject2D(i);
+
+			objectPointer->Update();
+		}
+#else
 		// Get the number of game objects present in the currently assigned scene.
 		unsigned int sceneObjectCount = this->currentScene->GetSize();
 		// Update each game objects in the scene.
@@ -27,6 +38,7 @@ void GameEngine::UpdateGameObjects()
 
 			objectPointer->Update();
 		}
+#endif // DX2D
 	}
 }
 
@@ -34,8 +46,18 @@ void GameEngine::RenderScene()
 {
 	if (this->currentScene)
 	{
+#ifdef DX2D
+		this->graphics2d->RenderScene(this->currentScene->GetRenderComponentList());
+#else
 		this->graphics->RenderScene(this->currentScene->GetRenderComponentList());
+#endif // DX2D
+
 	}
+}
+
+void GameEngine::UpdatePhysics()
+{
+	this->currentScene->GetPhysicsComponentList()->Step(this->time->GetDeltaTime() / 1000.0f);
 }
 
 void GameEngine::SetScene(Scene* setNewScene)
@@ -43,7 +65,37 @@ void GameEngine::SetScene(Scene* setNewScene)
 	this->currentScene = setNewScene;
 
 	// Initialize the scene.
+
+	// Game object initalization.
+#ifdef DX2D
+	// Get the number of game objects present in the currently assigned scene.
+	unsigned int sceneObject2DCount = this->currentScene->GetSize2D();
+	// Initalize each game objects in the scene.
+	for (unsigned int i = 0; i < sceneObject2DCount; i++)
+	{
+		GameObject2D* objectPointer = this->currentScene->GetGameObject2D(i);
+
+		objectPointer->Initialize(this->currentScene->GetRenderComponentList(), this->currentScene->GetPhysicsComponentList());
+	}
+#else
+	// Get the number of game objects present in the currently assigned scene.
+	unsigned int sceneObjectCount = this->currentScene->GetSize();
+	// Update each game objects in the scene.
+	for (unsigned int i = 0; i < sceneObjectCount; i++)
+	{
+		GameObject* objectPointer = this->currentScene->GetGameObject(i);
+
+		objectPointer->Initialize(this->currentScene->GetRenderComponentList());
+	}
+#endif // DX2D
+
+
+	// Render components initialization.
+#ifdef DX2D
+	this->graphics2d->InitializeRenderList(this->currentScene->GetRenderComponentList());
+#else
 	this->graphics->InitializeRenderList(this->currentScene->GetRenderComponentList());
+#endif // DX2D
 }
 
 void GameEngine::Initialize(HINSTANCE hInstance)
@@ -55,8 +107,11 @@ void GameEngine::Initialize(HINSTANCE hInstance)
 	// Start the time for the game.
 	this->time->Start();
 	// Initialize the render engine.
+#ifdef DX2D
+	this->graphics2d->Initialize(this->output->GetHandle(), this->output->GetWindowWidth(), this->output->GetWindowHeight());
+#else
 	this->graphics->Initialize(this->output->GetHandle(), this->output->GetWindowWidth(), this->output->GetWindowHeight());
-
+#endif // DX2D
 }
 
 void GameEngine::RunGame()
@@ -76,6 +131,9 @@ void GameEngine::RunGame()
 
 		// Process all the game objects.
 		this->UpdateGameObjects();
+
+		// Process physics.
+		this->UpdatePhysics();
 
 		// Render the game objects in the scene.
 		this->RenderScene();

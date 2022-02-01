@@ -17,6 +17,15 @@ public:
 	DirectX::XMFLOAT3 bitangent;
 };
 
+struct MeshVertex2D
+{
+public:
+	MeshVertex2D(float x, float y, float u, float v) : position(x, y), texCoord(u, y) {}
+
+	DirectX::XMFLOAT2 position;
+	DirectX::XMFLOAT2 texCoord;
+};
+
 class Mesh
 {
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource = nullptr;
@@ -48,4 +57,10 @@ public:
 	unsigned int GetNumberOfVertices();
 	// Function to get number of indices.
 	unsigned int GetNumberOfIndices();
+	// Function to release all the vertex and index resources.
+	void ReleaseVertexData();
+
+public:
+	// Initialize the 2D mesh and its resources.
+	void Initialize2D(Microsoft::WRL::ComPtr<ID3D12Device5> device, std::vector<MeshVertex2D> vertices, std::vector<unsigned short> indices);
 };

@@ -105,7 +105,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>XInput.lib;dxgi.lib;d3d12.lib;D3DCompiler.lib;dxguid.lib;DirectXTK12.lib;assimp-vc142-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>XInput.lib;dxgi.lib;d3d12.lib;D3DCompiler.lib;dxguid.lib;DirectXTK12.lib;box2d.lib;assimp-vc142-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)\ReducedEngine\Lib\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -140,12 +140,19 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>XInput.lib;dxgi.lib;d3d12.lib;D3DCompiler.lib;dxguid.lib;DirectXTK12.lib;assimp-vc142-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>XInput.lib;dxgi.lib;d3d12.lib;D3DCompiler.lib;dxguid.lib;DirectXTK12.lib;box2d.lib;assimp-vc142-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)\ReducedEngine\Lib\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AssetManager\GameAssetManager.cpp" />
+    <ClCompile Include="Assets\2D_Assets\Objects\BoxObject2D\BoxObject2D.cpp" />
+    <ClCompile Include="Assets\2D_Assets\Objects\CameraObject2D\CameraObject2D.cpp" />
+    <ClCompile Include="Assets\2D_Assets\Objects\PlayerObject2D\PlayerObject2D.cpp" />
+    <ClCompile Include="Assets\2D_Assets\RenderComponents\WireframeRenderComponent2D.cpp" />
+    <ClCompile Include="Assets\2D_Assets\Scenes\MainScene2D.cpp" />
+    <ClCompile Include="Assets\2D_Assets\Shaders\PostDisplayShader\PostDisplayShader.cpp" />
+    <ClCompile Include="Assets\2D_Assets\Shaders\WireframeShader\WireframeShader.cpp" />
     <ClCompile Include="Assets\CubemapShader\CubemapShader.cpp" />
     <ClCompile Include="Assets\DirectionalLightShader\DirectionalLightShader.cpp" />
     <ClCompile Include="Assets\DirectionalShadowDepthShader\DirectionalShadowDepthShader.cpp" />
@@ -161,12 +168,16 @@
     <ClCompile Include="Assets\TextureShader\TextureShader.cpp" />
     <ClCompile Include="Assets\UnlitShader\UnlitShader.cpp" />
     <ClCompile Include="GameEngine.cpp" />
+    <ClCompile Include="GameObject2D.cpp" />
     <ClCompile Include="Input\Keyboard\KeyboardClass.cpp" />
     <ClCompile Include="Input\Keyboard\KeyboardEvent.cpp" />
     <ClCompile Include="Input\Mouse\MouseClass.cpp" />
     <ClCompile Include="Input\Mouse\MouseEvent.cpp" />
     <ClCompile Include="Input\XController.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Output\Graphics\2D\Camera2D.cpp" />
+    <ClCompile Include="Output\Graphics\2D\Graphics2D.cpp" />
+    <ClCompile Include="Output\Graphics\2D\RenderComponent2D.cpp" />
     <ClCompile Include="Output\Graphics\Camera.cpp" />
     <ClCompile Include="Output\Graphics\Cubemap.cpp" />
     <ClCompile Include="Output\Graphics\DepthFramebuffer.cpp" />
@@ -187,6 +198,10 @@
     <ClCompile Include="Output\Graphics\SSAO\SSAO.cpp" />
     <ClCompile Include="Output\Graphics\UniversalDescriptorHeap.cpp" />
     <ClCompile Include="Output\Output.cpp" />
+    <ClCompile Include="Physics\2D\Colliders\BoxCollider2D.cpp" />
+    <ClCompile Include="Physics\2D\Colliders\Collider2D.cpp" />
+    <ClCompile Include="Physics\2D\Rigidbody2D.cpp" />
+    <ClCompile Include="Physics\PhysicsComponentList.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Time.cpp" />
     <ClCompile Include="Tools\TimeTool.cpp" />
@@ -194,6 +209,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AssetManager\GameAssetManager.h" />
+    <ClInclude Include="Assets\2D_Assets\Objects\BoxObject2D\BoxObject2D.h" />
+    <ClInclude Include="Assets\2D_Assets\Objects\CameraObject2D\CameraObject2D.h" />
+    <ClInclude Include="Assets\2D_Assets\Objects\PlayerObject2D\PlayerObject2D.h" />
+    <ClInclude Include="Assets\2D_Assets\Scenes\MainScene2D.h" />
+    <ClInclude Include="GameObject2D.h" />
+    <ClInclude Include="Assets\2D_Assets\RenderComponents\WireframeRenderComponent2D.h" />
+    <ClInclude Include="Assets\2D_Assets\Shaders\PostDisplayShader\PostDisplayShader.h" />
+    <ClInclude Include="Assets\2D_Assets\Shaders\WireframeShader\WireframeShader.h" />
     <ClInclude Include="Assets\CubemapShader\CubemapShader.h" />
     <ClInclude Include="Assets\DirectionalLightShader\DirectionalLightShader.h" />
     <ClInclude Include="Assets\DirectionalShadowDepthShader\DirectionalShadowDepthShader.h" />
@@ -220,6 +243,9 @@
     <ClInclude Include="Input\Mouse\MouseEvent.h" />
     <ClInclude Include="Input\XController.h" />
     <ClInclude Include="MathEngine.h" />
+    <ClInclude Include="Output\Graphics\2D\Camera2D.h" />
+    <ClInclude Include="Output\Graphics\2D\Graphics2D.h" />
+    <ClInclude Include="Output\Graphics\2D\RenderComponent2D.h" />
     <ClInclude Include="Output\Graphics\Camera.h" />
     <ClInclude Include="Output\Graphics\Cubemap.h" />
     <ClInclude Include="Output\Graphics\d3dx12.h" />
@@ -240,6 +266,10 @@
     <ClInclude Include="AssetManager\TextureAssetManager.h" />
     <ClInclude Include="Output\Graphics\SSAO\SSAO.h" />
     <ClInclude Include="Output\Graphics\UniversalDescriptorHeap.h" />
+    <ClInclude Include="Physics\2D\Colliders\BoxCollider2D.h" />
+    <ClInclude Include="Physics\2D\Colliders\Collider2D.h" />
+    <ClInclude Include="Physics\2D\Rigidbody2D.h" />
+    <ClInclude Include="Physics\PhysicsComponentList.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Time.h" />
     <ClInclude Include="Tools\TimeTool.h" />
@@ -247,6 +277,38 @@
     <ClInclude Include="Output\Output.h" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="Assets\2D_Assets\Shaders\PostDisplayShader\post_display_pixel_shader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Assets\2D_Assets\Shaders\PostDisplayShader\post_display_vertex_shader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Assets\2D_Assets\Shaders\WireframeShader\wireframe_pixel_shader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Assets\2D_Assets\Shaders\WireframeShader\wireframe_vertex_shader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
     <FxCompile Include="Assets\CubemapShader\cubemap_pixel_shader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>

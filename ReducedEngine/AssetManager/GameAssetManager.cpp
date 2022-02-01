@@ -181,6 +181,11 @@ UINT64 GameAssetManager::SetNewMesh(std::vector<MeshVertex> vertices, std::vecto
 	return this->Mesh_AM->SetNewMesh(vertices, indices);
 }
 
+UINT64 GameAssetManager::SetNewGeometry2D(std::vector<MeshVertex2D> vertices, std::vector<unsigned short> indices)
+{
+	return this->Mesh_AM->SetNewGeometry2D(vertices, indices);
+}
+
 Mesh* GameAssetManager::GetMesh(UINT64 meshIndex)
 {
 	return this->Mesh_AM->GetMesh(meshIndex);
@@ -222,6 +227,12 @@ void GameAssetManager::AssignTextureViewToHeap(UINT64 textureIndex, D3D12_CPU_DE
 	this->ToBeAppliedHandles.push_back({ textureIndex, handle });
 }
 
+void GameAssetManager::ReleaseAllAssets()
+{
+	this->Texture_AM->ReleaseAllTextures();
+	this->Mesh_AM->ReleaseAllMeshes();
+}
+
 void GameAssetManager::SetGraphicsDevice(Microsoft::WRL::ComPtr<ID3D12Device5> device)
 {
 	this->Mesh_AM->SetDevice(device);
@@ -239,4 +250,11 @@ void GameAssetManager::InitializeAllShadersForDeferredRender(Microsoft::WRL::Com
 	TextureShader::GetInstance()->Initialize(device, numberOfRenderTarget, renderTargetFormats, depthStencilFormat, samples);
 	CubemapShader::GetInstance()->Initialize(device, numberOfRenderTarget, renderTargetFormats, depthStencilFormat, samples);
 	InstanceShader::GetInstance()->Initialize(device, numberOfRenderTarget, renderTargetFormats, depthStencilFormat, samples);
+}
+
+#include "../Assets/2D_Assets/Shaders/WireframeShader/WireframeShader.h"
+
+void GameAssetManager::InitializeAllShadersFor2DDeferredRender(Microsoft::WRL::ComPtr<ID3D12Device5> device, unsigned int numberOfRenderTarget, DXGI_FORMAT* renderTargetFormats, DXGI_FORMAT depthStencilFormat, unsigned int samples)
+{
+	WireframeShader::GetInstance()->Initialize(device, numberOfRenderTarget, renderTargetFormats, depthStencilFormat, samples);
 }

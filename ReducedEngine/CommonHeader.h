@@ -9,3 +9,5 @@
 #include <string>
 #include <comdef.h>
 #include <memory>
+
+#define DX2D

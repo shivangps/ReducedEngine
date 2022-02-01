@@ -26,6 +26,20 @@ UINT64 RenderList::AssignRenderComponent(RenderComponent* renderComponent)
 	return info->componentIndex;
 }
 
+UINT64 RenderList::AssignRenderComponent2D(RenderComponent2D* renderComponent2d)
+{
+	this->renderComponent2DList.push_back(RenderComponent2DInfo());
+	RenderComponent2DInfo* info = &this->renderComponent2DList[this->renderComponent2DList.size() - 1];
+
+	info->enable = Boolean(true, &this->stateEnableChange2D);
+	info->componentIndex = this->currentRenderComponent2DIndex++;
+	info->renderComponent2d = renderComponent2d;
+
+	renderComponent2d->SetEnable(&info->enable);
+
+	return info->componentIndex;
+}
+
 void RenderList::InitializeComponents(Microsoft::WRL::ComPtr<ID3D12Device5> device, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList)
 {
 	for (unsigned int i = 0; i < this->renderComponentList.size(); i++)
@@ -39,6 +53,18 @@ void RenderList::InitializeComponents(Microsoft::WRL::ComPtr<ID3D12Device5> devi
 	this->stateEnableChange = false;
 }
 
+void RenderList::InitializeComponents2D(Microsoft::WRL::ComPtr<ID3D12Device5> device)
+{
+	for (unsigned int i = 0; i < this->renderComponent2DList.size(); i++)
+	{
+		RenderComponent2D* renderComponent2d = renderComponent2DList[i].renderComponent2d;
+
+		renderComponent2d->Initialize(device);
+	}
+
+	this->stateEnableChange2D = false;
+}
+
 void RenderList::InitializeAllBundleLists()
 {
 	for (unsigned int i = 0; i < this->renderComponentList.size(); i++)
@@ -47,6 +73,8 @@ void RenderList::InitializeAllBundleLists()
 
 		renderComponent->InitializeBundleListForRender();
 	}
+
+	this->stateEnableChange2D;
 }
 
 void RenderList::DrawAllComponents(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList, Camera camera)
@@ -115,6 +143,19 @@ void RenderList::DrawAllComponents(std::vector<ID3D12GraphicsCommandList4*> comm
 	{
 		if(thread_objects[i].joinable())
 			thread_objects[i].join();
+	}
+}
+
+void RenderList::DrawAll2DComponents(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList, Camera2D camera)
+{
+	for (unsigned int i = 0; i < this->renderComponent2DList.size(); i++)
+	{
+		if (renderComponent2DList[i].enable.GetBool())
+		{
+			RenderComponent2D* renderComponent2d = this->renderComponent2DList[i].renderComponent2d;
+
+			renderComponent2d->Draw(commandList, camera);
+		}
 	}
 }
 

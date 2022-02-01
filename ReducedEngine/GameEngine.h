@@ -3,6 +3,7 @@
 #include "Scene.h"
 #include "Win32Handler.h"
 #include "Output/Graphics/Graphics.h"
+#include "Output/Graphics/2D/Graphics2D.h"
 
 // Game Engine class is a class that runs the whole game.
 class GameEngine	// Single Instance
@@ -24,7 +25,11 @@ class GameEngine	// Single Instance
 	// Output class.
 	Output* output = Output::GetInstance();
 	// Graphics class.
+#ifdef DX2D
+	Graphics2D* graphics2d = Graphics2D::GetInstance();
+#else
 	Graphics* graphics = Graphics::GetInstance();
+#endif // DX2D
 
 	// Function to be called to check to run the game.
 	bool IsGameRunning();
@@ -34,6 +39,8 @@ class GameEngine	// Single Instance
 	void UpdateGameObjects();
 	// Function to render all the game object render components present in the scene.
 	void RenderScene();
+	// Function to update physics objects in the scene.
+	void UpdatePhysics();
 
 public:
 	static GameEngine* GetInstance()

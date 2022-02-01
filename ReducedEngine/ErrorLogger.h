@@ -8,6 +8,13 @@ static std::wstring StringToWide(std::string str)
 	return wide_str;
 }
 
+static void DebugLog(std::string message)
+{
+#ifdef _DEBUG
+	OutputDebugStringA(message.c_str());
+#endif // _DEBUG
+}
+
 static void ErrorLog(std::string message)
 {
 #ifdef _DEBUG

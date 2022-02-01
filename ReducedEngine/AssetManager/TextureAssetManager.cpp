@@ -47,6 +47,16 @@ D3D12_GPU_DESCRIPTOR_HANDLE TextureAssetManager::GetTextureHandleForRender(UINT6
 	return handle;
 }
 
+void TextureAssetManager::ReleaseAllTextures()
+{
+	for (unsigned int i = 0; i < this->textures.size(); i++)
+	{
+		this->textures[i]->texture.Release();
+	}
+
+	this->textures.clear();
+}
+
 void TextureAssetManager::LoadAllTextureDataTo_GPU_RAM(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList)
 {
 	for (unsigned int i = 0; i < this->textures.size(); i++)

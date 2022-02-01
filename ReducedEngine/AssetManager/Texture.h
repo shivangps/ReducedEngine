@@ -26,4 +26,6 @@ public:
 	void CreateResourceView(Microsoft::WRL::ComPtr<ID3D12Device5> device, D3D12_CPU_DESCRIPTOR_HANDLE handle);
 	// Function to get the texture resource.
 	ID3D12Resource* GetResource();
+	// Function to release the texture resource.
+	void Release();
 };

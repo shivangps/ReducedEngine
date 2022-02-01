@@ -17,20 +17,6 @@
 
 // Class that handles the rendering of objects present in the scene.
 
-// Command list and command allocator for each thread.
-struct CommandSet
-{
-	D3D12_COMMAND_LIST_TYPE type = D3D12_COMMAND_LIST_TYPE_DIRECT;
-	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList = nullptr;
-	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator = nullptr;
-
-	void CreateSet(Microsoft::WRL::ComPtr<ID3D12Device5> device);
-	void CloseCommandList();
-	void ResetCommandList();
-	void ResetCommandAllocator();
-	void ResetAll();
-};
-
 // This is a singleton.
 class Graphics
 {
@@ -41,8 +27,9 @@ class Graphics
 	D3D12_VIEWPORT viewport = {};
 	D3D12_RECT clippingRect = {};
 
-	Microsoft::WRL::ComPtr<IDXGIFactory4> factory = nullptr;
 	Microsoft::WRL::ComPtr<ID3D12Device5> device = nullptr;
+
+	GraphicsDeviceManager deviceManager = {};
 
 	Microsoft::WRL::ComPtr<IDXGISwapChain3> swapChain = nullptr;
 	DXGI_FORMAT renderTargetFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -66,41 +53,12 @@ class Graphics
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList = nullptr;
 	UINT64 commandFenceValue = 0;
 
-	// Function to create and select the graphics device based on the amount of dedicated VRAM.
-	void CreateDevice();
-	// Function to create command queue.
-	void CreateCommandQueue(Microsoft::WRL::ComPtr<ID3D12CommandQueue>* commandQueue, Microsoft::WRL::ComPtr<ID3D12Device5> device, D3D12_COMMAND_LIST_TYPE commandListType);
-
 	// Function to get queue fence value.
 	UINT64 GetCurrentSetFence();
 
-	// Function to create swap chain.
-	void CreateSwapChain(Microsoft::WRL::ComPtr<IDXGISwapChain3>* swapChain, Microsoft::WRL::ComPtr<ID3D12Device5> device, Microsoft::WRL::ComPtr<IDXGIFactory4> factory, 
-		Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue, HWND hWnd, unsigned int width, unsigned int height, unsigned int framesCount, DXGI_FORMAT swapChainFormat);
-	// Function to create render targets.
-	void CreateRenderTargets(DescriptorHeap* heap, Microsoft::WRL::ComPtr<ID3D12Resource> renderTargetResource[], unsigned int numberOfRTBuffers, Microsoft::WRL::ComPtr<IDXGISwapChain3> swapChain, Microsoft::WRL::ComPtr<ID3D12Device5> device);
-	// Function to create depth stencil.
-	void CreateDepthStencil(DescriptorHeap* heap, Microsoft::WRL::ComPtr<ID3D12Resource>* depthStencilResource, DXGI_FORMAT depthStencilFormat, Microsoft::WRL::ComPtr<ID3D12Device5> device, unsigned int width, unsigned int height);
-
-	// Function to create command allocator.
-	void CreateCommandAllocator(Microsoft::WRL::ComPtr<ID3D12CommandAllocator>* commandAllocator, Microsoft::WRL::ComPtr<ID3D12Device5> device, D3D12_COMMAND_LIST_TYPE commandListType);
-	// Function to create command list.
-	void CreateGraphicsCommandList(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4>* commandList, UINT64* fenceValue, Microsoft::WRL::ComPtr<ID3D12Device5> device, Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator, D3D12_COMMAND_LIST_TYPE commandListType);
 	// Function to create command list all together with command allocator.
 	void CreateCommandListSet(Microsoft::WRL::ComPtr<ID3D12CommandAllocator>* commandAllocator, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4>* commandList, UINT64* fenceValue, Microsoft::WRL::ComPtr<ID3D12Device5> device, D3D12_COMMAND_LIST_TYPE commandListType);
-	// Function to create fence.
-	void CreateFence(Microsoft::WRL::ComPtr<ID3D12Fence>* fence, UINT64* fenceValue, Microsoft::WRL::ComPtr<ID3D12Device5> device);
-	// Function to signal the new fence value.
-	void SignalFence(Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue, Microsoft::WRL::ComPtr<ID3D12Fence> fence, UINT64 fenceValue);
-	// Function to wait for GPU to reach the fence value.
-	void WaitForFenceValue(Microsoft::WRL::ComPtr<ID3D12Fence> fence, UINT64 fenceValue);
 
-	// Function to reset command list and command allocator.
-	void Reset(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList, Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator);
-	// Function to close the command list.
-	void CloseCommandList(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList);
-	// Function to present the frame.
-	void PresentFrame(Microsoft::WRL::ComPtr<IDXGISwapChain3> swapChain, unsigned int* currentFrame);
 	// Function to initialize all the graphics engine shaders.
 	void InitilizeGraphicsEngineShaders(Microsoft::WRL::ComPtr<ID3D12Device5> device, unsigned int numRT, DXGI_FORMAT* renderTargetFormats, DXGI_FORMAT depthStencilFormat, unsigned int samples);
 
@@ -220,7 +178,7 @@ private:
 	unsigned int number_of_cpu_cores = 0;
 	std::vector<CommandSet> threadCommandSet = {};
 	std::vector<ID3D12GraphicsCommandList4*> threadedCommandLists = {};
-	// 0 - As many as the logical cores of cpu.
+	// Set as 0 for as many as the logical cores of cpu.
 	unsigned int maximumThreadsToSpawn = 4;
 
 	void InitializeMultipleCommandLists(Microsoft::WRL::ComPtr<ID3D12Device5> device);

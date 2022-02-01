@@ -27,6 +27,26 @@ int MeshAssetManager::SetNewMesh(std::vector<MeshVertex> vertices, std::vector<u
 	return -1;
 }
 
+int MeshAssetManager::SetNewGeometry2D(std::vector<MeshVertex2D> vertices, std::vector<unsigned short> indices)
+{
+	if (this->graphicsDevice)
+	{
+		MeshAssetInfo meshInfo;
+
+		meshInfo.meshIndex = this->currentMeshIndex++;
+		meshInfo.mesh.Initialize2D(this->graphicsDevice, vertices, indices);
+
+		this->meshes.push_back(meshInfo);
+
+		return meshInfo.meshIndex;
+	}
+	else
+	{
+		ExitWithMessage("Graphics Device not assigned to Mesh Asset Manager.");
+	}
+	return -1;
+}
+
 void MeshAssetManager::LoadAllMeshDataTo_GPU_RAM(Microsoft::WRL::ComPtr<ID3D12Device5> device, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList)
 {
 	for (unsigned int i = 0; i < this->meshes.size(); i++)
@@ -53,4 +73,14 @@ Mesh* MeshAssetManager::GetMesh(UINT64 meshIndex)
 		}
 
 	return nullptr;
+}
+
+void MeshAssetManager::ReleaseAllMeshes()
+{
+	for (unsigned int i = 0; i < this->meshes.size(); i++)
+	{
+		this->meshes[i].mesh.ReleaseVertexData();
+	}
+
+	this->meshes.clear();
 }

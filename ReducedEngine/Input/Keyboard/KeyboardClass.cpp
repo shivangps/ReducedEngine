@@ -95,3 +95,18 @@ bool KeyboardClass::IsCharAutoRepeat()
 {
 	return this->autoRepeatChars;
 }
+
+void KeyboardClass::OnSpacePressed()
+{
+	this->spacePressed = true;
+}
+
+void KeyboardClass::OnSpaceReleased()
+{
+	this->spacePressed = false;
+}
+
+bool KeyboardClass::IsSpacePressed()
+{
+	return this->spacePressed;
+}

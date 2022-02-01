@@ -210,6 +210,51 @@
     <ClCompile Include="Output\Graphics\UniversalDescriptorHeap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Output\Graphics\2D\Graphics2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\2D_Assets\Shaders\PostDisplayShader\PostDisplayShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Output\Graphics\2D\RenderComponent2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\2D_Assets\RenderComponents\WireframeRenderComponent2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\2D_Assets\Shaders\WireframeShader\WireframeShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\2D_Assets\Objects\BoxObject2D\BoxObject2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\2D_Assets\Scenes\MainScene2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Output\Graphics\2D\Camera2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\2D_Assets\Objects\CameraObject2D\CameraObject2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\2D_Assets\Objects\PlayerObject2D\PlayerObject2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\PhysicsComponentList.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\2D\Rigidbody2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\2D\Colliders\BoxCollider2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\2D\Colliders\Collider2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CommonHeader.h">
@@ -368,6 +413,51 @@
     <ClInclude Include="Output\Graphics\UniversalDescriptorHeap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Output\Graphics\2D\Graphics2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets\2D_Assets\Shaders\PostDisplayShader\PostDisplayShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Output\Graphics\2D\RenderComponent2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets\2D_Assets\RenderComponents\WireframeRenderComponent2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets\2D_Assets\Shaders\WireframeShader\WireframeShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets\2D_Assets\Objects\BoxObject2D\BoxObject2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets\2D_Assets\Scenes\MainScene2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Output\Graphics\2D\Camera2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets\2D_Assets\Objects\CameraObject2D\CameraObject2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets\2D_Assets\Objects\PlayerObject2D\PlayerObject2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\PhysicsComponentList.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\2D\Rigidbody2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\2D\Colliders\Collider2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\2D\Colliders\BoxCollider2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Assets\DisplayShader\display_pixel_shader.hlsl">
@@ -404,5 +494,9 @@
     <FxCompile Include="Assets\ShadowPostProcessShader\shadow_post_process_vertex_shader.hlsl" />
     <FxCompile Include="Assets\DirectionalShadowShader\directional_shadow_pixel_shader.hlsl" />
     <FxCompile Include="Assets\DirectionalShadowShader\directional_shadow_vertex_shader.hlsl" />
+    <FxCompile Include="Assets\2D_Assets\Shaders\PostDisplayShader\post_display_vertex_shader.hlsl" />
+    <FxCompile Include="Assets\2D_Assets\Shaders\PostDisplayShader\post_display_pixel_shader.hlsl" />
+    <FxCompile Include="Assets\2D_Assets\Shaders\WireframeShader\wireframe_vertex_shader.hlsl" />
+    <FxCompile Include="Assets\2D_Assets\Shaders\WireframeShader\wireframe_pixel_shader.hlsl" />
   </ItemGroup>
 </Project>

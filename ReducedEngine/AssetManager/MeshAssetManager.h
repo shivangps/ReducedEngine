@@ -10,7 +10,7 @@ class MeshAssetManager
 
 	struct MeshAssetInfo
 	{
-		UINT64 meshIndex;
+		UINT64 meshIndex = 0;
 		Mesh mesh;
 	};
 
@@ -33,10 +33,13 @@ public:
 	void SetDevice(Microsoft::WRL::ComPtr<ID3D12Device5> device);
 	// Function to assign a new mesh and assigns as well as returns the index of the mesh.
 	int SetNewMesh(std::vector<MeshVertex> vertices, std::vector<unsigned short> indices);
+	int SetNewGeometry2D(std::vector<MeshVertex2D> vertices, std::vector<unsigned short> indices);
 	// Function to call for loading all the meshes data to CPU RAM.
 	void LoadAllMeshDataTo_GPU_RAM(Microsoft::WRL::ComPtr<ID3D12Device5> device, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList);
 	// Function to call for removal of all meshes data from CPU RAM.
 	void RemoveAllMeshDataFrom_CPU_RAM();
 	// Function to get the mesh pointer base on mesh index entered.
 	Mesh* GetMesh(UINT64 meshIndex);
+	// Function to release all the meshes in the mesh asset manager.
+	void ReleaseAllMeshes();
 };

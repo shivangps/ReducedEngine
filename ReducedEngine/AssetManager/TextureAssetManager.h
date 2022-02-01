@@ -55,4 +55,6 @@ public:
 	int SetNewTexture(std::string fileDirectory);
 	// Function to get the GPU descriptor handle for texture.
 	D3D12_GPU_DESCRIPTOR_HANDLE GetTextureHandleForRender(UINT64 textureIndex);
+	// Function to release all the texture resources in the asset manager.
+	void ReleaseAllTextures();
 };
