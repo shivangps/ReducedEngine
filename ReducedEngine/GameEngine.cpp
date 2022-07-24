@@ -47,7 +47,7 @@ void GameEngine::RenderScene()
 	if (this->currentScene)
 	{
 #ifdef DX2D
-		this->graphics2d->RenderScene(this->currentScene->GetRenderComponentList());
+		this->graphics2d->RenderScene(this->currentScene->GetRenderComponentList(), this->currentScene->GetGUIComponentList());
 #else
 		this->graphics->RenderScene(this->currentScene->GetRenderComponentList());
 #endif // DX2D
@@ -58,6 +58,11 @@ void GameEngine::RenderScene()
 void GameEngine::UpdatePhysics()
 {
 	this->currentScene->GetPhysicsComponentList()->Step(this->time->GetDeltaTime() / 1000.0f);
+}
+
+void GameEngine::ProcessSounds()
+{
+	this->audio->PlaySounds(this->currentScene->GetAudioComponentList());
 }
 
 void GameEngine::SetScene(Scene* setNewScene)
@@ -75,7 +80,7 @@ void GameEngine::SetScene(Scene* setNewScene)
 	{
 		GameObject2D* objectPointer = this->currentScene->GetGameObject2D(i);
 
-		objectPointer->Initialize(this->currentScene->GetRenderComponentList(), this->currentScene->GetPhysicsComponentList());
+		objectPointer->Initialize(this->currentScene->GetRenderComponentList(), this->currentScene->GetPhysicsComponentList(), this->currentScene->GetAudioComponentList(), this->currentScene->GetGUIComponentList());
 	}
 #else
 	// Get the number of game objects present in the currently assigned scene.
@@ -93,9 +98,14 @@ void GameEngine::SetScene(Scene* setNewScene)
 	// Render components initialization.
 #ifdef DX2D
 	this->graphics2d->InitializeRenderList(this->currentScene->GetRenderComponentList());
+
+	this->graphics2d->InitializeGUIComponentList(this->currentScene->GetGUIComponentList());
 #else
 	this->graphics->InitializeRenderList(this->currentScene->GetRenderComponentList());
 #endif // DX2D
+
+	// Audio components initialization.
+	this->audio->InitalizeAudioComponentList(this->currentScene->GetAudioComponentList());
 }
 
 void GameEngine::Initialize(HINSTANCE hInstance)
@@ -112,6 +122,8 @@ void GameEngine::Initialize(HINSTANCE hInstance)
 #else
 	this->graphics->Initialize(this->output->GetHandle(), this->output->GetWindowWidth(), this->output->GetWindowHeight());
 #endif // DX2D
+	// Initlaize the sound engine.
+	this->audio->Initilize();
 }
 
 void GameEngine::RunGame()
@@ -140,6 +152,9 @@ void GameEngine::RunGame()
 
 		// Reset the frame time.
 		this->time->ResetFrameTime();
+
+		// Process all the sounds.
+		this->ProcessSounds();
 
 #ifdef _DEBUG
 		// Update the FPS on the window title.

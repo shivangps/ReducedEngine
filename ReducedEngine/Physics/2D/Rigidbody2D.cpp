@@ -1,8 +1,10 @@
 #include "Rigidbody2D.h"
 
-Rigidbody2D::Rigidbody2D(Transform2D* transform, bool staticState, RigibodyType type)
+Rigidbody2D::Rigidbody2D(Transform2D* transform, GameObject2D* gameObject, bool staticState, RigibodyType type, bool fixedRotation = false)
 {
 	this->transform = transform;
+
+	this->type = type;
 
 	Vector2 newPos = transform->GetGlobalPostion();
 	this->bodyDefination.position.Set(newPos.X(), newPos.Y());
@@ -28,6 +30,11 @@ Rigidbody2D::Rigidbody2D(Transform2D* transform, bool staticState, RigibodyType 
 			this->bodyDefination.type = b2_staticBody;
 		}
 	}
+
+	this->bodyDefination.fixedRotation = fixedRotation;
+
+	PhysicalCharacteristics2D* characteristics = (PhysicalCharacteristics2D*)gameObject;
+	characteristics->gameObject = gameObject;
 
 	this->massData.mass = 1.0f;
 }
@@ -61,6 +68,7 @@ void Rigidbody2D::Initialize(b2World* physicsWorld)
 		fixtureDef.density = collider->GetDensity();
 		fixtureDef.friction = collider->GetFriction();
 		fixtureDef.isSensor = collider->GetTriggerState();
+		fixtureDef.isSensor = collider->GetTriggerState();
 
 		this->physicsBody->CreateFixture(&fixtureDef);
 	}
@@ -80,9 +88,33 @@ void Rigidbody2D::TranslateBody(Vector2 translationVector)
 	this->physicsBody->ApplyLinearImpulseToCenter(translationVector.GetBox2DVector(), true);
 }
 
+void Rigidbody2D::ChangeTransform(Transform2D transform)
+{
+	if (this->type == RigibodyType::RigibodyTypeKinematic)
+	{
+		this->physicsBody->SetTransform(transform.GetGlobalPostion().GetBox2DVector(), transform.GetGlobalRotation());
+		this->physicsBody->SetAwake(true);
+	}
+}
+
+void Rigidbody2D::SetVelocity(Vector2 vector)
+{
+	this->physicsBody->SetLinearVelocity(vector.GetBox2DVector());
+}
+
+Vector2 Rigidbody2D::GetVelocity()
+{
+	return this->physicsBody->GetLinearVelocity();
+}
+
 void Rigidbody2D::SetMass(float mass)
 {
 	this->massData.mass = mass;
+}
+
+void Rigidbody2D::SetGravityScale(float scale)
+{
+	this->gravityScale = scale;
 }
 
 void Rigidbody2D::SetPhysicalCharacteristics(PhysicalCharacteristics2D* characteristics)

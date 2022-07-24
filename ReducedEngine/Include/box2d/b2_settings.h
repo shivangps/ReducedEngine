@@ -25,6 +25,7 @@
 
 #include "b2_types.h"
 #include "b2_api.h"
+#include <string>
 
 /// @file
 /// Settings that can be overriden for your application
@@ -52,12 +53,26 @@
 /// this too much because b2BlockAllocator has a maximum object size.
 #define b2_maxPolygonVertices	8
 
+class GameObject2D;
+struct Vector2;
+class CollisionCharacteristics2D
+{
+public:
+	GameObject2D* otherCollidingObject = nullptr;
+	Vector2* collisionPosition = nullptr;
+	Vector2* collisionNormal = nullptr;
+};
+
 // User data
 class PhysicalCharacteristics2D
 {
 public:
+	GameObject2D* gameObject = nullptr;
+
 	virtual void OnCollisionEnter2D() {}
+	virtual void OnCollisionEnter2D(CollisionCharacteristics2D collision) {}
 	virtual void OnCollisionExit2D() {}
+	virtual void OnCollisionExit2D(CollisionCharacteristics2D collision) {}
 };
 
 /// You can define this to inject whatever data you want in b2Body

@@ -120,10 +120,14 @@ void Graphics2D::Initialize(HWND windowHandle, unsigned int width, unsigned int 
 
 	// Initialize the quad geometry.
 	this->quad = Quad::GetInstance();
-	this->quad->Initialize(device);
+	this->quad->Initialize(this->device);
 
 	// Shader initialization for 2D.
 	this->GAM->InitializeAllShadersFor2DDeferredRender(this->device, G_Buffer_RT::Size_RT, this->gBufferFormats, this->depthStencilFormat, currentMultiSamples);
+
+	// GUIEngine initialisation.
+	this->guiEngine->Initalize(this->device, this->mainCommandSet.commandList, this->output->GetWindowWidth(), this->output->GetWindowHeight());
+	this->uiGpuHandle = this->guiEngine->GetUISrvGpuHandle();
 
 	// Close and execute the command list.
 	this->mainCommandSet.CloseCommandList();
@@ -154,7 +158,23 @@ void Graphics2D::InitializeRenderList(RenderList* renderComponentList)
 	gameAssetManager->RemoveAssetsFrom_CPU_RAM();
 }
 
-void Graphics2D::RenderScene(RenderList* renderComponentList)
+void Graphics2D::InitializeGUIComponentList(GUIComponentList* guiComponentList)
+{
+	WaitForFenceValue(this->fence, this->commandFenceValue);
+
+	this->mainCommandSet.ResetAll();
+
+	this->guiEngine->InitializeGUICompnentList(guiComponentList, device, mainCommandSet.commandList);
+
+	this->mainCommandSet.CloseCommandList();
+
+	this->ExecuteCommandLists(this->mainCommandSet.commandList);
+
+	this->commandFenceValue = this->GetCurrentSetFence();
+	SignalFence(this->commandQueue, this->fence, this->commandFenceValue);
+}
+
+void Graphics2D::RenderScene(RenderList* renderComponentList, GUIComponentList* guiComponentList)
 {
 	WaitForFenceValue(this->fence, this->commandFenceValue);
 
@@ -184,9 +204,10 @@ void Graphics2D::RenderScene(RenderList* renderComponentList)
 
 	renderComponentList->DrawAll2DComponents(this->mainCommandSet.commandList, this->mainCamera2d->GetCamera2D());
 
-	//this->quad->Draw(this->mainCommandSet.commandList);
-
 	this->RemoveGBuffers(this->mainCommandSet.commandList, 1, &rtvHandle, &dsvHandle);
+
+	// UI RENDERING.
+	this->guiEngine->RenderGUI(guiComponentList, this->mainCommandSet.commandList, 1, &rtvHandle, &dsvHandle);
 
 	// POST RENDERING.
 	this->mainCommandSet.commandList->ClearRenderTargetView(rtvHandle, this->backgroundColor, 0, nullptr);
@@ -195,6 +216,7 @@ void Graphics2D::RenderScene(RenderList* renderComponentList)
 	this->postDisplayShader->SetShaderForRender(this->mainCommandSet.commandList);
 
 	this->mainCommandSet.commandList->SetGraphicsRootDescriptorTable(0, this->albedoGpuHandle);
+	this->mainCommandSet.commandList->SetGraphicsRootDescriptorTable(1, this->uiGpuHandle);
 
 	this->quad->Draw(this->mainCommandSet.commandList);
 

@@ -1,7 +1,8 @@
 #pragma once
 #include "GraphicsHelper.h"
 
-// This class defines the descriptor heap that will store the srv textures description and cbv data description for all. 
+// This class defines the descriptor heap that will store the srv textures description and cbv data description for all.
+// ISSUES: Subscriber pattern not implemented for the change of the descriptor heap slots.
 
 class UniversalDescriptorHeap
 {
@@ -37,6 +38,9 @@ public:
 	UINT64 SetCpuHandle(Microsoft::WRL::ComPtr<ID3D12Device5> device, D3D12_CONSTANT_BUFFER_VIEW_DESC* cbvDesc);
 	UINT64 SetCpuHandle(Microsoft::WRL::ComPtr<ID3D12Device5> device, Microsoft::WRL::ComPtr<ID3D12Resource>* resource, Microsoft::WRL::ComPtr<ID3D12Resource>* pCounterResource, D3D12_UNORDERED_ACCESS_VIEW_DESC* uavDesc);
 	UINT64 SetCpuHandle(Microsoft::WRL::ComPtr<ID3D12Device5> device, D3D12_SAMPLER_DESC* samplerDesc);
+
+	// Function to get the srv or cbv cpu handle.
+	D3D12_CPU_DESCRIPTOR_HANDLE GetCbvSrvUavCPUHandle(UINT64 index);
 
 	// Function to get the srv or cbv gpu handle.
 	D3D12_GPU_DESCRIPTOR_HANDLE GetCbvSrvUavGPUHandle(UINT64 index);

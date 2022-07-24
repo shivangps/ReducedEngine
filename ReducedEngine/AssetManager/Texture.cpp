@@ -8,8 +8,8 @@ void Texture::Initialize(Microsoft::WRL::ComPtr<ID3D12Device5> device, std::stri
 {
 	HRESULT HR;
 
-	this->subresources = std::unique_ptr<D3D12_SUBRESOURCE_DATA>(new D3D12_SUBRESOURCE_DATA());
-	HR = DirectX::LoadWICTextureFromFile(device.Get(), StringToWide(fileDirectory).c_str(), this->mainTextureResource.GetAddressOf(), this->decodedData, *this->subresources);
+	this->subresource = new D3D12_SUBRESOURCE_DATA();
+	HR = DirectX::LoadWICTextureFromFile(device.Get(), StringToWide(fileDirectory).c_str(), this->mainTextureResource.GetAddressOf(), this->decodedData, *this->subresource);
 	ExitOnError(HR, "Failed to load texture data from file directory: " + fileDirectory);
 	this->mainTextureResource->SetName(StringToWide(GetFileNameFromDirectory(fileDirectory) + " Texture Resource").c_str());
 
@@ -20,19 +20,24 @@ void Texture::Initialize(Microsoft::WRL::ComPtr<ID3D12Device5> device, std::stri
 
 void Texture::LoadTextureDataTo_GPU_RAM(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList)
 {
-	UpdateSubresources(commandList.Get(), this->mainTextureResource.Get(), this->uploadResource.Get(), 0, 0, 1, this->subresources.get());
+	UpdateSubresources(commandList.Get(), this->mainTextureResource.Get(), this->uploadResource.Get(), 0, 0, 1, this->subresource);
 	TransitionResourceState(this->mainTextureResource, commandList, D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 }
 
 void Texture::RemoveTextureDataFrom_CPU_RAM()
 {
 	this->decodedData.release();
-	this->subresources.release();
+	delete this->subresource;
 }
 
 void Texture::CreateResourceView(Microsoft::WRL::ComPtr<ID3D12Device5> device, D3D12_CPU_DESCRIPTOR_HANDLE handle)
 {
-	device->CreateShaderResourceView(this->mainTextureResource.Get(), nullptr, handle);
+	device->CreateShaderResourceView(this->mainTextureResource.Get(), this->srvDesc, handle);
+}
+
+D3D12_SHADER_RESOURCE_VIEW_DESC* Texture::GetShaderResourceView()
+{
+	return this->srvDesc;
 }
 
 ID3D12Resource* Texture::GetResource()

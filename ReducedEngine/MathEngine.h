@@ -93,6 +93,10 @@ public:
 	{
 		return this->Multiply(*this, aValue);
 	}
+	Vector2 operator*(Vector2 otherVector2)
+	{
+		return this->Multiply(*this, otherVector2);
+	}
 	void operator*=(Vector2 otherVector2)
 	{
 		*this = this->Multiply(*this, otherVector2);
@@ -108,6 +112,10 @@ public:
 	Vector2 Normalize()
 	{
 		return DirectX::XMVector2Normalize(this->GetVector());
+	}
+	Vector2 Reflect(Vector2 normal)
+	{
+		return DirectX::XMVector2Reflect(this->GetVector(), normal.GetVector());
 	}
 	b2Vec2 GetBox2DVector()
 	{
@@ -260,6 +268,38 @@ public:
 	{
 		return this->values;
 	}
+	float Get11() { return this->values._11; }
+	float Get12() { return this->values._12; }
+	float Get13() { return this->values._13; }
+	float Get14() { return this->values._14; }
+	float Get21() { return this->values._21; }
+	float Get22() { return this->values._22; }
+	float Get23() { return this->values._23; }
+	float Get24() { return this->values._24; }
+	float Get31() { return this->values._31; }
+	float Get32() { return this->values._32; }
+	float Get33() { return this->values._33; }
+	float Get34() { return this->values._34; }
+	float Get41() { return this->values._41; }
+	float Get42() { return this->values._42; }
+	float Get43() { return this->values._43; }
+	float Get44() { return this->values._44; }
+	void Set11(float value) { this->values._11 = value; }
+	void Set12(float value) { this->values._12 = value; }
+	void Set13(float value) { this->values._13 = value; }
+	void Set14(float value) { this->values._14 = value; }
+	void Set21(float value) { this->values._21 = value; }
+	void Set22(float value) { this->values._22 = value; }
+	void Set23(float value) { this->values._23 = value; }
+	void Set24(float value) { this->values._24 = value; }
+	void Set31(float value) { this->values._31 = value; }
+	void Set32(float value) { this->values._32 = value; }
+	void Set33(float value) { this->values._33 = value; }
+	void Set34(float value) { this->values._34 = value; }
+	void Set41(float value) { this->values._41 = value; }
+	void Set42(float value) { this->values._42 = value; }
+	void Set43(float value) { this->values._43 = value; }
+	void Set44(float value) { this->values._44 = value; }
 
 	// Operations. (Using SIMD operations)
 	void operator=(DirectX::XMFLOAT4X4 newValues)
@@ -304,14 +344,14 @@ public:
 	}
 	Matrix4 Rotation(Vector3 rotation)
 	{
-		return DirectX::XMMatrixRotationQuaternion(DirectX::XMQuaternionRotationRollPitchYaw(
+		return *this * DirectX::XMMatrixRotationQuaternion(DirectX::XMQuaternionRotationRollPitchYaw(
 			DirectX::XMConvertToRadians(rotation.X()),
 			DirectX::XMConvertToRadians(rotation.Y()),
 			DirectX::XMConvertToRadians(rotation.Z()))) * this->GetMatrix();
 	}
 	Matrix4 Rotation(float z)
 	{
-		return DirectX::XMMatrixRotationAxis(DirectX::XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f), z);
+		return *this * DirectX::XMMatrixRotationAxis(DirectX::XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f), z);
 	}
 	Matrix4 Scale(Vector3 scale)
 	{
@@ -369,6 +409,9 @@ public:
 	}
 	void SetPosition(Vector3 position) { this->position = position; }
 	void SetPosition(float x, float y, float z) { this->position = Vector3(x, y, z); }
+	void SetPositionX(float x) { this->position = Vector3(x, this->position.Y(), this->position.Z()); }
+	void SetPositionY(float y) { this->position = Vector3(this->position.X(), y, this->position.Z()); }
+	void SetPositionZ(float z) { this->position = Vector3(this->position.X(), this->position.Y(), z); }
 	void Translate(Vector3 translationVector)
 	{
 		this->position += translationVector;
@@ -538,6 +581,8 @@ public:
 	}
 	void SetPosition(Vector2 position) { this->position = position; }
 	void SetPosition(float x, float y) { this->position = Vector2(x, y); }
+	void SetPositionX(float x) { this->position = Vector2(x, this->position.Y()); }
+	void SetPositionY(float y) { this->position = Vector2(this->position.X(), y); }
 	void Translate(Vector2 translationVector)
 	{
 		this->position += translationVector;
@@ -624,9 +669,9 @@ public:
 	Matrix4 GetGlobalModel()
 	{
 		Matrix4 model;
-		model = model.Translation(this->position);
-		model = model.Rotation(this->rotation);
 		model = model.Scale(this->scale);
+		model = model.Rotation(this->rotation);
+		model = model.Translation(this->position);
 		if (this->HasParent())
 		{
 			Matrix4 parentModel = parent->GetGlobalModel();
@@ -638,9 +683,9 @@ public:
 	Matrix4 GetLocalModel()
 	{
 		Matrix4 model;
-		model = model.Translation(this->position);
-		model = model.Rotation(this->rotation);
 		model = model.Scale(this->scale);
+		model = model.Rotation(this->rotation);
+		model = model.Translation(this->position);
 		return model;
 	}
 };

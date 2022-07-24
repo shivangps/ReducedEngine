@@ -2,6 +2,7 @@
 
 #include "Assets/Scenes/MainScene.h"
 #include "Assets/2D_Assets/Scenes/MainScene2D.h"
+#include "Assets/2D_Assets/AtariPong/Scenes/PongScene.h"
 
 // Main function.
 
@@ -16,7 +17,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	Scene* scene = new MainScene();
 #ifdef DX2D
-	scene = new MainScene2D();
+	scene = new PongScene();
 #endif // DX2D
 	mainEngine->SetScene(scene);
 

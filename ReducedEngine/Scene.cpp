@@ -80,3 +80,13 @@ PhysicsComponentList* Scene::GetPhysicsComponentList()
 	return &this->physicsComponentList;
 }
 
+AudioComponentList* Scene::GetAudioComponentList()
+{
+	return &this->audioComponentList;
+}
+
+GUIComponentList* Scene::GetGUIComponentList()
+{
+	return &this->guiComponentList;
+}
+

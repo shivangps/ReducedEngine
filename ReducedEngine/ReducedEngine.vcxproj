@@ -105,7 +105,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>XInput.lib;dxgi.lib;d3d12.lib;D3DCompiler.lib;dxguid.lib;DirectXTK12.lib;box2d.lib;assimp-vc142-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>XInput.lib;dxgi.lib;d3d12.lib;D3DCompiler.lib;dxguid.lib;DirectXTK12.lib;box2d.lib;fmodL_vc.lib;fmod_vc.lib;assimp-vc142-mtd.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)\ReducedEngine\Lib\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -140,17 +140,29 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>XInput.lib;dxgi.lib;d3d12.lib;D3DCompiler.lib;dxguid.lib;DirectXTK12.lib;box2d.lib;assimp-vc142-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>XInput.lib;dxgi.lib;d3d12.lib;D3DCompiler.lib;dxguid.lib;DirectXTK12.lib;box2d.lib;fmodL_vc.lib;fmod_vc.lib;assimp-vc142-mt.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)\ReducedEngine\Lib\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AssetManager\AudioAssetManager.cpp" />
+    <ClCompile Include="AssetManager\FontAssetManager.cpp" />
+    <ClCompile Include="AssetManager\FontType.cpp" />
     <ClCompile Include="AssetManager\GameAssetManager.cpp" />
+    <ClCompile Include="Assets\2D_Assets\AtariPong\Objects\BorderObject.cpp" />
+    <ClCompile Include="Assets\2D_Assets\AtariPong\Objects\EnemyPaddle.cpp" />
+    <ClCompile Include="Assets\2D_Assets\AtariPong\Objects\PlayerPaddle.cpp" />
+    <ClCompile Include="Assets\2D_Assets\AtariPong\Objects\PongBall.cpp" />
+    <ClCompile Include="Assets\2D_Assets\AtariPong\Objects\PongGameManager.cpp" />
+    <ClCompile Include="Assets\2D_Assets\AtariPong\Objects\ScoreBorder.cpp" />
+    <ClCompile Include="Assets\2D_Assets\AtariPong\Scenes\PongScene.cpp" />
     <ClCompile Include="Assets\2D_Assets\Objects\BoxObject2D\BoxObject2D.cpp" />
     <ClCompile Include="Assets\2D_Assets\Objects\CameraObject2D\CameraObject2D.cpp" />
+    <ClCompile Include="Assets\2D_Assets\Objects\PlatformObject2D\PlatformObject2D.cpp" />
     <ClCompile Include="Assets\2D_Assets\Objects\PlayerObject2D\PlayerObject2D.cpp" />
     <ClCompile Include="Assets\2D_Assets\RenderComponents\WireframeRenderComponent2D.cpp" />
     <ClCompile Include="Assets\2D_Assets\Scenes\MainScene2D.cpp" />
+    <ClCompile Include="Assets\2D_Assets\Shaders\CharacterShader\CharacterDisplayShader.cpp" />
     <ClCompile Include="Assets\2D_Assets\Shaders\PostDisplayShader\PostDisplayShader.cpp" />
     <ClCompile Include="Assets\2D_Assets\Shaders\WireframeShader\WireframeShader.cpp" />
     <ClCompile Include="Assets\CubemapShader\CubemapShader.cpp" />
@@ -167,6 +179,7 @@
     <ClCompile Include="Assets\SSAOShader\SSAOShader.cpp" />
     <ClCompile Include="Assets\TextureShader\TextureShader.cpp" />
     <ClCompile Include="Assets\UnlitShader\UnlitShader.cpp" />
+    <ClCompile Include="Experimental\ANIMATION_EXPERIMENTAL.cpp" />
     <ClCompile Include="GameEngine.cpp" />
     <ClCompile Include="GameObject2D.cpp" />
     <ClCompile Include="Input\Keyboard\KeyboardClass.cpp" />
@@ -175,6 +188,9 @@
     <ClCompile Include="Input\Mouse\MouseEvent.cpp" />
     <ClCompile Include="Input\XController.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Output\Audio\Audio.cpp" />
+    <ClCompile Include="Output\Audio\AudioComponent.cpp" />
+    <ClCompile Include="Output\Audio\AudioComponentList.cpp" />
     <ClCompile Include="Output\Graphics\2D\Camera2D.cpp" />
     <ClCompile Include="Output\Graphics\2D\Graphics2D.cpp" />
     <ClCompile Include="Output\Graphics\2D\RenderComponent2D.cpp" />
@@ -186,7 +202,11 @@
     <ClCompile Include="Output\Graphics\GraphicsHelper.cpp" />
     <ClCompile Include="AssetManager\Mesh.cpp" />
     <ClCompile Include="AssetManager\MeshAssetManager.cpp" />
-    <ClCompile Include="Output\Graphics\INSTANCE_EXPERIMENT.cpp" />
+    <ClCompile Include="Experimental\INSTANCE_EXPERIMENT.cpp" />
+    <ClCompile Include="Output\Graphics\GUI\GUIComponent.cpp" />
+    <ClCompile Include="Output\Graphics\GUI\GUIComponentList.cpp" />
+    <ClCompile Include="Output\Graphics\GUI\GUIEngine.cpp" />
+    <ClCompile Include="Output\Graphics\GUI\TextGUIComponent.cpp" />
     <ClCompile Include="Output\Graphics\LightComponent.cpp" />
     <ClCompile Include="Output\Graphics\Quad\Quad.cpp" />
     <ClCompile Include="Output\Graphics\RenderComponent.cpp" />
@@ -208,11 +228,25 @@
     <ClCompile Include="Win32Handler.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AssetManager\AudioAssetManager.h" />
+    <ClInclude Include="AssetManager\FontAssetManager.h" />
+    <ClInclude Include="AssetManager\FontType.h" />
     <ClInclude Include="AssetManager\GameAssetManager.h" />
+    <ClInclude Include="Assets\2D_Assets\AtariPong\Objects\BorderObject.h" />
+    <ClInclude Include="Assets\2D_Assets\AtariPong\Objects\EnemyPaddle.h" />
+    <ClInclude Include="Assets\2D_Assets\AtariPong\Objects\PlayerPaddle.h" />
+    <ClInclude Include="Assets\2D_Assets\AtariPong\Objects\PongBall.h" />
+    <ClInclude Include="Assets\2D_Assets\AtariPong\Objects\PongGameManager.h" />
+    <ClInclude Include="Assets\2D_Assets\AtariPong\Objects\PongPaddle.h" />
+    <ClInclude Include="Assets\2D_Assets\AtariPong\Objects\ScoreBorder.h" />
+    <ClInclude Include="Assets\2D_Assets\AtariPong\Scenes\PongScene.h" />
     <ClInclude Include="Assets\2D_Assets\Objects\BoxObject2D\BoxObject2D.h" />
     <ClInclude Include="Assets\2D_Assets\Objects\CameraObject2D\CameraObject2D.h" />
+    <ClInclude Include="Assets\2D_Assets\Objects\PlatformObject2D\PlatformObject2D.h" />
     <ClInclude Include="Assets\2D_Assets\Objects\PlayerObject2D\PlayerObject2D.h" />
     <ClInclude Include="Assets\2D_Assets\Scenes\MainScene2D.h" />
+    <ClInclude Include="Assets\2D_Assets\Shaders\CharacterShader\CharacterDisplayShader.h" />
+    <ClInclude Include="Experimental\ANIMATION_EXPERIMENTAL.h" />
     <ClInclude Include="GameObject2D.h" />
     <ClInclude Include="Assets\2D_Assets\RenderComponents\WireframeRenderComponent2D.h" />
     <ClInclude Include="Assets\2D_Assets\Shaders\PostDisplayShader\PostDisplayShader.h" />
@@ -243,6 +277,9 @@
     <ClInclude Include="Input\Mouse\MouseEvent.h" />
     <ClInclude Include="Input\XController.h" />
     <ClInclude Include="MathEngine.h" />
+    <ClInclude Include="Output\Audio\Audio.h" />
+    <ClInclude Include="Output\Audio\AudioComponent.h" />
+    <ClInclude Include="Output\Audio\AudioComponentList.h" />
     <ClInclude Include="Output\Graphics\2D\Camera2D.h" />
     <ClInclude Include="Output\Graphics\2D\Graphics2D.h" />
     <ClInclude Include="Output\Graphics\2D\RenderComponent2D.h" />
@@ -255,7 +292,11 @@
     <ClInclude Include="Output\Graphics\GraphicsHelper.h" />
     <ClInclude Include="AssetManager\Mesh.h" />
     <ClInclude Include="AssetManager\MeshAssetManager.h" />
-    <ClInclude Include="Output\Graphics\INSTANCE_EXPERIMENT.h" />
+    <ClInclude Include="Experimental\INSTANCE_EXPERIMENT.h" />
+    <ClInclude Include="Output\Graphics\GUI\GUIComponent.h" />
+    <ClInclude Include="Output\Graphics\GUI\GUIComponentList.h" />
+    <ClInclude Include="Output\Graphics\GUI\GUIEngine.h" />
+    <ClInclude Include="Output\Graphics\GUI\TextGUIComponent.h" />
     <ClInclude Include="Output\Graphics\LightComponent.h" />
     <ClInclude Include="Output\Graphics\Quad\Quad.h" />
     <ClInclude Include="Output\Graphics\RenderComponent.h" />
@@ -277,6 +318,22 @@
     <ClInclude Include="Output\Output.h" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="Assets\2D_Assets\Shaders\CharacterShader\character_display_pixel_shader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Assets\2D_Assets\Shaders\CharacterShader\character_display_vertex_shader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+    </FxCompile>
     <FxCompile Include="Assets\2D_Assets\Shaders\PostDisplayShader\post_display_pixel_shader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
@@ -509,6 +566,11 @@
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)/CompiledShaders/%(Filename).cso</ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)/CompiledShaders/%(Filename).cso</ObjectFileOutput>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="Assets\Fonts\FOT-Rodin Pro UB.otf" />
+    <Font Include="Assets\Fonts\Mello-Nr-Black.ttf" />
+    <Font Include="Assets\Fonts\Roboto-Bold.ttf" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

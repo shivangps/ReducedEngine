@@ -4,7 +4,7 @@ void PostDisplayShader::Initialize(Microsoft::WRL::ComPtr<ID3D12Device5> device,
 {
 	this->CreateShaderFromFile("Assets/2D_Assets/Shaders/PostDisplayShader/post_display_vertex_shader.hlsl", "Assets/2D_Assets/Shaders/PostDisplayShader/post_display_pixel_shader.hlsl");
 
-	this->CreateTextureTable(device, 1);
+	this->CreateTextureTable(device, 2);
 
 	D3D12_INPUT_ELEMENT_DESC inputLayout[] =
 	{

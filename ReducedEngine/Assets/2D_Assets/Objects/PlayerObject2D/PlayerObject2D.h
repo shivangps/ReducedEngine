@@ -14,6 +14,14 @@ private:
 	BoxCollider2D* boxCollider = nullptr;
 	Rigidbody2D* rigidbody = nullptr;
 
+	AudioComponent* jumpSound = nullptr;
+	std::string jumpSoundFile = "Assets/SoundSamples/Woosh.mp3";
+	float jumpSoundVolume = 0.1f;
+
+	AudioComponent* landedSound = nullptr;
+	std::string landedSoundFile = "Assets/SoundSamples/CardboardBox_Drop.wav";
+	float landedSoundVolume = 0.3f;
+
 	KeyboardClass* keyboard = Input::GetInstance()->GetKeyboard();
 	XController* controller = Input::GetInstance()->GetController();
 	Output* output = Output::GetInstance();
@@ -29,6 +37,8 @@ private:
 	float timeKeepForRumble = 0.0f;
 
 	float leftThumbstickDeadzone = 0.1f;
+
+
 
 	// Function to move the box using key input.
 	void MoveBoxUsingKeys();
@@ -49,7 +59,8 @@ public:
 	float jumpForce = 2.0f;
 
 	// Function to initialize the game object.
-	void Initialize(RenderList* sceneRenderComponentList, PhysicsComponentList* physicsComponentList);
+	void Initialize(RenderList* sceneRenderComponentList, PhysicsComponentList* physicsComponentList, AudioComponentList* audioComponentList, GUIComponentList* guiComponentList);
+	// Function that is called every frame.
 	void Update();
 
 	// Function to call when the object is entering collision.

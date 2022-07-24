@@ -198,9 +198,6 @@
     <ClCompile Include="Assets\SSAOBlurShader\SSAOBlurShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Output\Graphics\INSTANCE_EXPERIMENT.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Assets\ShadowPostProcessShader\ShadowPostProcessShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -253,6 +250,69 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Physics\2D\Colliders\Collider2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Experimental\INSTANCE_EXPERIMENT.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Experimental\ANIMATION_EXPERIMENTAL.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Output\Audio\Audio.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Output\Audio\AudioComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AssetManager\AudioAssetManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Output\Audio\AudioComponentList.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\2D_Assets\Objects\PlatformObject2D\PlatformObject2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\2D_Assets\AtariPong\Scenes\PongScene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Output\Graphics\GUI\GUIEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Output\Graphics\GUI\TextGUIComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\2D_Assets\Shaders\CharacterShader\CharacterDisplayShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AssetManager\FontType.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Output\Graphics\GUI\GUIComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AssetManager\FontAssetManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Output\Graphics\GUI\GUIComponentList.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\2D_Assets\AtariPong\Objects\PongGameManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\2D_Assets\AtariPong\Objects\PongBall.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\2D_Assets\AtariPong\Objects\PlayerPaddle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\2D_Assets\AtariPong\Objects\EnemyPaddle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\2D_Assets\AtariPong\Objects\BorderObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\2D_Assets\AtariPong\Objects\ScoreBorder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -401,9 +461,6 @@
     <ClInclude Include="Assets\SSAOBlurShader\SSAOBlurShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Output\Graphics\INSTANCE_EXPERIMENT.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Assets\ShadowPostProcessShader\ShadowPostProcessShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -458,6 +515,72 @@
     <ClInclude Include="Physics\2D\Colliders\BoxCollider2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Experimental\INSTANCE_EXPERIMENT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Experimental\ANIMATION_EXPERIMENTAL.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Output\Audio\Audio.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Output\Audio\AudioComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AssetManager\AudioAssetManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Output\Audio\AudioComponentList.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets\2D_Assets\Objects\PlatformObject2D\PlatformObject2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets\2D_Assets\AtariPong\Scenes\PongScene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets\2D_Assets\AtariPong\Objects\PongPaddle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Output\Graphics\GUI\GUIEngine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Output\Graphics\GUI\GUIComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Output\Graphics\GUI\TextGUIComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets\2D_Assets\Shaders\CharacterShader\CharacterDisplayShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AssetManager\FontType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AssetManager\FontAssetManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Output\Graphics\GUI\GUIComponentList.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets\2D_Assets\AtariPong\Objects\PongGameManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets\2D_Assets\AtariPong\Objects\PongBall.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets\2D_Assets\AtariPong\Objects\PlayerPaddle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets\2D_Assets\AtariPong\Objects\EnemyPaddle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets\2D_Assets\AtariPong\Objects\BorderObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets\2D_Assets\AtariPong\Objects\ScoreBorder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Assets\DisplayShader\display_pixel_shader.hlsl">
@@ -498,5 +621,12 @@
     <FxCompile Include="Assets\2D_Assets\Shaders\PostDisplayShader\post_display_pixel_shader.hlsl" />
     <FxCompile Include="Assets\2D_Assets\Shaders\WireframeShader\wireframe_vertex_shader.hlsl" />
     <FxCompile Include="Assets\2D_Assets\Shaders\WireframeShader\wireframe_pixel_shader.hlsl" />
+    <FxCompile Include="Assets\2D_Assets\Shaders\CharacterShader\character_display_vertex_shader.hlsl" />
+    <FxCompile Include="Assets\2D_Assets\Shaders\CharacterShader\character_display_pixel_shader.hlsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="Assets\Fonts\Mello-Nr-Black.ttf" />
+    <Font Include="Assets\Fonts\FOT-Rodin Pro UB.otf" />
+    <Font Include="Assets\Fonts\Roboto-Bold.ttf" />
   </ItemGroup>
 </Project>

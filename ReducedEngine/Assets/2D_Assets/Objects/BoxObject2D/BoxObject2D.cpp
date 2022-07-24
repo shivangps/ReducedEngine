@@ -6,7 +6,7 @@ BoxObject2D::BoxObject2D(Transform2D transform)
 	this->objectTransform = transform;
 }
 
-void BoxObject2D::Initialize(RenderList* sceneRenderComponentList, PhysicsComponentList* physicsComponentList)
+void BoxObject2D::Initialize(RenderList* sceneRenderComponentList, PhysicsComponentList* physicsComponentList, AudioComponentList* audioComponentList, GUIComponentList* guiComponentList)
 {
 	this->isStatic = true;
 
@@ -39,7 +39,7 @@ void BoxObject2D::Initialize(RenderList* sceneRenderComponentList, PhysicsCompon
 	// Physics.
 	this->boxCollider = new BoxCollider2D(&this->objectTransform);
 
-	this->rigidbody = new Rigidbody2D(&this->objectTransform, this->isStatic, RigibodyType::RigibodyTypeStatic);
+	this->rigidbody = new Rigidbody2D(&this->objectTransform, this, this->isStatic, RigibodyType::RigibodyTypeStatic, true);
 	this->rigidbody->AddColliderToRigidbody(this->boxCollider);
 	this->rigidbody->SetPhysicalCharacteristics(this);
 	physicsComponentList->RegisterRigidbody2D(this->rigidbody);

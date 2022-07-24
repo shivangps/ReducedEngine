@@ -52,7 +52,7 @@ public:
 	// Function to create resource view from texture and store it in descriptor heap.
 	void CreateResourceView(UINT64 textureIndex, D3D12_CPU_DESCRIPTOR_HANDLE handle);
 	// Function to assign a new texture and assigns as well as returns the index of the texture.
-	int SetNewTexture(std::string fileDirectory);
+	UINT64 SetNewTexture(std::string fileDirectory);
 	// Function to get the GPU descriptor handle for texture.
 	D3D12_GPU_DESCRIPTOR_HANDLE GetTextureHandleForRender(UINT64 textureIndex);
 	// Function to release all the texture resources in the asset manager.

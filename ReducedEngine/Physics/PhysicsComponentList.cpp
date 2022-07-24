@@ -26,10 +26,24 @@ void PhysicsComponentList::Step(float deltaTime)
 void PhysicsComponentList::BeginContact(b2Contact* contact)
 {
 	b2BodyUserData firstUserData = contact->GetFixtureA()->GetBody()->GetUserData();
-	firstUserData.characteristics->OnCollisionEnter2D();
-
 	b2BodyUserData secondUserData = contact->GetFixtureB()->GetBody()->GetUserData();
+
+	CollisionCharacteristics2D firstUserCollision = CollisionCharacteristics2D();
+	CollisionCharacteristics2D secondUserCollision = CollisionCharacteristics2D();
+	//b2WorldManifold worldManifold;
+	//contact->GetWorldManifold(&worldManifold);
+
+	firstUserCollision.otherCollidingObject = secondUserData.characteristics->gameObject;
+	firstUserCollision.collisionPosition = new Vector2();
+	firstUserCollision.collisionNormal = new Vector2();
+	firstUserData.characteristics->OnCollisionEnter2D();
+	firstUserData.characteristics->OnCollisionEnter2D(firstUserCollision);
+	
+	secondUserCollision.otherCollidingObject = firstUserData.characteristics->gameObject; 
+	secondUserCollision.collisionPosition = new Vector2();
+	secondUserCollision.collisionNormal = new Vector2();
 	secondUserData.characteristics->OnCollisionEnter2D();
+	secondUserData.characteristics->OnCollisionEnter2D(secondUserCollision);
 }
 
 void PhysicsComponentList::EndContact(b2Contact* contact)

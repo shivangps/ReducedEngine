@@ -1,8 +1,7 @@
 #include "UniversalDescriptorHeap.h"
 #include "../ErrorLogger.h"
 
-void UniversalDescriptorHeap::Initialize(Microsoft::WRL::ComPtr<ID3D12Device5
-> device)
+void UniversalDescriptorHeap::Initialize(Microsoft::WRL::ComPtr<ID3D12Device5> device)
 {
 	this->srvCbvUavHeap.Initialize(device, this->maxSrvCbvUavHeapCount, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
 	this->samplerHeap.Initialize(device, this->maxSamplerHeapCount, D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
@@ -76,6 +75,16 @@ UINT64 UniversalDescriptorHeap::SetCpuHandle(Microsoft::WRL::ComPtr<ID3D12Device
 	device->CreateSampler(samplerDesc, this->samplerHeap.GetCPUHandle(currentIndex));
 
 	return currentIndex;
+}
+
+D3D12_CPU_DESCRIPTOR_HANDLE UniversalDescriptorHeap::GetCbvSrvUavCPUHandle(UINT64 index)
+{
+	if (index > this->maxSrvCbvUavHeapCount)
+	{
+		ExitWithMessage("ERROR: Universal Descriptor Heap, requested index exceeded the maximum value for the shader resource, constant or unordered access view heap.\n");
+	}
+
+	return this->srvCbvUavHeap.GetCPUHandle(index);
 }
 
 D3D12_GPU_DESCRIPTOR_HANDLE UniversalDescriptorHeap::GetCbvSrvUavGPUHandle(UINT64 index)

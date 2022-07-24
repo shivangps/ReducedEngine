@@ -1,5 +1,5 @@
 #include "MainScene2D.h"
-#include "../Assets/2D_Assets/Objects/BoxObject2D/BoxObject2D.h"
+#include "../Assets/2D_Assets/Objects/PlatformObject2D/PlatformObject2D.h"
 #include "../Assets/2D_Assets/Objects/CameraObject2D/CameraObject2D.h"
 #include "../Assets/2D_Assets/Objects/PlayerObject2D/PlayerObject2D.h"
 
@@ -10,11 +10,11 @@ MainScene2D::MainScene2D()
 	GameObject2D* newGameobject2D = nullptr;
 	Transform2D setTransform2d;
 
-	// Box Object 2D.
+	// Platform Object 2D.
 	setTransform2d = Transform2D();
 	setTransform2d.SetScale(5.0f, 1.0f);
-	BoxObject2D* boxObject2D = new BoxObject2D(setTransform2d);
-	this->objects2DPresent.push_back(boxObject2D);
+	PlatformObject2D* platformObject2D = new PlatformObject2D(setTransform2d);
+	this->objects2DPresent.push_back(platformObject2D);
 
 	// Player Object 2D.
 	setTransform2d = Transform2D();

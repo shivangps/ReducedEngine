@@ -25,6 +25,6 @@ public:
 	float controller_movement_speed = 0.01;
 
 	// Function to initialize the game object.
-	void Initialize(RenderList* sceneRenderComponentList, PhysicsComponentList* physicsComponentList);
+	void Initialize(RenderList* sceneRenderComponentList, PhysicsComponentList* physicsComponentList, AudioComponentList* audioComponentList, GUIComponentList* guiComponentList);
 	void Update();
 };

@@ -253,8 +253,10 @@ void GameAssetManager::InitializeAllShadersForDeferredRender(Microsoft::WRL::Com
 }
 
 #include "../Assets/2D_Assets/Shaders/WireframeShader/WireframeShader.h"
+#include "../Assets/2D_Assets/Shaders/CharacterShader/CharacterDisplayShader.h"
 
 void GameAssetManager::InitializeAllShadersFor2DDeferredRender(Microsoft::WRL::ComPtr<ID3D12Device5> device, unsigned int numberOfRenderTarget, DXGI_FORMAT* renderTargetFormats, DXGI_FORMAT depthStencilFormat, unsigned int samples)
 {
 	WireframeShader::GetInstance()->Initialize(device, numberOfRenderTarget, renderTargetFormats, depthStencilFormat, samples);
+	CharacterDisplayShader::GetInstance()->Initialize(device, numberOfRenderTarget, renderTargetFormats, depthStencilFormat, samples);
 }

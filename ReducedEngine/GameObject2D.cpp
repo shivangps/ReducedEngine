@@ -14,3 +14,8 @@ bool GameObject2D::GetStaticState()
 {
 	return this->isStatic;
 }
+
+bool GameObject2D::CompareTag(std::string otherTag)
+{
+	return std::strcmp(this->tag.c_str(), otherTag.c_str()) == 0;
+}

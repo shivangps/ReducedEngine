@@ -58,13 +58,13 @@ void XController::UpdateGamepadState()
 		magnitude_L = sqrt(LX * LX + LY * LY);
 
 		//Determine the direction the controller is pushed in
-		normalizedLX = LX / magnitude_L;
-		normalizedLY = LY / magnitude_L;
+		normalizedLX = (LX) / (MAX_RADIUS);
+		normalizedLY = (LY) / (MAX_RADIUS);
 
 		normalizedMagnitude_L = 0.0f;
 
 		//Check if the controller is outside the circular deadzone
-		if (magnitude_L > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
+		if (magnitude_L > 0.0f)
 		{
 			//Clip the value at its expected maximum value
 			if (magnitude_L > (float)MAX_RADIUS)
@@ -73,10 +73,10 @@ void XController::UpdateGamepadState()
 			}
 
 			//Adjust magnitude relative to the end of the dead zone
-			magnitude_L -= XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE;
+			//magnitude_L -= XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE;
 
 			//Optionally normalize the magnitude
-			normalizedMagnitude_L = magnitude_L / (float)(MAX_RADIUS - XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE);
+			normalizedMagnitude_L = magnitude_L / (float)(MAX_RADIUS);
 			inDeadZone_L = false;
 		}
 		//If controller is in the deadzone
@@ -94,14 +94,14 @@ void XController::UpdateGamepadState()
 		//Detemine how far the thumbstick is pushed
 		magnitude_R = sqrt(RX * RX + RY * RY);
 
-		//Determine the direction in which the controller is pushed in
-		normalizedRX = RX / magnitude_R;
-		normalizedRY = RY / magnitude_R;
+		//Determine the direction in which the controller is pushed in relative to the right thumbstick deadzone.
+		normalizedRX = (RX) / (MAX_RADIUS);
+		normalizedRY = (RY) / (MAX_RADIUS);
 
 		normalizedMagnitude_R = 0.0f;
 
 		//Check if the controller is outside the circular deadzone
-		if (magnitude_R > XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
+		if (magnitude_R > 0.0f)
 		{
 			//Clip the value at its expected maximum value
 			if (magnitude_R > (float)MAX_RADIUS)
@@ -110,10 +110,10 @@ void XController::UpdateGamepadState()
 			}
 
 			//Adjust magnitude relative to the end of the dead zone
-			magnitude_R -= XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE;
+			//magnitude_R -= XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE;
 
 			//Optionally normalize the magnitude
-			normalizedMagnitude_R = magnitude_R / (float)(MAX_RADIUS - XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE);
+			normalizedMagnitude_R = magnitude_R / (float)(MAX_RADIUS);
 			inDeadZone_R = false;
 		}
 		//If controller is in the deadzone

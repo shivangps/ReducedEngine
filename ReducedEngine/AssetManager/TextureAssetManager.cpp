@@ -7,7 +7,7 @@ void TextureAssetManager::SetDevice(Microsoft::WRL::ComPtr<ID3D12Device5> device
 	this->graphicsDevice = device;
 }
 
-int TextureAssetManager::SetNewTexture(std::string fileDirectory)
+UINT64 TextureAssetManager::SetNewTexture(std::string fileDirectory)
 {
 	if (this->graphicsDevice)
 	{
@@ -22,7 +22,7 @@ int TextureAssetManager::SetNewTexture(std::string fileDirectory)
 
 		// Assign the texture view into the descriptor heap.
 		textureInfo->handle = this->universalDescriptorHeap->GetCbvSrvUavGPUHandle(this->universalDescriptorHeap->SetCpuHandle(
-			this->graphicsDevice, textureInfo->texture.GetResource(), nullptr));
+			this->graphicsDevice, textureInfo->texture.GetResource(), textureInfo->texture.GetShaderResourceView()));
 
 		return textureInfo->textureIndex;
 	}
@@ -30,7 +30,7 @@ int TextureAssetManager::SetNewTexture(std::string fileDirectory)
 	{
 		ExitWithMessage("Graphics Device not assigned to Texture Asset Manager.");
 	}
-	return -1;
+	return 0;
 }
 
 D3D12_GPU_DESCRIPTOR_HANDLE TextureAssetManager::GetTextureHandleForRender(UINT64 textureIndex)

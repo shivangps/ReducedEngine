@@ -6,6 +6,7 @@
 #include "../RenderFramebuffer.h"
 #include "../DepthFramebuffer.h"
 #include "../Assets/2D_Assets/Shaders/PostDisplayShader/PostDisplayShader.h"
+#include "../Output/Graphics/GUI/GUIEngine.h"
 
 // Class that handles the rendering of 2D objects present in the scene.
 
@@ -19,6 +20,7 @@ private:
 	}
 
 	HWND hWnd = NULL;
+	Output* output = Output::GetInstance();
 
 	D3D12_VIEWPORT viewport = {};
 	D3D12_RECT clippingRect = {};
@@ -118,6 +120,10 @@ private:
 	// Shader to display the framebuffer.
 	Shader* postDisplayShader = PostDisplayShader::GetInstance();
 
+private:
+	GUIEngine* guiEngine = GUIEngine::GetInstance();
+	D3D12_GPU_DESCRIPTOR_HANDLE uiGpuHandle = {};
+
 public:
 	// Function to get the a single instance of the 2d graphics engine.
 	static Graphics2D* GetInstance()
@@ -130,6 +136,8 @@ public:
 	void Initialize(HWND windowHandle, unsigned int width, unsigned int height);
 	// Function to initialize render componenet list.
 	void InitializeRenderList(RenderList* renderComponentList);
+	// Function to initialize gui component list.
+	void InitializeGUIComponentList(GUIComponentList* guiComponentList);
 	// Function to call for rendering the whole scene.
-	void RenderScene(RenderList* renderComponentList);
+	void RenderScene(RenderList* renderComponentList, GUIComponentList* guiComponentList);
 };

@@ -15,6 +15,10 @@ protected:
 	RenderList renderComponentList = {};
 	// Collection of rigidbody components.
 	PhysicsComponentList physicsComponentList = {};
+	// Collection of audio components.
+	AudioComponentList audioComponentList = {};
+	// Collection of GUI components.
+	GUIComponentList guiComponentList = {};
 
 public:
 	Scene() {}
@@ -31,6 +35,10 @@ public:
 	RenderList* GetRenderComponentList();
 	// Function to get the physics component list.
 	PhysicsComponentList* GetPhysicsComponentList();
+	// Function to get the audio component list.
+	AudioComponentList* GetAudioComponentList();
+	// Function to get the GUI component list.
+	GUIComponentList* GetGUIComponentList();
 
 	unsigned int GetSize2D();
 	// Function to get the game object in the scene.

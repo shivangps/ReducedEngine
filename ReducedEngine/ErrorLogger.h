@@ -50,3 +50,18 @@ static void ExitWithMessage(std::string message)
 #endif // _DEBUG
 	exit(-1);
 }
+
+// For debugging fmod audio api.
+#include <fmod/fmod_errors.h>
+
+static void ExitOnError(FMOD_RESULT result)
+{
+#ifdef _DEBUG
+	if (result != FMOD_OK)
+	{
+		std::string errorString = "ERROR (from FMOD): ";
+		errorString = errorString + FMOD_ErrorString(result);
+		DebugLog(errorString);
+	}
+#endif	// _DEBUG
+}

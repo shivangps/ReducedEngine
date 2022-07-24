@@ -76,7 +76,7 @@ PlayerObject2D::PlayerObject2D(Transform2D transform)
 	this->objectTransform = transform;
 }
 
-void PlayerObject2D::Initialize(RenderList* sceneRenderComponentList, PhysicsComponentList* physicsComponentList)
+void PlayerObject2D::Initialize(RenderList* sceneRenderComponentList, PhysicsComponentList* physicsComponentList, AudioComponentList* audioComponentList, GUIComponentList* guiComponentList)
 {
 	WireframeRenderComponent2D* newRenderComponent2D = new WireframeRenderComponent2D(&this->objectTransform);
 
@@ -106,11 +106,26 @@ void PlayerObject2D::Initialize(RenderList* sceneRenderComponentList, PhysicsCom
 	// Physics.
 	this->boxCollider = new BoxCollider2D(&this->objectTransform);
 
-	this->rigidbody = new Rigidbody2D(&this->objectTransform, this->isStatic, RigibodyType::RigibodyTypeDynamic);
+	this->rigidbody = new Rigidbody2D(&this->objectTransform, this, this->isStatic, RigibodyType::RigibodyTypeDynamic, true);
 	this->rigidbody->AddColliderToRigidbody(this->boxCollider);
 	this->rigidbody->SetPhysicalCharacteristics(this);
 	this->rigidbody->SetMass(5.0f);
 	physicsComponentList->RegisterRigidbody2D(this->rigidbody);
+
+	// Audio and sounds.
+
+	// Jumping.
+	this->jumpSound = new AudioComponent();
+	this->jumpSound->Initialize(this->jumpSoundFile);
+	this->jumpSound->SetVolume(this->jumpSoundVolume);
+
+	// Landing on jump.
+	this->landedSound = new AudioComponent();
+	this->landedSound->Initialize(this->landedSoundFile);
+	this->landedSound->SetVolume(this->landedSoundVolume);
+
+	audioComponentList->AssignAudioComponent(this->jumpSound);
+	audioComponentList->AssignAudioComponent(this->landedSound);
 }
 
 void PlayerObject2D::Update()
@@ -140,6 +155,7 @@ void PlayerObject2D::OnCollisionEnter2D()
 	}
 	this->color = Vector3(0.0f, 0.0f, 1.0f);
 	this->wireframeRenderer->ChangeColor(this->color);
+	this->landedSound->Play();
 }
 
 void PlayerObject2D::OnCollisionExit2D()
@@ -147,4 +163,5 @@ void PlayerObject2D::OnCollisionExit2D()
 	this->onAir = true;
 	this->color = Vector3(0.0f, 1.0f, 1.0f);
 	this->wireframeRenderer->ChangeColor(this->color);
+	this->jumpSound->Play();
 }
