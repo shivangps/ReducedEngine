@@ -18,6 +18,7 @@ void Graphics2D::ExecuteCommandLists(Microsoft::WRL::ComPtr<ID3D12GraphicsComman
 
 void Graphics2D::DestroyAndReleaseAll()
 {
+	this->device->Release();
 	this->GAM->ReleaseAllAssets();
 	this->universalDescriptorHeap->Release();
 	this->depthStencilHeap.Release();
@@ -25,7 +26,6 @@ void Graphics2D::DestroyAndReleaseAll()
 	this->mainCommandSet.ReleaseAll();
 	this->commandQueue->Release();
 	this->swapChain->Release();
-	this->device->Release();
 }
 
 void Graphics2D::InitializeDefferedRendering(Microsoft::WRL::ComPtr<ID3D12Device5> device, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList, unsigned int width, unsigned int height, unsigned int multiSamples)
@@ -197,6 +197,12 @@ void Graphics2D::RenderScene(RenderList* renderComponentList, GUIComponentList* 
 	this->mainCommandSet.commandList->RSSetScissorRects(1, &this->clippingRect);
 
 	// G-BUFFER FILL.
+	// Setting background color from render list.
+	Vector3 backgroundColor = renderComponentList->GetBackgroundColor();
+	this->albedoBackgroundColor[0] = backgroundColor.X();
+	this->albedoBackgroundColor[1] = backgroundColor.Y();
+	this->albedoBackgroundColor[2] = backgroundColor.Z();
+
 	this->ClearGBuffers(this->mainCommandSet.commandList);
 	this->SetGBuffers(this->mainCommandSet.commandList);
 

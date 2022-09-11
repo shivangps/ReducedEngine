@@ -20,7 +20,7 @@ public:
 struct MeshVertex2D
 {
 public:
-	MeshVertex2D(float x, float y, float u, float v) : position(x, y), texCoord(u, y) {}
+	MeshVertex2D(float x, float y, float u, float v) : position(x, y), texCoord(u, v) {}
 
 	DirectX::XMFLOAT2 position;
 	DirectX::XMFLOAT2 texCoord;

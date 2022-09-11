@@ -254,9 +254,13 @@ void GameAssetManager::InitializeAllShadersForDeferredRender(Microsoft::WRL::Com
 
 #include "../Assets/2D_Assets/Shaders/WireframeShader/WireframeShader.h"
 #include "../Assets/2D_Assets/Shaders/CharacterShader/CharacterDisplayShader.h"
+#include "../Assets/2D_Assets/Shaders/AlphaTexShader/AlphaTexShader.h"
+#include "../Assets/2D_Assets/Shaders/ButtonShader/ButtonShader.h"
 
 void GameAssetManager::InitializeAllShadersFor2DDeferredRender(Microsoft::WRL::ComPtr<ID3D12Device5> device, unsigned int numberOfRenderTarget, DXGI_FORMAT* renderTargetFormats, DXGI_FORMAT depthStencilFormat, unsigned int samples)
 {
 	WireframeShader::GetInstance()->Initialize(device, numberOfRenderTarget, renderTargetFormats, depthStencilFormat, samples);
 	CharacterDisplayShader::GetInstance()->Initialize(device, numberOfRenderTarget, renderTargetFormats, depthStencilFormat, samples);
+	AlphaTexShader::GetInstance()->Initialize(device, numberOfRenderTarget, renderTargetFormats, depthStencilFormat, samples);
+	ButtonShader::GetInstance()->Initialize(device, numberOfRenderTarget, renderTargetFormats, depthStencilFormat, samples);
 }

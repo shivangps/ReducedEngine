@@ -55,6 +55,9 @@ private:
 	void InitlializeColorConstantBuffer();
 
 public:
+	// REMOVE
+	bool enableText = true;
+
 	// Function to set the text string to be displayed.
 	void AssignText(std::string text);
 	// Function to set a new font to the text.

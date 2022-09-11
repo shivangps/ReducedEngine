@@ -107,6 +107,11 @@ Vector2 Rigidbody2D::GetVelocity()
 	return this->physicsBody->GetLinearVelocity();
 }
 
+void Rigidbody2D::SetToPosition(Vector2 position)
+{
+	this->physicsBody->SetTransform(position.GetBox2DVector(), this->transform->GetGlobalRotation());
+}
+
 void Rigidbody2D::SetMass(float mass)
 {
 	this->massData.mass = mass;

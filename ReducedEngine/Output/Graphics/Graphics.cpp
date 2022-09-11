@@ -308,6 +308,13 @@ void Graphics::RenderScene(RenderList* renderComponentList)
 
 	this->ClearDeferredFramebuffers(this->preRenderCommandList.commandList);
 
+	// Set the background render color.
+	Vector3 backgroundColor;
+	backgroundColor = renderComponentList->GetBackgroundColor();
+	this->gBufferClearColor[GBufferRenderTarget::AlbedoSpecular_RT][0] = backgroundColor.X();
+	this->gBufferClearColor[GBufferRenderTarget::AlbedoSpecular_RT][1] = backgroundColor.Y();
+	this->gBufferClearColor[GBufferRenderTarget::AlbedoSpecular_RT][2] = backgroundColor.Z();
+
 	ExecuteCommandListsImmediately(this->preRenderCommandList.commandList, this->preRenderCommandList.commandAllocator);
 	//----------------X-----------------//
 	// G-BUFFER FILL.

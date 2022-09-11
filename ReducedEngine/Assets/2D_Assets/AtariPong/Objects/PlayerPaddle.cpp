@@ -17,30 +17,63 @@ void PlayerPaddle::MovePaddleUsingController()
 	Transform2D newTransform = this->objectTransform;
 	newTransform.SetPositionY(paddleYValue);
 	this->rigidbody->ChangeTransform(newTransform);
+}
 
-	// Quit pressing B button.
-	if (this->controller->GetButtonDown(button_id.B))
+void PlayerPaddle::MovePaddleUsingMouse()
+{
+	Vector2 pointerData = *this->mouse->GetMouseWindowPosition();
+	float YPosition = this->ScreenTo3DCoordinates(pointerData).Y();
+
+	if (YPosition > (this->characteristics.GetMedianVertical() + this->characteristics.GetMaxVerticalDistance()))
 	{
-		Output::GetInstance()->CloseWindow();
+		YPosition = this->characteristics.GetMedianVertical() + this->characteristics.GetMaxVerticalDistance();
 	}
+	if (YPosition < (this->characteristics.GetMedianVertical() - this->characteristics.GetMaxVerticalDistance()))
+	{
+		YPosition = this->characteristics.GetMedianVertical() - this->characteristics.GetMaxVerticalDistance();
+	}
+
+	this->objectTransform.SetPositionY(YPosition);
+	this->rigidbody->ChangeTransform(this->objectTransform);
+}
+
+Vector2 PlayerPaddle::ScreenTo3DCoordinates(Vector2 ScreenCoordinates)
+{
+	Vector2 screenResolution(output->GetWindowWidth(), output->GetWindowHeight());
+	Vector2 result;
+	Camera2D camera = MainCamera2D::GetInstance()->GetCamera2D();
+	
+	Vector2 screenRatio = Vector2(ScreenCoordinates.X() / screenResolution.X(), ScreenCoordinates.Y() / screenResolution.Y());
+	result = screenRatio * Vector2(camera.width, camera.height);
+	result = result - Vector2(camera.width / 2, camera.height / 2);
+	result.Y(-result.Y());
+
+	return result;
 }
 
 void PlayerPaddle::Initialize(RenderList* sceneRenderComponentList, PhysicsComponentList* physicsComponentList, AudioComponentList* audioComponentList, GUIComponentList* guiComponentList)
 {
 	this->tag = "PaddlePaddle";
-	// Set the x axis position of the paddle.
+	// Set the X axis position of the paddle.
 	this->objectTransform.SetScale(this->characteristics.GetScale());
 	this->objectTransform.SetPositionX(this->characteristics.GetXValue());
 
-	WireframeRenderComponent2D* newRenderComponent2D = new WireframeRenderComponent2D(&this->objectTransform);
+	// Sprite Render Component initialization.
+	SpriteRenderComponent2D* newSpriteRenderer = new SpriteRenderComponent2D(&this->objectTransform);
 
-	newRenderComponent2D->Load2DGeometry(characteristics.GetVertices(), characteristics.GetIndices());
+	std::vector<MeshVertex2D> vertices = this->characteristics.GetVertices();
+	std::vector<unsigned short> indices = this->characteristics.GetIndices();
+	newSpriteRenderer->Load2DGeometry(vertices, indices);
 
-	newRenderComponent2D->ChangeColor(this->color);
+	newSpriteRenderer->ChangeColor(this->color);
 
-	this->renderer = newRenderComponent2D;
+	newSpriteRenderer->LoadSpriteTexture(this->characteristics.GetPaddleTexture());
 
-	sceneRenderComponentList->AssignRenderComponent2D(this->renderer);
+	newSpriteRenderer->SetGameObject(this);
+
+	this->spriteRenderer = newSpriteRenderer;
+
+	sceneRenderComponentList->AssignRenderComponent2D(this->spriteRenderer);
 
 	// Setting physical cahracteristics.
 	this->boxCollider = BoxCollider2D(&this->objectTransform);
@@ -56,5 +89,12 @@ void PlayerPaddle::Initialize(RenderList* sceneRenderComponentList, PhysicsCompo
 
 void PlayerPaddle::Update()
 {
-	this->MovePaddleUsingController();
+	if (abs(controller->GetRightThumbNormalizedX()) > 0.1f || abs(controller->GetRightThumbNormalizedY()) > 0.1f)
+	{
+		this->MovePaddleUsingController();
+	}
+	else
+	{
+		this->MovePaddleUsingMouse();
+	}
 }

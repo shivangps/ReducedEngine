@@ -99,8 +99,9 @@
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
+      <ConformanceMode>false</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)/ReducedEngine/Include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -132,7 +133,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
+      <ConformanceMode>false</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)/ReducedEngine/Include/;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -155,13 +156,19 @@
     <ClCompile Include="Assets\2D_Assets\AtariPong\Objects\PongBall.cpp" />
     <ClCompile Include="Assets\2D_Assets\AtariPong\Objects\PongGameManager.cpp" />
     <ClCompile Include="Assets\2D_Assets\AtariPong\Objects\ScoreBorder.cpp" />
+    <ClCompile Include="Assets\2D_Assets\AtariPong\PongMenuObjects\PlayButtonObject.cpp" />
+    <ClCompile Include="Assets\2D_Assets\AtariPong\PongMenuObjects\PongMenuManager.cpp" />
+    <ClCompile Include="Assets\2D_Assets\AtariPong\Scenes\PongMenuScene.cpp" />
     <ClCompile Include="Assets\2D_Assets\AtariPong\Scenes\PongScene.cpp" />
     <ClCompile Include="Assets\2D_Assets\Objects\BoxObject2D\BoxObject2D.cpp" />
     <ClCompile Include="Assets\2D_Assets\Objects\CameraObject2D\CameraObject2D.cpp" />
     <ClCompile Include="Assets\2D_Assets\Objects\PlatformObject2D\PlatformObject2D.cpp" />
     <ClCompile Include="Assets\2D_Assets\Objects\PlayerObject2D\PlayerObject2D.cpp" />
+    <ClCompile Include="Assets\2D_Assets\RenderComponents\SpriteRenderComponent2D.cpp" />
     <ClCompile Include="Assets\2D_Assets\RenderComponents\WireframeRenderComponent2D.cpp" />
     <ClCompile Include="Assets\2D_Assets\Scenes\MainScene2D.cpp" />
+    <ClCompile Include="Assets\2D_Assets\Shaders\AlphaTexShader\AlphaTexShader.cpp" />
+    <ClCompile Include="Assets\2D_Assets\Shaders\ButtonShader\ButtonShader.cpp" />
     <ClCompile Include="Assets\2D_Assets\Shaders\CharacterShader\CharacterDisplayShader.cpp" />
     <ClCompile Include="Assets\2D_Assets\Shaders\PostDisplayShader\PostDisplayShader.cpp" />
     <ClCompile Include="Assets\2D_Assets\Shaders\WireframeShader\WireframeShader.cpp" />
@@ -203,6 +210,7 @@
     <ClCompile Include="AssetManager\Mesh.cpp" />
     <ClCompile Include="AssetManager\MeshAssetManager.cpp" />
     <ClCompile Include="Experimental\INSTANCE_EXPERIMENT.cpp" />
+    <ClCompile Include="Output\Graphics\GUI\ButtonGUIComponent.cpp" />
     <ClCompile Include="Output\Graphics\GUI\GUIComponent.cpp" />
     <ClCompile Include="Output\Graphics\GUI\GUIComponentList.cpp" />
     <ClCompile Include="Output\Graphics\GUI\GUIEngine.cpp" />
@@ -239,12 +247,18 @@
     <ClInclude Include="Assets\2D_Assets\AtariPong\Objects\PongGameManager.h" />
     <ClInclude Include="Assets\2D_Assets\AtariPong\Objects\PongPaddle.h" />
     <ClInclude Include="Assets\2D_Assets\AtariPong\Objects\ScoreBorder.h" />
+    <ClInclude Include="Assets\2D_Assets\AtariPong\PongMenuObjects\PlayButtonObject.h" />
+    <ClInclude Include="Assets\2D_Assets\AtariPong\PongMenuObjects\PongMenuManager.h" />
+    <ClInclude Include="Assets\2D_Assets\AtariPong\Scenes\PongMenuScene.h" />
     <ClInclude Include="Assets\2D_Assets\AtariPong\Scenes\PongScene.h" />
     <ClInclude Include="Assets\2D_Assets\Objects\BoxObject2D\BoxObject2D.h" />
     <ClInclude Include="Assets\2D_Assets\Objects\CameraObject2D\CameraObject2D.h" />
     <ClInclude Include="Assets\2D_Assets\Objects\PlatformObject2D\PlatformObject2D.h" />
     <ClInclude Include="Assets\2D_Assets\Objects\PlayerObject2D\PlayerObject2D.h" />
+    <ClInclude Include="Assets\2D_Assets\RenderComponents\SpriteRenderComponent2D.h" />
     <ClInclude Include="Assets\2D_Assets\Scenes\MainScene2D.h" />
+    <ClInclude Include="Assets\2D_Assets\Shaders\AlphaTexShader\AlphaTexShader.h" />
+    <ClInclude Include="Assets\2D_Assets\Shaders\ButtonShader\ButtonShader.h" />
     <ClInclude Include="Assets\2D_Assets\Shaders\CharacterShader\CharacterDisplayShader.h" />
     <ClInclude Include="Experimental\ANIMATION_EXPERIMENTAL.h" />
     <ClInclude Include="GameObject2D.h" />
@@ -293,6 +307,7 @@
     <ClInclude Include="AssetManager\Mesh.h" />
     <ClInclude Include="AssetManager\MeshAssetManager.h" />
     <ClInclude Include="Experimental\INSTANCE_EXPERIMENT.h" />
+    <ClInclude Include="Output\Graphics\GUI\ButtonGUIComponent.h" />
     <ClInclude Include="Output\Graphics\GUI\GUIComponent.h" />
     <ClInclude Include="Output\Graphics\GUI\GUIComponentList.h" />
     <ClInclude Include="Output\Graphics\GUI\GUIEngine.h" />
@@ -318,6 +333,38 @@
     <ClInclude Include="Output\Output.h" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="Assets\2D_Assets\Shaders\AlphaTexShader\alpha_tex_pixel_shader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Assets\2D_Assets\Shaders\AlphaTexShader\alpha_tex_vertex_shader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Assets\2D_Assets\Shaders\ButtonShader\button_pixel_shader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Assets\2D_Assets\Shaders\ButtonShader\button_vertex_shader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
     <FxCompile Include="Assets\2D_Assets\Shaders\CharacterShader\character_display_pixel_shader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>

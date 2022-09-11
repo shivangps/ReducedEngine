@@ -37,6 +37,7 @@ public:
 	}
 	Vector2(float aValue) : values(aValue, aValue) {}
 	Vector2(b2Vec2 box2dVector2) : values(box2dVector2.x, box2dVector2.y) {}
+	Vector2(POINT p) : values(p.x, p.y) {}
 
 	// Get & Set functions.
 	DirectX::XMVECTOR GetVector()
@@ -351,7 +352,7 @@ public:
 	}
 	Matrix4 Rotation(float z)
 	{
-		return *this * DirectX::XMMatrixRotationAxis(DirectX::XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f), z);
+		return *this * DirectX::XMMatrixRotationQuaternion(DirectX::XMQuaternionRotationRollPitchYaw(0.0f, 0.0f, DirectX::XMConvertToRadians(z)));
 	}
 	Matrix4 Scale(Vector3 scale)
 	{

@@ -24,10 +24,26 @@ void GameEngine::UpdateGameObjects()
 		// Update each game objects in the scene.
 		for (unsigned int i = 0; i < sceneObject2DCount; i++)
 		{
-			GameObject2D* objectPointer = this->currentScene->GetGameObject2D(i);
+			if (this->currentScene->GetGameObject2D(i)->GetEnabledState())
+			{
+				GameObject2D* objectPointer = this->currentScene->GetGameObject2D(i);
 
-			objectPointer->Update();
+				objectPointer->Update();
+			}
 		}
+		// Check if the scene is required to be changed and do so if true.
+		//if (this->currentScene->ToChangeScene())
+		//{
+		//	Scene* sceneToChange = this->currentScene->GetChangedScene();
+		//
+		//	// Clean up the engine.
+		//	delete this->currentScene;
+		//	Graphics2D::GetInstance()->DestroyAndReleaseAll();
+		//	GameAssetManager::GetInstance()->ReleaseAllAssets();
+		//	Graphics2D::GetInstance()->Initialize(this->output->GetHandle(), this->output->GetWindowWidth(), this->output->GetWindowHeight());
+		//
+		//	this->SetScene(sceneToChange);
+		//}
 #else
 		// Get the number of game objects present in the currently assigned scene.
 		unsigned int sceneObjectCount = this->currentScene->GetSize();
@@ -81,6 +97,7 @@ void GameEngine::SetScene(Scene* setNewScene)
 		GameObject2D* objectPointer = this->currentScene->GetGameObject2D(i);
 
 		objectPointer->Initialize(this->currentScene->GetRenderComponentList(), this->currentScene->GetPhysicsComponentList(), this->currentScene->GetAudioComponentList(), this->currentScene->GetGUIComponentList());
+		objectPointer->SetScene(currentScene);
 	}
 #else
 	// Get the number of game objects present in the currently assigned scene.

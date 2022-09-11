@@ -6,7 +6,7 @@ class PongBall;
 class EnemyPaddle : public GameObject2D
 {
 private:
-	WireframeRenderComponent2D* renderer = nullptr;
+	SpriteRenderComponent2D* spriteRenderer = nullptr;
 	BoxCollider2D boxCollider = BoxCollider2D(&this->objectTransform);
 	Rigidbody2D* rigidbody = nullptr;
 
@@ -16,7 +16,7 @@ private:
 	PaddleCharacteristics characteristics;
 
 	// Object color to red to represent player.
-	Vector3 color = Vector3(1.0f, 1.0f, 1.0f);
+	Vector3 color = Vector3((float) 255/255, (float) 0/255, (float) 68/255);
 
 	// Pong ball pointer to move the paddle based on the pong ball position.
 	PongBall* pongBall;

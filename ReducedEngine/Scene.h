@@ -11,6 +11,11 @@ protected:
 	std::vector<GameObject*> objectsPresent = {};
 	std::vector<GameObject2D*> objects2DPresent = {};
 
+	// Condition to change the scene.
+	bool toChange = false;
+	// The pointer to the scene to be changed.
+	Scene* sceneToChangeTo = nullptr;
+
 	// Collection of render components.
 	RenderList renderComponentList = {};
 	// Collection of rigidbody components.
@@ -47,4 +52,11 @@ public:
 	bool CheckIndexSanity2D(unsigned int index);
 	// Function to det a new 2D game object.
 	void SetGameObject2D(GameObject2D* newGameObject2d);
+
+	// Function to change to a new scene.
+	void ChangeToScene(Scene* nextScene);
+	// Function to get if the scene is to be changed.
+	bool ToChangeScene();
+	// Function to get the scene to be changed.
+	Scene* GetChangedScene();
 };

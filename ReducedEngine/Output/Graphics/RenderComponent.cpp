@@ -26,8 +26,8 @@ void RenderComponent::UpdateCameraMatrix(Camera camera)
 
 	Matrix4 model;
 
-	model = model.Rotation(transform.GetGlobalRotation());
 	model = model.Scale(transform.GetGlobalScale());
+	model = model.Rotation(transform.GetGlobalRotation());
 	model = model.Translation(transform.GetGlobalPostion());
 
 	this->localData.cameraMatrix = model * camera.GetViewProjectionMatrix();

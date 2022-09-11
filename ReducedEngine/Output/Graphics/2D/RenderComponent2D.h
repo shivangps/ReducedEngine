@@ -18,10 +18,14 @@ protected:
 	ConstantBuffer matrixConstantBuffer = {};
 	D3D12_GPU_DESCRIPTOR_HANDLE matrixConstantBufferHandle = {};
 
+	class RenderList* associatedRenderList = nullptr;
+
 	struct MatrixData
 	{
 		Matrix4 cameraMatrix;
 	}matrixData;
+
+	class GameObject2D* associatedGameObject = nullptr;
 
 	// Function to handle the constant buffer for matrix calculation.
 	void InitializeMatrixConstantBuffer(Microsoft::WRL::ComPtr<ID3D12Device5> device, LPCWSTR constantBufferName);
@@ -43,4 +47,9 @@ public:
 	void SetEnable(Boolean* pBool);
 	void EnableRendering();
 	void DisableRendering();
+	void SetRenderList(class RenderList* renderlist);
+	bool SetBackgroundColor(Vector3 bgColor);
+
+	void SetGameObject(GameObject2D* gameObject);
+	GameObject2D* GetGameObject();
 };

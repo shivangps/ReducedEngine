@@ -315,6 +315,27 @@
     <ClCompile Include="Assets\2D_Assets\AtariPong\Objects\ScoreBorder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Assets\2D_Assets\Shaders\AlphaTexShader\AlphaTexShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\2D_Assets\RenderComponents\SpriteRenderComponent2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\2D_Assets\AtariPong\PongMenuObjects\PongMenuManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\2D_Assets\AtariPong\Scenes\PongMenuScene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Output\Graphics\GUI\ButtonGUIComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\2D_Assets\Shaders\ButtonShader\ButtonShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\2D_Assets\AtariPong\PongMenuObjects\PlayButtonObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CommonHeader.h">
@@ -581,6 +602,27 @@
     <ClInclude Include="Assets\2D_Assets\AtariPong\Objects\ScoreBorder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Assets\2D_Assets\Shaders\AlphaTexShader\AlphaTexShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets\2D_Assets\RenderComponents\SpriteRenderComponent2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets\2D_Assets\AtariPong\PongMenuObjects\PongMenuManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets\2D_Assets\AtariPong\Scenes\PongMenuScene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Output\Graphics\GUI\ButtonGUIComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets\2D_Assets\Shaders\ButtonShader\ButtonShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets\2D_Assets\AtariPong\PongMenuObjects\PlayButtonObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Assets\DisplayShader\display_pixel_shader.hlsl">
@@ -623,6 +665,10 @@
     <FxCompile Include="Assets\2D_Assets\Shaders\WireframeShader\wireframe_pixel_shader.hlsl" />
     <FxCompile Include="Assets\2D_Assets\Shaders\CharacterShader\character_display_vertex_shader.hlsl" />
     <FxCompile Include="Assets\2D_Assets\Shaders\CharacterShader\character_display_pixel_shader.hlsl" />
+    <FxCompile Include="Assets\2D_Assets\Shaders\AlphaTexShader\alpha_tex_vertex_shader.hlsl" />
+    <FxCompile Include="Assets\2D_Assets\Shaders\AlphaTexShader\alpha_tex_pixel_shader.hlsl" />
+    <FxCompile Include="Assets\2D_Assets\Shaders\ButtonShader\button_vertex_shader.hlsl" />
+    <FxCompile Include="Assets\2D_Assets\Shaders\ButtonShader\button_pixel_shader.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Assets\Fonts\Mello-Nr-Black.ttf" />

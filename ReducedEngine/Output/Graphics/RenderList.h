@@ -28,6 +28,9 @@ private:
 	UINT64 currentRenderComponentIndex = 0;
 	UINT64 currentRenderComponent2DIndex = 0;
 
+	// Background color of the scene.
+	Vector3 bgColor = Vector3(0.5f);
+
 	// Function to swap the contents of an element in the list in two poistions.
 	void SwapContents(unsigned int firstPosition, unsigned int secondPosition);
 
@@ -49,4 +52,8 @@ public:
 	void DrawAllComponentsForShadow(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList, Matrix4 lightSpaceMatrix);
 	// Function to initilize the command list bundles for all the render components.
 	void InitializeAllBundleLists();
+	// Function to set the bgColor of the scene.
+	void SetBackgroundColor(Vector3 bgColor);
+	// Function to get the background color.
+	Vector3 GetBackgroundColor();
 };

@@ -70,6 +70,25 @@ void Scene::SetGameObject2D(GameObject2D* newGameObject2d)
 	this->objects2DPresent.push_back(newGameObject2d);
 }
 
+void Scene::ChangeToScene(Scene* nextScene)
+{
+	if (nextScene)
+	{
+		this->toChange = true;
+		this->sceneToChangeTo = nextScene;
+	}
+}
+
+bool Scene::ToChangeScene()
+{
+	return this->toChange;
+}
+
+Scene* Scene::GetChangedScene()
+{
+	return this->sceneToChangeTo;
+}
+
 RenderList* Scene::GetRenderComponentList()
 {
 	return &this->renderComponentList;

@@ -94,8 +94,6 @@ void TextGUIComponent::InitializeGUI(Microsoft::WRL::ComPtr<ID3D12Device5> devic
 
 	// Initialize the transformation data constant buffer.
 	this->transformationConstantBuffer.Initialize(device, sizeof(GUITransformationData), L"GUI Transformation");
-	UniversalDescriptorHeap* universalDescriptorHeap = UniversalDescriptorHeap::GetInstance();
-	this->guiTransformationHandle = universalDescriptorHeap->GetCbvSrvUavGPUHandle(universalDescriptorHeap->SetCpuHandle(device, this->transformationConstantBuffer.GetConstantBufferViewDesc()));
 	GUIDescriptorHeap* guiDescriptorHeap = GUIDescriptorHeap::GetInstance();
 	this->guiTransformationHandle = guiDescriptorHeap->GetCbvSrvUavGPUHandle(guiDescriptorHeap->SetCpuHandle(device, this->transformationConstantBuffer.GetConstantBufferViewDesc()));
 
@@ -105,44 +103,48 @@ void TextGUIComponent::InitializeGUI(Microsoft::WRL::ComPtr<ID3D12Device5> devic
 
 void TextGUIComponent::DrawGUI(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList, Matrix4 projection, unsigned int width, unsigned int height)
 {
-	this->shader->SetShaderForRender(commandList);
-	FontType cachedFontType = *this->fontType;
-
-	// Reassign color.
-	this->colorConstantBuffer.CopyDataToConstantBufferLocation(&this->currentColorData);
-
-	// Recalculate the text if it has been changed.
-	this->InitializeTextConstantBuffers();
-
-	// Calculate the width of the overall text.
-	float spacing = this->textSize * 2.0f;
-	float overallWidth = 0.0f;
-	for (unsigned int currentElement = 0; currentElement < this->characterTransformElements.size(); currentElement++)
+	if (this->enableText)
 	{
-		char character = this->characterTransformElements[currentElement].setCharacter;
-		overallWidth = overallWidth + (spacing * float(cachedFontType.GetAdvanceForCharacter(character) >> 6));
-	}
+		this->shader->SetShaderForRender(commandList);
+		FontType cachedFontType = *this->fontType;
 
-	// Display all the characters of the text.
-	Vector2 origin = Vector2((-(float)overallWidth / 2.0f) + this->transform->GetGlobalPostion().X(), this->transform->GetGlobalPostion().Y());
-	for (unsigned int currentElement = 0; currentElement < this->characterTransformElements.size(); currentElement++)
-	{
-		Transform2D spacingTransform = Transform2D();
-		char character = this->characterTransformElements[currentElement].setCharacter;
+		// Reassign color.
+		this->colorConstantBuffer.CopyDataToConstantBufferLocation(&this->currentColorData);
 
-		spacingTransform.SetScale(spacingTransform.GetGlobalScale() * Vector2(this->textSize * cachedFontType.GetSizeOfCharacter(character).X()/ (float)width, this->textSize * cachedFontType.GetSizeOfCharacter(character).Y() / (float)height));
-		float xPos = (origin.X() + this->textSize * (cachedFontType.GetBearingOfCharacter(character).X() + cachedFontType.GetSizeOfCharacter(character).X() / 2.0f)) / (float)width;
-		float yPos = (origin.Y() - this->textSize * (cachedFontType.GetSizeOfCharacter(character).Y() - (cachedFontType.GetBearingOfCharacter(character).Y()) * 2.0f)) / (float)height;
-		spacingTransform.SetPosition(xPos, yPos);
-		this->characterTransformElements[currentElement].characterTransformationData.TransformationMatrix = (spacingTransform.GetGlobalModel()).Transpose();
-		this->characterTransformElements[currentElement].characterTransformConstantBuffer.CopyDataToConstantBufferLocation(&this->characterTransformElements[currentElement].characterTransformationData);
+		// Recalculate the text if it has been changed.
+		this->InitializeTextConstantBuffers();
 
-		commandList->SetGraphicsRootDescriptorTable(0, this->characterTransformElements[currentElement].characterTextureHandle);
-		commandList->SetGraphicsRootDescriptorTable(1, this->characterTransformElements[currentElement].characterTransformationHandle);
-		commandList->SetGraphicsRootDescriptorTable(2, this->colorCbvHandle);
+		// Calculate the width of the overall text.
+		float spacing = this->textSize * 2.0f;
+		float overallWidth = 0.0f;
+		for (unsigned int currentElement = 0; currentElement < this->characterTransformElements.size(); currentElement++)
+		{
+			char character = this->characterTransformElements[currentElement].setCharacter;
+			overallWidth = overallWidth + (spacing * float(cachedFontType.GetAdvanceForCharacter(character) >> 6));
+		}
 
-		Quad::GetInstance()->Draw(commandList);
+		// Display all the characters of the text.
+		Vector2 origin = Vector2((-(float)overallWidth / 2.0f) + this->transform->GetGlobalPostion().X(), this->transform->GetGlobalPostion().Y());
+		for (unsigned int currentElement = 0; currentElement < this->characterTransformElements.size(); currentElement++)
+		{
+			Transform2D spacingTransform = Transform2D();
+			char character = this->characterTransformElements[currentElement].setCharacter;
 
-		origin.X(origin.X() + (spacing * (float)(cachedFontType.GetAdvanceForCharacter(character) >> 6)));
+			spacingTransform.SetRotation(this->transform->GetGlobalRotation());
+			spacingTransform.SetScale(spacingTransform.GetGlobalScale() * Vector2(this->textSize * cachedFontType.GetSizeOfCharacter(character).X() / (float)width, this->textSize * cachedFontType.GetSizeOfCharacter(character).Y() / (float)height));
+			float xPos = (origin.X() + this->textSize * (cachedFontType.GetBearingOfCharacter(character).X() + cachedFontType.GetSizeOfCharacter(character).X() / 2.0f)) / (float)width;
+			float yPos = (origin.Y() - this->textSize * (cachedFontType.GetSizeOfCharacter(character).Y() - (cachedFontType.GetBearingOfCharacter(character).Y()) * 2.0f)) / (float)height;
+			spacingTransform.SetPosition(xPos, yPos);
+			this->characterTransformElements[currentElement].characterTransformationData.TransformationMatrix = (spacingTransform.GetGlobalModel()).Transpose();
+			this->characterTransformElements[currentElement].characterTransformConstantBuffer.CopyDataToConstantBufferLocation(&this->characterTransformElements[currentElement].characterTransformationData);
+
+			commandList->SetGraphicsRootDescriptorTable(0, this->characterTransformElements[currentElement].characterTextureHandle);
+			commandList->SetGraphicsRootDescriptorTable(1, this->characterTransformElements[currentElement].characterTransformationHandle);
+			commandList->SetGraphicsRootDescriptorTable(2, this->colorCbvHandle);
+
+			Quad::GetInstance()->Draw(commandList);
+
+			origin.X(origin.X() + (spacing * (float)(cachedFontType.GetAdvanceForCharacter(character) >> 6)));
+		}
 	}
 }

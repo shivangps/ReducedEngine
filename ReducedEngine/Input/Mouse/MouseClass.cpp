@@ -1,4 +1,6 @@
 #include "MouseClass.h"
+#include "../MathEngine.h"
+#include "../Output/Output.h"
 
 void MouseClass::OnLeftPressed(int x, int y)
 {
@@ -135,4 +137,25 @@ MouseEvent MouseClass::ReadEvent()
 		this->eventBuffer.pop();				//Remove first event from the buffer
 		return e;
 	}
+}
+
+Vector2* MouseClass::GetMouseScreenPosition()
+{
+	POINT p;
+	GetCursorPos(&p);
+	Vector2* pointerPosition = new Vector2(p);
+	return pointerPosition;
+}
+
+Vector2* MouseClass::GetMouseWindowPosition()
+{
+	POINT p;
+	GetCursorPos(&p);
+	ScreenToClient(Output::GetInstance()->GetHandle(), &p);
+	return new Vector2(p);
+}
+
+void MouseClass::ShowMouseCursor(bool toShow)
+{
+	ShowCursor(toShow);
 }

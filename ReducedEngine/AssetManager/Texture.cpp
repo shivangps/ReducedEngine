@@ -47,6 +47,12 @@ ID3D12Resource* Texture::GetResource()
 
 void Texture::Release()
 {
-	this->mainTextureResource->Release();
-	this->uploadResource->Release();
+	if (this->mainTextureResource)
+	{
+		this->mainTextureResource.Reset();
+	}
+	if (this->uploadResource)
+	{
+		this->uploadResource.Reset();
+	}
 }

@@ -1,5 +1,6 @@
 #include "RenderList.h"
 #include <thread>
+#include "../GameObject2D.h"
 
 void RenderList::SwapContents(unsigned int firstPosition, unsigned int secondPosition)
 {
@@ -60,6 +61,7 @@ void RenderList::InitializeComponents2D(Microsoft::WRL::ComPtr<ID3D12Device5> de
 		RenderComponent2D* renderComponent2d = renderComponent2DList[i].renderComponent2d;
 
 		renderComponent2d->Initialize(device);
+		renderComponent2d->SetRenderList(this);
 	}
 
 	this->stateEnableChange2D = false;
@@ -75,6 +77,16 @@ void RenderList::InitializeAllBundleLists()
 	}
 
 	this->stateEnableChange2D;
+}
+
+void RenderList::SetBackgroundColor(Vector3 bgColor)
+{
+	this->bgColor = bgColor;
+}
+
+Vector3 RenderList::GetBackgroundColor()
+{
+	return bgColor;
 }
 
 void RenderList::DrawAllComponents(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList, Camera camera)
@@ -150,7 +162,7 @@ void RenderList::DrawAll2DComponents(Microsoft::WRL::ComPtr<ID3D12GraphicsComman
 {
 	for (unsigned int i = 0; i < this->renderComponent2DList.size(); i++)
 	{
-		if (renderComponent2DList[i].enable.GetBool())
+		if (renderComponent2DList[i].enable.GetBool() && renderComponent2DList[i].renderComponent2d->GetGameObject()->GetEnabledState())
 		{
 			RenderComponent2D* renderComponent2d = this->renderComponent2DList[i].renderComponent2d;
 

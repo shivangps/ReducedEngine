@@ -3,6 +3,7 @@
 #include "Assets/Scenes/MainScene.h"
 #include "Assets/2D_Assets/Scenes/MainScene2D.h"
 #include "Assets/2D_Assets/AtariPong/Scenes/PongScene.h"
+#include "Assets/2D_Assets/AtariPong/Scenes/PongMenuScene.h"
 
 // Main function.
 

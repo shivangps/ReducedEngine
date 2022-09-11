@@ -72,9 +72,21 @@ public:
 	Boolean(bool setState, bool* setChangePointer) : state(setState), stateChange(setChangePointer) {}
 
 	// Function to set true to boolean.
-	void SetTrue() { this->state = true; *this->stateChange = true; }
+	void SetTrue() { 
+		this->state = true; 
+		if (this->stateChange)
+		{
+			*this->stateChange = true;
+		}
+	}
 	// Function to set false to boolean.
-	void SetFalse() { this->state = false; *this->stateChange = true; }
+	void SetFalse() { 
+		this->state = false; 
+		if (this->stateChange)
+		{
+			*this->stateChange = true;
+		}
+	}
 
 	// Function to set new state change pointer.
 	void SetStateChangePointer(bool* newStateChangePointer) { this->stateChange = newStateChangePointer; }

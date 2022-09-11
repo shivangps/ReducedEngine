@@ -31,6 +31,8 @@ void ScoreBorder::Initialize(RenderList* sceneRenderComponentList, PhysicsCompon
 
 	this->renderer.ChangeColor(Vector3(0.0f, 1.0f, 0.0f));
 
+	this->renderer.SetGameObject(this);
+
 	sceneRenderComponentList->AssignRenderComponent2D(&this->renderer);
 
 	// Setting physical cahracteristics.

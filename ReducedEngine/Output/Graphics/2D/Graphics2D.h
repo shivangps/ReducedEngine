@@ -58,8 +58,6 @@ private:
 	void InitilizeGraphicsEngineShaders(Microsoft::WRL::ComPtr<ID3D12Device5> device, unsigned int numRT, DXGI_FORMAT* renderTargetFormats, DXGI_FORMAT depthStencilFormat, unsigned int samples);
 	// Function to execute the command lists in queue.
 	void ExecuteCommandLists(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList4> commandList);
-	// Function to destroy all the resources and heaps and release it from memory if any.
-	void DestroyAndReleaseAll();
 
 private:
 	// Boolean to apply anti aliasing using mutli sampling.
@@ -140,4 +138,6 @@ public:
 	void InitializeGUIComponentList(GUIComponentList* guiComponentList);
 	// Function to call for rendering the whole scene.
 	void RenderScene(RenderList* renderComponentList, GUIComponentList* guiComponentList);
+	// Function to destroy all the resources and heaps and release it from memory if any.
+	void DestroyAndReleaseAll();
 };

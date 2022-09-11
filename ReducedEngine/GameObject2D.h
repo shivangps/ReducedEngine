@@ -16,6 +16,10 @@ protected:
 
 	std::string tag = "Empty Tag";
 
+	class Scene* associatedScene = nullptr;
+
+	bool isEnabled = true;
+
 public:
 	GameObject2D() {}
 
@@ -33,4 +37,13 @@ public:
 
 	// Fucntion to compare the tag of the game object and its the same or not.
 	bool CompareTag(std::string otherTag);
+
+	// Function to set the scene of the game object.
+	void SetScene(Scene* scene);
+
+	// Get the enabled state of the object.
+	bool GetEnabledState();
+	// Set the enabled state.
+	void EnableGameObject();
+	void DisableGameObject();
 };

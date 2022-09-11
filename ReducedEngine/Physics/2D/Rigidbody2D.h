@@ -52,6 +52,9 @@ public:
 	// Function to get the linear velocity of the rigidbody.
 	Vector2 GetVelocity();
 
+	// Function to set it to a position.
+	void SetToPosition(Vector2 position);
+
 	// Function to set mass of the rigidbody.
 	void SetMass(float mass);
 

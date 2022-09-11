@@ -31,6 +31,11 @@ public:
 	bool EventBufferIsEmpty();
 	MouseEvent ReadEvent();
 
+	class Vector2* GetMouseScreenPosition();
+	class Vector2* GetMouseWindowPosition();
+
+	void ShowMouseCursor(bool toShow);
+
 private:
 	std::queue<MouseEvent> eventBuffer;
 	bool leftIsDown = false;

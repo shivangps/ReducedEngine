@@ -38,15 +38,19 @@ void EnemyPaddle::Initialize(RenderList* sceneRenderComponentList, PhysicsCompon
 	this->objectTransform.SetScale(this->characteristics.GetScale());
 	this->objectTransform.SetPositionX(-this->characteristics.GetXValue());
 
-	WireframeRenderComponent2D* newRenderComponent2D = new WireframeRenderComponent2D(&this->objectTransform);
+	SpriteRenderComponent2D* newSpriteRenderer = new SpriteRenderComponent2D(&this->objectTransform);
 
-	newRenderComponent2D->Load2DGeometry(characteristics.GetVertices(), characteristics.GetIndices());
+	newSpriteRenderer->Load2DGeometry(this->characteristics.GetVertices(), this->characteristics.GetIndices());
 
-	newRenderComponent2D->ChangeColor(this->color);
+	newSpriteRenderer->ChangeColor(this->color);
 
-	this->renderer = newRenderComponent2D;
+	newSpriteRenderer->LoadSpriteTexture(this->characteristics.GetPaddleTexture());
 
-	sceneRenderComponentList->AssignRenderComponent2D(this->renderer);
+	newSpriteRenderer->SetGameObject(this);
+
+	this->spriteRenderer = newSpriteRenderer;
+
+	sceneRenderComponentList->AssignRenderComponent2D(this->spriteRenderer);
 
 	// Setting physical cahracteristics.
 	this->boxCollider = BoxCollider2D(&this->objectTransform);

@@ -6,17 +6,23 @@
 #include "../Assets/2D_Assets/AtariPong/Objects/PongBall.h"
 #include "../Assets/2D_Assets/AtariPong/Objects/BorderObject.h"
 #include "../Assets/2D_Assets/AtariPong/Objects/ScoreBorder.h"
+#include "../Assets/2D_Assets/AtariPong/PongMenuObjects/PongMenuManager.h"
+#include "../Assets/2D_Assets/AtariPong/PongMenuObjects/PlayButtonObject.h"
 
 PongScene::PongScene()
 {
 	GameObject2D* newGameobject2D = nullptr;
 	Transform2D setTransform2d;
 
+	PongMenuManager* menuManager = new PongMenuManager(setTransform2d);
+	PongGameManager* pongGameManagerObject = new PongGameManager(setTransform2d);
+
 	// Camera Object 2D.
 	setTransform2d = Transform2D();
 	CameraObject2D* cameraObject = new CameraObject2D(setTransform2d);
 	this->objects2DPresent.push_back(cameraObject);
 
+	// PONG GAME
 	// Player pong paddle object.
 	setTransform2d = Transform2D();
 	PlayerPaddle* pongPlayerObject = new PlayerPaddle(setTransform2d);
@@ -25,6 +31,7 @@ PongScene::PongScene()
 	// Set pong ball.
 	setTransform2d = Transform2D();
 	PongBall* pongBallObject = new PongBall(setTransform2d);
+	pongBallObject->SetGameManager(pongGameManagerObject);
 	this->objects2DPresent.push_back(pongBallObject);
 
 	// Enemy pong paddle object.
@@ -57,8 +64,30 @@ PongScene::PongScene()
 
 	// Set the pong game manager.
 	setTransform2d = Transform2D();
-	PongGameManager* pongGameManagerObject = new PongGameManager(setTransform2d);
+	pongGameManagerObject->AssignMenuManager(menuManager);
+	// Assigning all the objects in the game.
+	pongGameManagerObject->AssignGameSceneObjects(pongPlayerObject);
+	pongGameManagerObject->AssignGameSceneObjects(pongBallObject);
+	pongGameManagerObject->AssignGameSceneObjects(pongEnemyPaddle);
+	pongGameManagerObject->AssignGameSceneObjects(borderObject1);
+	pongGameManagerObject->AssignGameSceneObjects(borderObject2);
+	pongGameManagerObject->AssignGameSceneObjects(scoreBorderObject1);
+	pongGameManagerObject->AssignGameSceneObjects(scoreBorderObject2);
+
+	pongGameManagerObject->AssignPongBall(pongBallObject);
 	pongGameManagerObject->AssignPlayerOneScore(scoreBorderObject1);
 	pongGameManagerObject->AssignPlayerTwoScore(scoreBorderObject2);
 	this->objects2DPresent.push_back(pongGameManagerObject);
+
+	// PONG MENU.
+	// Play Button Object.
+	setTransform2d = Transform2D();
+	PlayButtonObject* playButton = new PlayButtonObject(setTransform2d);
+	this->objects2DPresent.push_back(playButton);
+
+	// Menu Object 2D.
+	setTransform2d = Transform2D();
+	menuManager->AssignGameManager(pongGameManagerObject);
+	this->objects2DPresent.push_back(menuManager);
+	menuManager->AssignPlayButtonObject(playButton);
 }

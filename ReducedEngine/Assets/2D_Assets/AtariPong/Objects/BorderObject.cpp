@@ -28,6 +28,8 @@ void BorderObject::Initialize(RenderList* sceneRenderComponentList, PhysicsCompo
 
 		this->renderComponent.ChangeColor(Vector3(1.0f));
 
+		this->renderComponent.SetGameObject(this);
+
 		sceneRenderComponentList->AssignRenderComponent2D(&this->renderComponent);
 	}
 
